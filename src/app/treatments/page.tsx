@@ -6,22 +6,27 @@ import { Card, CardContent } from "@/components/ui/card";
 export default function PublicTreatmentsPage() {
     return (
         <div className="min-h-screen bg-background text-foreground">
-            {/* Minimal Header */}
-            <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
-                <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
-                        <span className="font-serif text-xl tracking-wide">MedFit America</span>
+            {/* Minimal Header with improved spacing (Silent Elegance) */}
+            <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md py-4">
+                <div className="container mx-auto px-8 h-24 flex items-center justify-between">
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-2xl">M</div>
+                        <span className="font-serif text-2xl tracking-wide">MedFit America</span>
                     </Link>
-                    <Link href="/consultation">
-                        <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm rounded-full px-6">
-                            Start Clinical Intake
-                        </Button>
-                    </Link>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-5">
+                        <Link href="/consultation">
+                            <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-8 h-11 rounded-full transition-transform hover:scale-105 shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)]">
+                                Start Clinical Intake
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </header>
 
-            <main className="pt-32 pb-24 container mx-auto px-6 max-w-5xl">
+            <main className="pt-40 pb-24 container mx-auto px-6 max-w-5xl">
                 <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <p className="text-primary text-sm font-bold tracking-[0.2em] uppercase mb-4">Clinical Optimization</p>
                     <h1 className="text-5xl md:text-6xl font-serif mb-6">Our Treatment Portfolio</h1>
@@ -32,11 +37,10 @@ export default function PublicTreatmentsPage() {
 
                 <div className="grid lg:grid-cols-2 gap-8">
                     {[
-                        { id: "nfc-lab", title: "Comprehensive NFC Panel", desc: "Nutritional, Functional, and Cellular testing to roadmap your biological profile before any treatment starts.", icon: <Activity className="w-6 h-6" /> },
-                        { id: "medical-weight-loss", title: "Medical Weight Loss", desc: "A holistic metabolic reset program using advanced clinical directives to build sustainable wellness without restrictive dieting.", icon: <Users className="w-6 h-6" /> },
-                        { id: "testosterone-therapy", title: "Testosterone Replacement (TRT)", desc: "Restore optimal hormone levels, reignite vitality, and rebuild lean mass under strict medical supervision.", icon: <Dna className="w-6 h-6" /> },
-                        { id: "peptide-therapy", title: "Peptide Therapy", desc: "Advanced amino acid sequencing to accelerate recovery, boost anti-aging mechanisms, and enhance cognitive flow.", icon: <Pill className="w-6 h-6" /> },
-                        { id: "semaglutide-instructions", title: "Semaglutide / Tirzepatide", desc: "FDA-cleared GLP-1/GIP agonists scientifically proven to regulate appetite, improve insulin sensitivity, and drive significant fat loss.", icon: <Droplet className="w-6 h-6" /> }
+                        { id: "nfc-lab", title: "Comprehensive NFC Panel", desc: "Nutritional, Functional, and Cellular testing to roadmap your biological profile before any treatment starts.", icon: <Activity className="w-6 h-6" />, link: "/treatments/nfc-panel" },
+                        { id: "medical-weight-loss", title: "Medical Weight Loss", desc: "A holistic metabolic reset combining customized GLP-1/GIP receptor agonists (Semaglutide/Tirzepatide) to build sustainable wellness without restrictive dieting.", icon: <Users className="w-6 h-6" />, link: "/treatments/weight-loss" },
+                        { id: "testosterone-therapy", title: "Testosterone Replacement (TRT)", desc: "Restore optimal hormone levels, reignite vitality, and rebuild lean mass under strict medical supervision.", icon: <Dna className="w-6 h-6" />, link: "/treatments/trt" },
+                        { id: "peptide-therapy", title: "Peptide Therapy", desc: "Advanced amino acid sequencing to accelerate recovery, boost anti-aging mechanisms, and enhance cognitive flow.", icon: <Pill className="w-6 h-6" />, link: "/treatments/peptides" }
                     ].map((tx, idx) => (
                         <Card key={idx} className="bg-[#080808] border-border/50 hover:border-primary/50 transition-colors animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 group">
                             <CardContent className="p-8 flex flex-col h-full">
@@ -46,9 +50,9 @@ export default function PublicTreatmentsPage() {
                                 <h3 className="text-2xl font-serif mb-4">{tx.title}</h3>
                                 <p className="text-muted-foreground mb-8 flex-1">{tx.desc}</p>
 
-                                <Link href="/consultation" className="mt-auto">
+                                <Link href={tx.link} className="mt-auto">
                                     <button className="w-full py-3 border border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-all flex items-center justify-center gap-2 group-hover:text-primary">
-                                        Begin Authorization Process <ArrowRight className="w-4 h-4" />
+                                        Learn More <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </Link>
                             </CardContent>
