@@ -11,7 +11,19 @@ export interface Patient {
     email: string;
     activeTreatment: string;
     formsStatus: "PENDING" | "COMPLETED";
+    requiredForms: string[];
+    completedForms: string[];
 }
+
+export const getRequiredFormsForTreatment = (treatment: string): string[] => {
+    const defaultForms = ["wellness-intake"];
+    if (treatment.toLowerCase().includes("weight loss")) return [...defaultForms, "medical-weight-loss"];
+    if (treatment.toLowerCase().includes("testosterone") || treatment.toLowerCase().includes("trt")) return [...defaultForms, "testosterone-therapy"];
+    if (treatment.toLowerCase().includes("peptide")) return [...defaultForms, "peptide-therapy"];
+    if (treatment.toLowerCase().includes("semaglutide") || treatment.toLowerCase().includes("tirzepatide")) return [...defaultForms, "semaglutide-instructions"];
+    if (treatment.toLowerCase().includes("nfc")) return [...defaultForms, "nfc-hipaa"];
+    return defaultForms;
+};
 
 export interface Charge {
     id: string;
@@ -31,15 +43,15 @@ interface AppContextType {
     addCharge: (charge: Omit<Charge, "id" | "date" | "status">) => void;
     payCharge: (chargeId: string) => void;
     registerAndLogin: (name: string, email: string) => void;
-    submitIntakeForms: () => void;
+    submitForm: (formId: string) => void;
 }
 
 // Initial Mock Data
 const MOCK_PATIENTS: Patient[] = [
-    { id: "p1", name: "Sarah Johnson", email: "sarah@example.com", activeTreatment: "Hormone Optimization - Month 3", formsStatus: "COMPLETED" },
-    { id: "p2", name: "Michael Chang", email: "michael@example.com", activeTreatment: "Peptide Protocol", formsStatus: "COMPLETED" },
-    { id: "p3", name: "Emma Davis", email: "emma@example.com", activeTreatment: "Medical Weight Loss", formsStatus: "COMPLETED" },
-    { id: "test", name: "Test Patient", email: "test@medfit.com", activeTreatment: "Test Protocol", formsStatus: "PENDING" }, // Easy test login
+    { id: "p1", name: "Sarah Johnson", email: "sarah@example.com", activeTreatment: "Hormone Optimization - Month 3", formsStatus: "COMPLETED", requiredForms: ["wellness-intake"], completedForms: ["wellness-intake"] },
+    { id: "p2", name: "Michael Chang", email: "michael@example.com", activeTreatment: "Peptide Protocol", formsStatus: "COMPLETED", requiredForms: ["wellness-intake", "peptide-therapy"], completedForms: ["wellness-intake", "peptide-therapy"] },
+    { id: "p3", name: "Emma Davis", email: "emma@example.com", activeTreatment: "Medical Weight Loss", formsStatus: "COMPLETED", requiredForms: ["wellness-intake", "medical-weight-loss"], completedForms: ["wellness-intake", "medical-weight-loss"] },
+    { id: "test", name: "Test Patient", email: "test@medfit.com", activeTreatment: "Testosterone Therapy", formsStatus: "PENDING", requiredForms: ["wellness-intake", "testosterone-therapy"], completedForms: [] },
 ];
 
 const MOCK_CHARGES: Charge[] = [
@@ -70,22 +82,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
 
     const registerAndLogin = (name: string, email: string) => {
+        const activeTreatment = "Pending Evaluation";
+        const reqForms = getRequiredFormsForTreatment(activeTreatment);
         const newPatient: Patient = {
             id: `p${Date.now()}`,
             name,
             email,
-            activeTreatment: "Pending Evaluation",
-            formsStatus: "PENDING"
+            activeTreatment,
+            formsStatus: "PENDING",
+            requiredForms: reqForms,
+            completedForms: []
         };
         setPatients(prev => [newPatient, ...prev]);
         setCurrentUser({ id: newPatient.id, role: "PATIENT", name: newPatient.name });
     };
 
-    const submitIntakeForms = () => {
+    const submitForm = (formId: string) => {
         if (currentUser?.role === "PATIENT") {
-            setPatients(prev => prev.map(p =>
-                p.id === currentUser.id ? { ...p, formsStatus: "COMPLETED" } : p
-            ));
+            setPatients(prev => prev.map(p => {
+                if (p.id === currentUser.id) {
+                    const updatedCompleted = p.completedForms.includes(formId) ? p.completedForms : [...p.completedForms, formId];
+                    // Check if all required are completed
+                    const allDone = p.requiredForms.every(req => updatedCompleted.includes(req));
+                    return { ...p, completedForms: updatedCompleted, formsStatus: allDone ? "COMPLETED" : "PENDING" };
+                }
+                return p;
+            }));
         }
     };
 
@@ -108,7 +130,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitIntakeForms }}>
+        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm }}>
             {children}
         </AppContext.Provider>
     );
