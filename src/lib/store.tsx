@@ -18,7 +18,7 @@ export interface Patient {
 
 export const getRequiredFormsForTreatment = (treatment: string): string[] => {
     const defaultForms = ["wellness-intake"];
-    if (treatment.toLowerCase().includes("weight loss")) return [...defaultForms, "medical-weight-loss"];
+    if (treatment.toLowerCase().includes("weight loss")) return [...defaultForms, "medical-weight-loss", "semaglutide-instructions"];
     if (treatment.toLowerCase().includes("testosterone") || treatment.toLowerCase().includes("trt")) return [...defaultForms, "testosterone-therapy"];
     if (treatment.toLowerCase().includes("peptide")) return [...defaultForms, "peptide-therapy"];
     if (treatment.toLowerCase().includes("semaglutide") || treatment.toLowerCase().includes("tirzepatide")) return [...defaultForms, "semaglutide-instructions"];

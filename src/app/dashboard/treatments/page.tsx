@@ -4,7 +4,7 @@ import { useAppContext } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Droplet, Pill, Info, ArrowRight, Zap, Target, ArrowUpRight } from "lucide-react";
+import { Activity, Droplet, Pill, Info, ArrowRight, Zap, Target, ArrowUpRight, Microscope, Database } from "lucide-react";
 
 export default function TreatmentsPage() {
     const { currentUser, patients, enrollTreatment } = useAppContext();
@@ -50,7 +50,7 @@ export default function TreatmentsPage() {
                 <p className="text-muted-foreground">Self-enroll in our pristine selection of regenerative and metamorphic protocols.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                 {/* 1. Weight Loss */}
                 <Card className="bg-card border-border/50 hover:border-[#8FA677]/50 transition-all flex flex-col group">
@@ -121,6 +121,31 @@ export default function TreatmentsPage() {
                         <button
                             onClick={() => handleEnroll("Testosterone Therapy")}
                             className="w-full py-4 rounded-xl bg-white/5 hover:bg-[#E8A838] hover:text-black text-foreground font-medium transition-all group-hover:shadow-[0_0_15px_rgba(232,168,56,0.2)] flex items-center justify-center gap-2"
+                        >
+                            Enroll Protocol <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </CardContent>
+                </Card>
+
+                {/* 4. Comprehensive NFC Panel */}
+                <Card className="bg-card border-border/50 hover:border-[#475569]/50 transition-all flex flex-col group">
+                    <CardHeader className="pb-4">
+                        <div className="w-12 h-12 rounded-xl bg-[#475569]/10 flex items-center justify-center mb-4 text-[#475569]">
+                            <Microscope className="w-6 h-6" />
+                        </div>
+                        <CardTitle className="font-serif text-xl border-b border-border/50 pb-4 mb-4">Comprehensive NFC Panel</CardTitle>
+                        <p className="text-sm text-muted-foreground leading-relaxed h-[100px]">
+                            Advanced clinical laboratory testing and analysis. From comprehensive blood panels to specialized hormonal profiles, setting the baseline for your metamorphic journey.
+                        </p>
+                    </CardHeader>
+                    <CardContent className="mt-auto pt-0 text-sm">
+                        <ul className="space-y-2 mb-6 text-foreground/80">
+                            <li className="flex gap-2 items-center"><Database className="w-3.5 h-3.5 text-[#475569]" /> Comprehensive Panels</li>
+                            <li className="flex gap-2 items-center"><ArrowUpRight className="w-3.5 h-3.5 text-[#475569]" /> Baseline Assessment</li>
+                        </ul>
+                        <button
+                            onClick={() => handleEnroll("Comprehensive NFC Panel")}
+                            className="w-full py-4 rounded-xl bg-white/5 hover:bg-[#475569] hover:text-white text-foreground font-medium transition-all group-hover:shadow-[0_0_15px_rgba(71,85,105,0.2)] flex items-center justify-center gap-2"
                         >
                             Enroll Protocol <ArrowRight className="w-4 h-4" />
                         </button>

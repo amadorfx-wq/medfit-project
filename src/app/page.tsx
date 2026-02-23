@@ -108,11 +108,12 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-serif">Precision Medicine, Tailored to You</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: "Hormone Therapy (TRT)", desc: "Clinically supervised TRT to restore optimal balance, energy, and vitality.", tags: ["Energy", "Muscle", "Focus"] },
-              { title: "Peptide Therapy", desc: "Targeted sequences for accelerated recovery, anti-aging, and performance.", tags: ["Recovery", "Longevity", "Repair"] },
-              { title: "Medical Weight Loss", desc: "FDA-cleared GLP-1 protocols with full clinical and nutritional guidance.", tags: ["GLP-1", "Fat Loss", "Metabolism"] },
+              { title: "Comprehensive NFC Panel", desc: "Advanced clinical laboratory testing and hormonal profiling to set the baseline for your metamorphic journey.", tags: ["Diagnostics", "Bloodwork", "Baseline"], link: "/treatments/nfc-panel" },
+              { title: "Medical Weight Loss", desc: "Advanced metabolic reset combining customized GLP-1/GIP receptor agonists (Semaglutide/Tirzepatide). Clinically proven to drive sustainable fat loss.", tags: ["GLP-1", "Semaglutide", "Fat Loss"], link: "/treatments/weight-loss" },
+              { title: "Testosterone Replacement Therapy", desc: "Comprehensive TRT to restore optimal balance, increase lean muscle mass, improve libido, and overcome andropause symptoms.", tags: ["Vitality", "Hormones", "Energy"], link: "/treatments/trt" },
+              { title: "Peptide Therapy", desc: "Targeted amino acid sequencing designed to accelerate recovery, enhance cognitive function, and optimize cellular longevity.", tags: ["Recovery", "Anti-Aging", "Repair"], link: "/treatments/peptides" },
             ].map((service, i) => (
               <Card key={i} className="bg-card/50 border-border/50 backdrop-blur-sm hover:border-primary/30 transition-colors">
                 <CardHeader>
@@ -127,9 +128,11 @@ export default function Home() {
                       </span>
                     ))}
                   </div>
-                  <Button variant="link" className="text-primary p-0 h-auto hover:text-primary/80">
-                    Learn More →
-                  </Button>
+                  <Link href={service.link}>
+                    <Button variant="link" className="text-primary p-0 h-auto hover:text-primary/80">
+                      Learn More →
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
