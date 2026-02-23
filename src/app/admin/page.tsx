@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Users, CreditCard, DollarSign, Calendar, LogOut, FileText, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
+import { Search, Users, CreditCard, DollarSign, Calendar, LogOut, FileText, ChevronRight, AlertCircle, Mail } from "lucide-react";
 
 export default function AdminDashboardPage() {
-    const { currentUser, logout, patients, charges, addCharge } = useAppContext();
+    const { currentUser, logout, patients, charges, addCharge, authorizeTreatment } = useAppContext();
 
     // Form state
     const [selectedPatientId, setSelectedPatientId] = useState<string>("p1");
@@ -24,21 +25,34 @@ export default function AdminDashboardPage() {
 
     // KPIs calculations
     const totalPending = charges.filter(c => c.status === "PENDING").length;
+    const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL").length;
     const revenueAmount = charges.filter(c => c.status === "PAID").reduce((sum, c) => sum + c.amount, 0);
 
     const handleAddCharge = (e: React.FormEvent) => {
         e.preventDefault();
         if (!amount || !description) return;
 
-        addCharge({
-            patientId: selectedPatientId,
-            amount: parseFloat(amount),
-            description: description,
-        });
+        const patient = patients.find(p => p.id === selectedPatientId);
+
+        if (patient?.approvalStatus === "PENDING_APPROVAL") {
+            authorizeTreatment(selectedPatientId, parseFloat(amount), description);
+            toast.success("Treatment Authorized", {
+                description: `A secure payment link has been emailed to ${patient.name} for ${description}.`,
+                icon: <Mail className="w-4 h-4 text-primary" />
+            });
+        } else {
+            addCharge({
+                patientId: selectedPatientId,
+                amount: parseFloat(amount),
+                description: description,
+            });
+            toast.success("Charge Assigned", {
+                description: `Invoice added to ${patient?.name}'s portal.`
+            });
+        }
 
         setAmount("");
         setDescription("");
-        alert("Charge assigned successfully.");
     };
 
     const getPatientPendingBalance = (patientId: string) => {
@@ -130,13 +144,14 @@ export default function AdminDashboardPage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-[#0C1420] border-border/50 text-white">
-                            <CardContent className="p-5">
+                        <Card className="bg-[#0C1420] border-border/50 text-white cursor-pointer hover:bg-white/5 transition-colors">
+                            <CardContent className="p-5 relative overflow-hidden">
+                                {pendingAuthorizations > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-white/60">Appointments</span>
-                                    <Calendar className="w-4 h-4 text-white/40" />
+                                    <span className="text-sm text-white/60">Pending Approvals</span>
+                                    <AlertCircle className={`w-4 h-4 ${pendingAuthorizations > 0 ? 'text-[#E8A838]' : 'text-white/40'}`} />
                                 </div>
-                                <div className="text-3xl font-serif">4</div>
+                                <div className={`text-3xl font-serif ${pendingAuthorizations > 0 ? 'text-[#E8A838]' : 'text-white'}`}>{pendingAuthorizations}</div>
                             </CardContent>
                         </Card>
                     </div>
@@ -170,10 +185,17 @@ export default function AdminDashboardPage() {
                                                 </div>
                                                 {patient.name}
                                             </TableCell>
-                                            <TableCell className="py-4 text-sm">{patient.activeTreatment}</TableCell>
+                                            <TableCell className="py-4 text-sm">
+                                                {patient.activeTreatment}
+                                                {patient.approvalStatus === "PENDING_APPROVAL" && (
+                                                    <Badge variant="outline" className="ml-2 border-[#E8A838]/50 text-[#E8A838]/90 bg-[#E8A838]/10 text-[10px] uppercase">
+                                                        Requires Auth
+                                                    </Badge>
+                                                )}
+                                            </TableCell>
                                             <TableCell className="py-4">
                                                 {balance > 0 ? (
-                                                    <Badge variant="outline" className="border-[#E8A838]/50 text-[#E8A838] bg-[#E8A838]/10 font-normal">
+                                                    <Badge variant="outline" className="border-red-500/50 text-red-400 bg-red-500/10 font-normal">
                                                         ${balance.toFixed(2)}
                                                     </Badge>
                                                 ) : (
@@ -255,8 +277,13 @@ export default function AdminDashboardPage() {
                             <Switch defaultChecked className="data-[state=checked]:bg-[#B8977E]" />
                         </div>
 
-                        <Button type="submit" className="w-full h-12 bg-[#B8977E] hover:bg-[#B8977E]/90 text-black font-semibold mt-4 shadow-[0_4px_14px_rgba(184,151,126,0.3)]">
-                            Assign Charge to Account
+                        <Button type="submit" className={`w-full h-12 text-black font-semibold mt-4 shadow-[0_4px_14px_rgba(184,151,126,0.2)] ${patients.find(p => p.id === selectedPatientId)?.approvalStatus === "PENDING_APPROVAL"
+                                ? "bg-[#E8A838] hover:bg-[#E8A838]/90"
+                                : "bg-[#B8977E] hover:bg-[#B8977E]/90"
+                            }`}>
+                            {patients.find(p => p.id === selectedPatientId)?.approvalStatus === "PENDING_APPROVAL"
+                                ? "Authorize Treatment & Assign Charge"
+                                : "Assign Charge to Account"}
                         </Button>
                     </form>
 

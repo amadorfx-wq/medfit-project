@@ -55,14 +55,44 @@ export default function PaymentPage() {
                 </div>
             </header>
 
-            {pendingBalance === 0 ? (
+            {currentPatient?.approvalStatus === "PENDING_FORMS" ? (
+                <Card className="bg-card border-border/50 text-center py-16">
+                    <CardContent className="space-y-4 flex flex-col items-center">
+                        <div className="w-16 h-16 rounded-full bg-[#E8A838]/20 flex items-center justify-center">
+                            <ShieldCheck className="w-8 h-8 text-[#E8A838]" />
+                        </div>
+                        <CardTitle className="font-serif text-2xl">Action Required</CardTitle>
+                        <CardDescription className="text-base max-w-sm mx-auto">
+                            Please complete your required clinical intake forms and medical questionnaires before proceeding to checkout.
+                        </CardDescription>
+                        <Button variant="outline" onClick={() => router.push("/dashboard/intake")} className="mt-4 rounded-xl border-[#E8A838]/50 text-[#E8A838] hover:bg-[#E8A838]/10">
+                            Go to Security Forms
+                        </Button>
+                    </CardContent>
+                </Card>
+            ) : currentPatient?.approvalStatus === "PENDING_APPROVAL" ? (
+                <Card className="bg-card border-border/50 text-center py-16">
+                    <CardContent className="space-y-4 flex flex-col items-center">
+                        <div className="w-16 h-16 rounded-full bg-[#B8977E]/20 flex items-center justify-center animate-pulse">
+                            <Building2 className="w-8 h-8 text-[#B8977E]" />
+                        </div>
+                        <CardTitle className="font-serif text-2xl">Pending Medical Authorization</CardTitle>
+                        <CardDescription className="text-base max-w-md mx-auto">
+                            Your requested treatment plan is currently under review by our clinical team. Once authorized, you will receive an email to complete your checkout securely.
+                        </CardDescription>
+                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">
+                            Return to Dashboard
+                        </Button>
+                    </CardContent>
+                </Card>
+            ) : pendingBalance === 0 ? (
                 <Card className="bg-card border-border/50 text-center py-16">
                     <CardContent className="space-y-4 flex flex-col items-center">
                         <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
                             <CheckCircle2 className="w-8 h-8 text-primary" />
                         </div>
                         <CardTitle className="font-serif text-2xl">Your account is up to date.</CardTitle>
-                        <CardDescription className="text-base max-w-smmx-auto">
+                        <CardDescription className="text-base max-w-sm mx-auto">
                             You have no pending charges. Thank you for your continued trust in MedFit America.
                         </CardDescription>
                         <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">

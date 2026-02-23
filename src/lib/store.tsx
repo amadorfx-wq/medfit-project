@@ -11,6 +11,7 @@ export interface Patient {
     email: string;
     activeTreatment: string;
     formsStatus: "PENDING" | "COMPLETED";
+    approvalStatus: "PENDING_FORMS" | "PENDING_APPROVAL" | "APPROVED";
     requiredForms: string[];
     completedForms: string[];
 }
@@ -44,14 +45,15 @@ interface AppContextType {
     payCharge: (chargeId: string) => void;
     registerAndLogin: (name: string, email: string) => void;
     submitForm: (formId: string) => void;
+    authorizeTreatment: (patientId: string, amount: number, description: string) => void;
 }
 
 // Initial Mock Data
 const MOCK_PATIENTS: Patient[] = [
-    { id: "p1", name: "Sarah Johnson", email: "sarah@example.com", activeTreatment: "Hormone Optimization - Month 3", formsStatus: "COMPLETED", requiredForms: ["wellness-intake"], completedForms: ["wellness-intake"] },
-    { id: "p2", name: "Michael Chang", email: "michael@example.com", activeTreatment: "Peptide Protocol", formsStatus: "COMPLETED", requiredForms: ["wellness-intake", "peptide-therapy"], completedForms: ["wellness-intake", "peptide-therapy"] },
-    { id: "p3", name: "Emma Davis", email: "emma@example.com", activeTreatment: "Medical Weight Loss", formsStatus: "COMPLETED", requiredForms: ["wellness-intake", "medical-weight-loss"], completedForms: ["wellness-intake", "medical-weight-loss"] },
-    { id: "test", name: "Test Patient", email: "test@medfit.com", activeTreatment: "Testosterone Therapy", formsStatus: "PENDING", requiredForms: ["wellness-intake", "testosterone-therapy"], completedForms: [] },
+    { id: "p1", name: "Sarah Johnson", email: "sarah@example.com", activeTreatment: "Hormone Optimization - Month 3", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake"], completedForms: ["wellness-intake"] },
+    { id: "p2", name: "Michael Chang", email: "michael@example.com", activeTreatment: "Peptide Protocol", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake", "peptide-therapy"], completedForms: ["wellness-intake", "peptide-therapy"] },
+    { id: "p3", name: "Emma Davis", email: "emma@example.com", activeTreatment: "Medical Weight Loss", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake", "medical-weight-loss"], completedForms: ["wellness-intake", "medical-weight-loss"] },
+    { id: "test", name: "Test Patient", email: "test@medfit.com", activeTreatment: "Testosterone Therapy", formsStatus: "PENDING", approvalStatus: "PENDING_FORMS", requiredForms: ["wellness-intake", "testosterone-therapy"], completedForms: [] },
 ];
 
 const MOCK_CHARGES: Charge[] = [
@@ -90,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             email,
             activeTreatment,
             formsStatus: "PENDING",
+            approvalStatus: "PENDING_FORMS",
             requiredForms: reqForms,
             completedForms: []
         };
@@ -104,7 +107,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     const updatedCompleted = p.completedForms.includes(formId) ? p.completedForms : [...p.completedForms, formId];
                     // Check if all required are completed
                     const allDone = p.requiredForms.every(req => updatedCompleted.includes(req));
-                    return { ...p, completedForms: updatedCompleted, formsStatus: allDone ? "COMPLETED" : "PENDING" };
+                    return {
+                        ...p,
+                        completedForms: updatedCompleted,
+                        formsStatus: allDone ? "COMPLETED" : "PENDING",
+                        approvalStatus: allDone ? "PENDING_APPROVAL" : "PENDING_FORMS"
+                    };
                 }
                 return p;
             }));
@@ -129,8 +137,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ));
     };
 
+    const authorizeTreatment = (patientId: string, amount: number, description: string) => {
+        // Change status to approved
+        setPatients(prev => prev.map(p =>
+            p.id === patientId ? { ...p, approvalStatus: "APPROVED" } : p
+        ));
+        // Add the authorized charge
+        addCharge({ patientId, amount, description });
+    };
+
     return (
-        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm }}>
+        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment }}>
             {children}
         </AppContext.Provider>
     );
