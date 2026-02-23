@@ -59,7 +59,7 @@ export default function TreatmentsPage() {
                             <Target className="w-6 h-6" />
                         </div>
                         <CardTitle className="font-serif text-xl border-b border-border/50 pb-4 mb-4">Medical Weight Loss</CardTitle>
-                        <p className="text-sm text-muted-foreground leading-relaxed h-[100px]">
+                        <p className="text-sm text-muted-foreground leading-relaxed h-auto min-h-[130px] mb-2">
                             Advanced metabolic reset using GLP-1/GIP receptor agonists (Semaglutide/Tirzepatide). Clinically proven to reduce cravings, improve insulin sensitivity, and drive sustainable fat loss.
                         </p>
                     </CardHeader>
@@ -84,7 +84,7 @@ export default function TreatmentsPage() {
                             <Pill className="w-6 h-6" />
                         </div>
                         <CardTitle className="font-serif text-xl border-b border-border/50 pb-4 mb-4">Peptide Therapy</CardTitle>
-                        <p className="text-sm text-muted-foreground leading-relaxed h-[100px]">
+                        <p className="text-sm text-muted-foreground leading-relaxed h-auto min-h-[130px] mb-2">
                             Targeted amino acid sequencing designed to accelerate recovery, enhance cognitive function, boost natural growth hormone, and optimize cellular longevity (e.g. BPC-157, CJC-1295).
                         </p>
                     </CardHeader>
@@ -109,7 +109,7 @@ export default function TreatmentsPage() {
                             <Zap className="w-6 h-6" />
                         </div>
                         <CardTitle className="font-serif text-xl border-b border-border/50 pb-4 mb-4">Hormone Optimization (TRT)</CardTitle>
-                        <p className="text-sm text-muted-foreground leading-relaxed h-[100px]">
+                        <p className="text-sm text-muted-foreground leading-relaxed h-auto min-h-[130px] mb-2">
                             Comprehensive Testosterone Replacement Therapy. Restore vitality, increase lean muscle mass, improve libido, and overcome the symptoms of andropause under strict medical supervision.
                         </p>
                     </CardHeader>
@@ -134,7 +134,7 @@ export default function TreatmentsPage() {
                             <Microscope className="w-6 h-6" />
                         </div>
                         <CardTitle className="font-serif text-xl border-b border-border/50 pb-4 mb-4">Comprehensive NFC Panel</CardTitle>
-                        <p className="text-sm text-muted-foreground leading-relaxed h-[100px]">
+                        <p className="text-sm text-muted-foreground leading-relaxed h-auto min-h-[130px] mb-2">
                             Advanced clinical laboratory testing and analysis. From comprehensive blood panels to specialized hormonal profiles, setting the baseline for your metamorphic journey.
                         </p>
                     </CardHeader>
