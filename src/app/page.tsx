@@ -10,39 +10,41 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md py-4">
+        <div className="container mx-auto px-8 h-24 flex items-center justify-between relative">
+
+          {/* Logo (Left) */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-2xl">
               M
             </div>
-            <span className="font-serif text-xl tracking-wide">MedFit America</span>
+            <span className="font-serif text-2xl tracking-wide">MedFit America</span>
           </div>
 
-          <div className="flex items-center gap-6">
-            <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-              <Link href="/treatments" className="hover:text-primary transition-colors">Treatments</Link>
-              <Link href="/results" className="hover:text-primary transition-colors">Results</Link>
-              <Link href="/about" className="hover:text-primary transition-colors">About Us</Link>
-              <Link href="/academy" className="hover:text-primary transition-colors">Academy</Link>
-            </nav>
+          {/* Nav Menu (Center) - absolute to ensure true center alignment */}
+          <nav className="hidden lg:flex items-center justify-center gap-10 text-sm font-medium absolute left-1/2 transform -translate-x-1/2">
+            <Link href="/treatments" className="hover:text-primary transition-colors tracking-wide">Treatments</Link>
+            <Link href="/results" className="hover:text-primary transition-colors tracking-wide">Results</Link>
+            <Link href="/about" className="hover:text-primary transition-colors tracking-wide">About Us</Link>
+            <Link href="/academy" className="hover:text-primary transition-colors tracking-wide">Academy</Link>
+          </nav>
 
-            <div className="flex items-center gap-4 border-l border-white/10 pl-6">
-              <Link
-                href="/login"
-                className="hidden lg:flex items-center justify-center text-sm font-medium text-[#8FA677] bg-[#8FA677]/5 hover:bg-[#8FA677]/10 border border-[#8FA677]/20 px-5 h-9 rounded-full transition-all shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)] mr-2"
-              >
-                Log In
-              </Link>
-              <a href="tel:4045550199" className="hidden lg:block text-sm font-medium text-[#B8977E]">
-                404-555-0199
-              </a>
-              <Link href="/consultation">
-                <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-6 h-10 rounded-full w-full sm:w-auto mt-0">
-                  Request Consultation
-                </Button>
-              </Link>
-            </div>
+          {/* Actions (Right) */}
+          <div className="flex items-center justify-end gap-5">
+            <Link
+              href="/login"
+              className="hidden lg:flex items-center justify-center text-sm font-medium text-[#8FA677] bg-[#8FA677]/5 hover:bg-[#8FA677]/10 border border-[#8FA677]/20 px-6 h-11 rounded-full transition-all shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)]"
+            >
+              Patient Portal
+            </Link>
+            <a href="tel:4045550199" className="hidden xl:block text-sm font-medium text-[#B8977E] tracking-wider ml-2">
+              404-555-0199
+            </a>
+            <Link href="/consultation">
+              <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-8 h-11 rounded-full transition-transform hover:scale-105">
+                Request Consultation
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -104,8 +106,8 @@ export default function Home() {
       <section id="treatments" className="py-32 bg-[#080808] relative">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <span className="text-[#B8977E] text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Our Treatments</span>
-            <h2 className="text-4xl md:text-5xl font-serif">Precision Medicine, Tailored to You</h2>
+            <span className="text-[#B8977E] text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Experience</span>
+            <h2 className="text-4xl md:text-5xl font-serif">Our Treatment Portfolio</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
