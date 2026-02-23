@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 
 export default function Home() {
   return (
@@ -20,10 +21,10 @@ export default function Home() {
 
           <div className="flex items-center gap-6">
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-              <Link href="#treatments" className="hover:text-primary transition-colors">Treatments</Link>
-              <Link href="#results" className="hover:text-primary transition-colors">Results</Link>
-              <Link href="#about" className="hover:text-primary transition-colors">About Us</Link>
-              <Link href="#academy" className="hover:text-primary transition-colors">Academy</Link>
+              <Link href="/treatments" className="hover:text-primary transition-colors">Treatments</Link>
+              <Link href="/results" className="hover:text-primary transition-colors">Results</Link>
+              <Link href="/about" className="hover:text-primary transition-colors">About Us</Link>
+              <Link href="/academy" className="hover:text-primary transition-colors">Academy</Link>
             </nav>
 
             <div className="flex items-center gap-4 border-l border-white/10 pl-6">
@@ -36,9 +37,11 @@ export default function Home() {
               <a href="tel:4045550199" className="hidden lg:block text-sm font-medium text-[#B8977E]">
                 404-555-0199
               </a>
-              <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-6 h-10 rounded-full w-full sm:w-auto mt-0">
-                Request Consultation
-              </Button>
+              <Link href="/consultation">
+                <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-6 h-10 rounded-full w-full sm:w-auto mt-0">
+                  Request Consultation
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -72,9 +75,11 @@ export default function Home() {
               Experience compassionate, high-end medical weight loss and hormone therapy designed for your unique biology. The new standard in medical wellness.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" variant="outline" className="rounded-full text-md px-10 h-14 border-white/10 hover:bg-white/5">
-                View All Treatments
-              </Button>
+              <Link href="/treatments">
+                <Button size="lg" variant="outline" className="rounded-full text-md px-10 h-14 border-white/10 hover:bg-white/5">
+                  View All Treatments
+                </Button>
+              </Link>
             </div>
 
             <div className="mt-16 flex items-center gap-8 text-sm text-muted-foreground">
@@ -136,42 +141,11 @@ export default function Home() {
       <section className="py-32 bg-gradient-to-b from-[#080808] to-background">
         <div className="container mx-auto px-6 max-w-4xl text-center">
           <h2 className="text-4xl md:text-5xl font-serif mb-6">Discover Your Optimal Treatment in 60 Seconds</h2>
-          <p className="text-muted-foreground text-lg mb-16">
-            Answer 3 quick questions and our clinical team will reach out with a personalized recommendation — no commitment required.
+          <p className="text-muted-foreground text-lg mb-16 max-w-2xl mx-auto">
+            Answer 3 quick questions and our clinical team will reach out with a personalized recommendation — entirely bespoke and confidential.
           </p>
 
-          <Card className="bg-card border-border/50 text-left p-6 md:p-12">
-            <CardContent className="space-y-10 p-0">
-              <div className="space-y-4">
-                <Label className="text-base text-muted-foreground font-normal">1. What is your primary health goal?</Label>
-                <div className="grid sm:grid-cols-3 gap-4">
-                  {["Low Energy & Hormones", "Body Composition", "Anti-Aging & Longevity"].map((goal) => (
-                    <div key={goal} className="border border-border/50 rounded-xl p-4 text-center cursor-pointer hover:border-primary transition-colors bg-white/5">
-                      <span className="text-sm font-medium">{goal}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="Sarah Johnson" className="bg-background/50 border-white/10 focus-visible:ring-primary h-12" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="sarah@example.com" className="bg-background/50 border-white/10 focus-visible:ring-primary h-12" />
-                </div>
-              </div>
-
-              <Button className="w-full rounded-full h-14 text-lg bg-primary hover:bg-primary/90 text-primary-foreground">
-                Send My Recommendation
-              </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Your information is 100% private and protected under HIPAA.
-              </p>
-            </CardContent>
-          </Card>
+          <LeadIntakeForm />
         </div>
       </section>
 
