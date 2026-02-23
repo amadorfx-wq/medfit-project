@@ -8,17 +8,17 @@ export default function PublicTreatmentsPage() {
         <div className="min-h-screen bg-background text-foreground">
             {/* Minimal Header with improved spacing (Silent Elegance) */}
             <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md py-4">
-                <div className="container mx-auto px-8 h-24 flex items-center justify-between">
+                <div className="container mx-auto px-4 xl:px-8 h-20 xl:h-24 flex items-center justify-between gap-4">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-2xl">M</div>
-                        <span className="font-serif text-2xl tracking-wide">MedFit America</span>
+                    <Link href="/" className="flex items-center gap-2 xl:gap-3 hover:opacity-80 transition-opacity">
+                        <div className="w-8 h-8 xl:w-10 xl:h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl xl:text-2xl">M</div>
+                        <span className="font-serif text-lg xl:text-2xl tracking-wide whitespace-nowrap">MedFit America</span>
                     </Link>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-2 xl:gap-5">
                         <Link href="/consultation">
-                            <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-8 h-11 rounded-full transition-transform hover:scale-105 shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)]">
+                            <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-xs xl:text-sm px-4 xl:px-8 h-9 xl:h-11 rounded-full transition-transform hover:scale-105 shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)] whitespace-nowrap">
                                 Start Clinical Intake
                             </Button>
                         </Link>

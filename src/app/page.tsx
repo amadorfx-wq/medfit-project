@@ -11,37 +11,39 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md py-4">
-        <div className="container mx-auto px-8 h-24 flex items-center justify-between relative">
+        <div className="container mx-auto px-4 xl:px-8 h-20 xl:h-24 flex items-center justify-between gap-2 lg:gap-4 xl:gap-8">
 
           {/* Logo (Left) */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-2xl">
-              M
-            </div>
-            <span className="font-serif text-2xl tracking-wide">MedFit America</span>
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center gap-2 xl:gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 xl:w-10 xl:h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl xl:text-2xl">
+                M
+              </div>
+              <span className="font-serif text-lg xl:text-2xl tracking-wide whitespace-nowrap">MedFit America</span>
+            </Link>
           </div>
 
-          {/* Nav Menu (Center) - absolute to ensure true center alignment */}
-          <nav className="hidden lg:flex items-center justify-center gap-10 text-sm font-medium absolute left-1/2 transform -translate-x-1/2">
-            <Link href="/treatments" className="hover:text-primary transition-colors tracking-wide">Treatments</Link>
-            <Link href="/results" className="hover:text-primary transition-colors tracking-wide">Results</Link>
-            <Link href="/about" className="hover:text-primary transition-colors tracking-wide">About Us</Link>
-            <Link href="/academy" className="hover:text-primary transition-colors tracking-wide">Academy</Link>
+          {/* Nav Menu (Center) */}
+          <nav className="hidden lg:flex items-center justify-center lg:gap-5 xl:gap-10 text-xs xl:text-sm font-medium">
+            <Link href="/treatments" className="hover:text-primary transition-colors tracking-wide whitespace-nowrap">Treatments</Link>
+            <Link href="/results" className="hover:text-primary transition-colors tracking-wide whitespace-nowrap">Results</Link>
+            <Link href="/about" className="hover:text-primary transition-colors tracking-wide whitespace-nowrap">About Us</Link>
+            <Link href="/academy" className="hover:text-primary transition-colors tracking-wide whitespace-nowrap">Academy</Link>
           </nav>
 
           {/* Actions (Right) */}
-          <div className="flex items-center justify-end gap-5">
+          <div className="flex items-center justify-end gap-2 xl:gap-5">
             <Link
               href="/login"
-              className="hidden lg:flex items-center justify-center text-sm font-medium text-[#8FA677] bg-[#8FA677]/5 hover:bg-[#8FA677]/10 border border-[#8FA677]/20 px-6 h-11 rounded-full transition-all shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)]"
+              className="hidden lg:flex items-center justify-center text-xs xl:text-sm font-medium text-[#8FA677] bg-[#8FA677]/5 hover:bg-[#8FA677]/10 border border-[#8FA677]/20 px-3 xl:px-6 h-9 xl:h-11 rounded-full transition-all shadow-[0_0_15px_rgba(143,166,119,0.15)] hover:shadow-[0_0_20px_rgba(143,166,119,0.25)] whitespace-nowrap"
             >
               Patient Portal
             </Link>
-            <a href="tel:4045550199" className="hidden xl:block text-sm font-medium text-[#B8977E] tracking-wider ml-2">
+            <a href="tel:4045550199" className="hidden xl:block text-sm font-medium text-[#B8977E] tracking-wider whitespace-nowrap ml-2">
               404-555-0199
             </a>
-            <Link href="/consultation">
-              <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm px-8 h-11 rounded-full transition-transform hover:scale-105">
+            <Link href="/consultation" className="flex items-center">
+              <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-xs xl:text-sm px-4 xl:px-8 h-9 xl:h-11 rounded-full transition-transform hover:scale-105 whitespace-nowrap">
                 Request Consultation
               </Button>
             </Link>
