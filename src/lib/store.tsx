@@ -46,6 +46,7 @@ interface AppContextType {
     registerAndLogin: (name: string, email: string) => void;
     submitForm: (formId: string) => void;
     authorizeTreatment: (patientId: string, amount: number, description: string) => void;
+    enrollTreatment: (patientId: string, treatment: string) => void;
 }
 
 // Initial Mock Data
@@ -146,8 +147,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
         addCharge({ patientId, amount, description });
     };
 
+    const enrollTreatment = (patientId: string, treatment: string) => {
+        setPatients(prev => prev.map(p => {
+            if (p.id === patientId) {
+                const newRequired = getRequiredFormsForTreatment(treatment);
+                const combinedRequired = Array.from(new Set([...p.requiredForms, ...newRequired]));
+                const allDone = combinedRequired.every(req => p.completedForms.includes(req));
+                return {
+                    ...p,
+                    activeTreatment: p.activeTreatment === "Pending Evaluation" ? treatment : `${p.activeTreatment} + ${treatment}`,
+                    requiredForms: combinedRequired,
+                    formsStatus: allDone ? "COMPLETED" : "PENDING",
+                    approvalStatus: allDone ? "PENDING_APPROVAL" : "PENDING_FORMS"
+                };
+            }
+            return p;
+        }));
+    };
+
     return (
-        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment }}>
+        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment }}>
             {children}
         </AppContext.Provider>
     );
