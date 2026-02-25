@@ -12,7 +12,8 @@ import {
     FileText,
     BarChart3,
     LogOut,
-    Search
+    Search,
+    DollarSign
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -46,6 +47,7 @@ export default function AdminLayout({
         { name: "Dashboard Overview", href: "/admin", icon: LayoutDashboard },
         { name: "Pending Approvals", href: "/admin/approvals", icon: ClipboardCheck, badge: pendingAuthorizations },
         { name: "Patient Management", href: "/admin/patients", icon: Users },
+        { name: "Billing & Invoices", href: "/admin/billing", icon: DollarSign },
         { name: "Treatments & Forms", href: "/admin/forms", icon: FileText },
         { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     ];

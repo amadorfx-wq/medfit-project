@@ -116,90 +116,104 @@ export default function PatientsManagementPage() {
                 </Table>
             </div>
 
-            {/* UPGRADED: Patient Profile Modal */}
-            <Dialog open={!!selectedPatientId} onOpenChange={(open) => !open && setSelectedPatientId(null)}>
-                <DialogContent className="bg-[#0C1420] border-border/50 text-white w-full max-w-4xl p-0 overflow-hidden rounded-xl">
-                    {activePatient && (
-                        <div className="flex flex-col md:flex-row max-h-[85vh]">
+            {/* UPGRADED: Full-Screen Patient Profile View */}
+            {activePatient && (
+                <div className="fixed inset-0 z-50 bg-[#0A0F17] flex flex-col animate-in fade-in zoom-in-95 duration-300">
+                    <div className="h-20 border-b border-border/50 px-6 lg:px-10 flex items-center justify-between bg-[#0C1420] shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded bg-white/5 flex items-center justify-center border border-white/10">
+                                <Users className="w-5 h-5 text-[#B8977E]" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-serif text-white leading-none">Complete Medical File</h2>
+                                <span className="text-xs text-white/50 uppercase tracking-widest">{activePatient.id}</span>
+                            </div>
+                        </div>
+                        <Button
+                            variant="outline"
+                            className="bg-transparent border-white/10 text-white hover:bg-white/10"
+                            onClick={() => setSelectedPatientId(null)}
+                        >
+                            Close Profile
+                        </Button>
+                    </div>
 
-                            {/* Left Side: Demographic & Balance */}
-                            <div className="w-full md:w-1/3 bg-[#080D15] p-8 border-b md:border-b-0 md:border-r border-border/50 overflow-y-auto hidden-scrollbar">
-                                <div className="text-center mb-8">
-                                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#1A2332] to-[#0A0F17] flex items-center justify-center font-serif text-4xl text-white border border-white/10 shadow-2xl mx-auto mb-4">
-                                        {activePatient.name.charAt(0)}
+                    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                        {/* Left Side: Demographic & Balance */}
+                        <div className="w-full lg:w-96 bg-[#080D15] p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-border/50 overflow-y-auto shrink-0">
+                            <div className="text-center mb-8">
+                                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1A2332] to-[#0A0F17] flex items-center justify-center font-serif text-5xl text-white border border-white/10 shadow-2xl mx-auto mb-6">
+                                    {activePatient.name.charAt(0)}
+                                </div>
+                                <h2 className="text-3xl font-serif text-white">{activePatient.name}</h2>
+                                <p className="text-white/50 text-base mt-2">{activePatient.email}</p>
+                            </div>
+
+                            <div className="space-y-8">
+                                <div>
+                                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Current Active Treatment</p>
+                                    <div className="flex items-center gap-2 p-4 bg-white/5 rounded-xl border border-white/5">
+                                        <Activity className="w-5 h-5 text-[#8FA677]" />
+                                        <p className="text-white text-base font-medium">{activePatient.activeTreatment}</p>
                                     </div>
-                                    <h2 className="text-2xl font-serif text-white">{activePatient.name}</h2>
-                                    <p className="text-white/50 text-sm mt-1">{activePatient.email}</p>
                                 </div>
 
-                                <div className="space-y-6">
-                                    <div>
-                                        <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Patient ID</p>
-                                        <p className="font-mono text-sm text-white/80">{activePatient.id.toUpperCase()}</p>
+                                <div className="p-5 bg-black/40 rounded-xl border border-white/5 shadow-inner">
+                                    <p className="text-xs text-white/40 uppercase tracking-wider mb-4">Financial Standing</p>
+                                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/5">
+                                        <span className="text-base text-white/70">Unpaid Balances</span>
+                                        <span className="text-red-400 font-serif text-xl">${getPatientPendingBalance(activePatient.id).toFixed(2)}</span>
                                     </div>
-
-                                    <div>
-                                        <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Current Active Treatment</p>
-                                        <div className="flex items-center gap-2">
-                                            <Activity className="w-4 h-4 text-[#8FA677]" />
-                                            <p className="text-white text-sm">{activePatient.activeTreatment}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                        <p className="text-xs text-white/40 uppercase tracking-wider mb-3">Financial Standing</p>
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="text-sm text-white/70">Unpaid Balances</span>
-                                            <span className="text-red-400 font-serif">${getPatientPendingBalance(activePatient.id).toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm text-white/70">Lifetime Value</span>
-                                            <span className="text-[#8FA677] font-serif">${getPatientPaidTotal(activePatient.id).toFixed(2)}</span>
-                                        </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-base text-white/70">Lifetime Value</span>
+                                        <span className="text-[#8FA677] font-serif text-xl">${getPatientPaidTotal(activePatient.id).toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Right Side: Compliance Logs */}
-                            <div className="flex-1 p-8 overflow-y-auto bg-gradient-to-b from-[#0C1420] to-[#080D15]">
-                                <DialogHeader className="mb-6">
-                                    <DialogTitle className="text-2xl font-serif flex items-center gap-3">
-                                        <FileCheck2 className="w-6 h-6 text-[#B8977E]" />
-                                        Compliance Archive (HIPAA & Consents)
-                                    </DialogTitle>
-                                    <DialogDescription className="text-white/50 text-sm">
-                                        Digital footprint of all medical intake forms and signed consents securely logged.
-                                    </DialogDescription>
-                                </DialogHeader>
+                        {/* Right Side: Compliance Logs */}
+                        <div className="flex-1 p-6 lg:p-12 overflow-y-auto bg-gradient-to-b from-[#0C1420] to-[#080D15]">
+                            <div className="max-w-4xl mx-auto">
+                                <div className="mb-10">
+                                    <h3 className="text-3xl font-serif flex items-center gap-3 text-white mb-2">
+                                        <FileCheck2 className="w-8 h-8 text-[#B8977E]" />
+                                        Medical Records & Forms
+                                    </h3>
+                                    <p className="text-white/50 text-base">
+                                        Digital footprint of all medical intake forms and signed consents securely logged. Ready for HIPAA audit.
+                                    </p>
+                                </div>
 
                                 <div className="space-y-4">
                                     {activePatient.requiredForms.length === 0 ? (
-                                        <div className="text-center py-10">
-                                            <p className="text-white/40">No forms required mapped to this profile yet.</p>
+                                        <div className="text-center py-20 bg-black/20 rounded-2xl border border-white/5 border-dashed">
+                                            <FileText className="w-12 h-12 text-white/10 mx-auto mb-4" />
+                                            <p className="text-white/40">No records or forms are associated with this patient account yet.</p>
                                         </div>
                                     ) : (
                                         activePatient.requiredForms.map((reqFormSlug, i) => {
                                             const isCompleted = activePatient.completedForms.includes(reqFormSlug);
                                             return (
-                                                <div key={i} className={`flex items-center justify-between p-4 rounded-xl border ${isCompleted ? 'bg-[#8FA677]/5 border-[#8FA677]/20' : 'bg-black/20 border-white/5 border-dashed'}`}>
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isCompleted ? 'bg-[#8FA677]/20 text-[#8FA677]' : 'bg-white/5 text-white/30'}`}>
-                                                            <FileText className="w-4 h-4" />
+                                                <div key={i} className={`flex items-center justify-between p-6 rounded-2xl border transition-colors ${isCompleted ? 'bg-[#8FA677]/5 border-[#8FA677]/20 hover:bg-[#8FA677]/10' : 'bg-black/20 border-white/5 border-dashed'}`}>
+                                                    <div className="flex items-center gap-6">
+                                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${isCompleted ? 'bg-[#8FA677]/20 text-[#8FA677]' : 'bg-white/5 text-white/30'}`}>
+                                                            <FileText className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <h4 className={`text-sm font-medium ${isCompleted ? 'text-white' : 'text-white/50'}`}>{formatFormName(reqFormSlug)}</h4>
-                                                            <p className="text-xs text-white/40 mt-0.5">
+                                                            <h4 className={`text-lg font-medium ${isCompleted ? 'text-white' : 'text-white/50'}`}>{formatFormName(reqFormSlug)}</h4>
+                                                            <p className="text-sm text-white/40 mt-1">
                                                                 {isCompleted ? 'Digitally Signed & Verified' : 'Awaiting Patient Signature'}
                                                             </p>
                                                         </div>
                                                     </div>
                                                     {isCompleted ? (
-                                                        <Button variant="outline" size="sm" className="border-[#B8977E]/30 text-[#B8977E] hover:bg-[#B8977E]/10 bg-transparent">
-                                                            View Document
+                                                        <Button variant="outline" className="border-[#B8977E]/50 text-[#B8977E] hover:bg-[#B8977E] hover:text-black bg-transparent h-10 px-6 shrink-0 shadow-[0_0_15px_rgba(184,151,126,0.1)]">
+                                                            Abre & Descarga
                                                         </Button>
                                                     ) : (
-                                                        <Badge variant="outline" className="text-white/30 border-white/10 uppercase text-[10px]">
-                                                            Pending
+                                                        <Badge variant="outline" className="text-white/30 border-white/10 uppercase text-xs px-3 py-1 cursor-not-allowed hidden md:flex">
+                                                            Pending Action
                                                         </Badge>
                                                     )}
                                                 </div>
@@ -209,17 +223,17 @@ export default function PatientsManagementPage() {
                                 </div>
 
                                 {activePatient.completedForms.length > 0 && (
-                                    <div className="mt-8 pt-6 border-t border-border/50">
-                                        <Button className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10">
-                                            Export All Patient Records (Encrypted PDF)
+                                    <div className="mt-12 flex justify-end">
+                                        <Button className="bg-[#B8977E] text-black hover:bg-[#B8977E]/90 shadow-[0_4px_20px_rgba(184,151,126,0.2)] h-12 px-8 font-semibold">
+                                            Export Medical Record (Encrypted PDF)
                                         </Button>
                                     </div>
                                 )}
                             </div>
                         </div>
-                    )}
-                </DialogContent>
-            </Dialog>
+                    </div>
+                </div>
+            )}
 
         </div>
     );
