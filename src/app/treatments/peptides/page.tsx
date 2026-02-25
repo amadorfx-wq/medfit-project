@@ -46,11 +46,14 @@ export default function PeptidesLandingPage() {
             <section className="py-24 bg-white border-y border-[#E5E5E5]">
                 <div className="container mx-auto px-6 max-w-5xl">
                     <div className="grid md:grid-cols-2 gap-16 items-center">
-                        <div className="relative h-[500px] w-full rounded-2xl overflow-hidden bg-[#E5E5E5]/50">
-                            {/* Visual representation placeholder */}
-                            <div className="absolute inset-0 flex items-center justify-center text-[#2D2D2D]/30 font-serif text-2xl">
-                                Advanced Peptide Therapeutics
-                            </div>
+                        <div className="relative h-[500px] w-full rounded-2xl overflow-hidden bg-[#E5E5E5]/50 group">
+                            <Image
+                                src="/images/treatments/peptides_hero.png"
+                                alt="Peptide Therapy (BPC-157, CJC-1295)"
+                                fill
+                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                priority
+                            />
                         </div>
                         <div className="space-y-8">
                             <h2 className="text-4xl font-serif text-[#1A1A1A]">Cellular Targeting Precision</h2>

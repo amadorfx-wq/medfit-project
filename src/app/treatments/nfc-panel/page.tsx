@@ -46,11 +46,14 @@ export default function NfcPanelLandingPage() {
             <section className="py-24 bg-white border-y border-[#E5E5E5]">
                 <div className="container mx-auto px-6 max-w-5xl">
                     <div className="grid md:grid-cols-2 gap-16 items-center">
-                        <div className="relative h-[500px] w-full rounded-2xl overflow-hidden bg-[#E5E5E5]/50">
-                            {/* In a real scenario, use a real image related to the treatment */}
-                            <div className="absolute inset-0 flex items-center justify-center text-[#2D2D2D]/30 font-serif text-2xl">
-                                Medical Laboratory Analysis
-                            </div>
+                        <div className="relative h-[500px] w-full rounded-2xl overflow-hidden bg-[#E5E5E5]/50 group">
+                            <Image
+                                src="/images/treatments/nfc_hero.png"
+                                alt="Comprehensive NFC Panel Laboratory Diagnostics"
+                                fill
+                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                priority
+                            />
                         </div>
                         <div className="space-y-8">
                             <h2 className="text-4xl font-serif text-[#1A1A1A]">The Deep Dive Into Your Biology</h2>
