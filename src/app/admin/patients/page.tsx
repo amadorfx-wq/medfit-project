@@ -8,27 +8,29 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 function PatientCRMContent() {
     const { patients, charges } = useAppContext();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     useEffect(() => {
         const patientId = searchParams.get('patientId');
         if (patientId) {
             const exists = patients.some(p => p.id === patientId);
             if (exists) {
-                setSelectedPatientId(patientId);
-                // Clear the URL to avoid re-triggering if modal is closed and reopened
-                if (typeof window !== 'undefined') {
-                    window.history.replaceState(null, '', '/admin/patients');
-                }
+                // Wait briefly to ensure state updates smoothly
+                setTimeout(() => setSelectedPatientId(patientId), 50);
+
+                // Use Next.js router so internal state unmounts the query parameter, 
+                // allowing subsequent clicks on the *same* patient to work again.
+                router.replace('/admin/patients', { scroll: false });
             }
         }
-    }, [searchParams, patients]);
+    }, [searchParams, patients, router]);
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
