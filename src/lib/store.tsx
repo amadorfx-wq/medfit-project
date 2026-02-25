@@ -48,6 +48,9 @@ interface AppContextType {
     submitForm: (formId: string) => void;
     authorizeTreatment: (patientId: string, amount: number, description: string) => void;
     enrollTreatment: (patientId: string, treatment: string) => void;
+    // Core Navigation State
+    selectedGlobalPatientId: string | null;
+    setSelectedGlobalPatientId: (id: string | null) => void;
 }
 
 // Initial Mock Data
@@ -69,6 +72,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [currentUser, setCurrentUser] = useState<AppContextType["currentUser"]>(null);
     const [patients, setPatients] = useState<Patient[]>(MOCK_PATIENTS);
     const [charges, setCharges] = useState<Charge[]>(MOCK_CHARGES);
+    const [selectedGlobalPatientId, setSelectedGlobalPatientId] = useState<string | null>(null);
 
     const login = (email: string, role: Role) => {
         if (role === "ADMIN") {
@@ -167,7 +171,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <AppContext.Provider value={{ currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment }}>
+        <AppContext.Provider value={{
+            currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment, selectedGlobalPatientId, setSelectedGlobalPatientId
+        }}>
             {children}
         </AppContext.Provider>
     );

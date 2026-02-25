@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState } from "react";
 import { useAppContext } from "@/lib/store";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -8,36 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSearchParams, useRouter } from "next/navigation";
 
-function PatientCRMContent() {
-    const { patients, charges } = useAppContext();
+export default function PatientsManagementPage() {
+    const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId } = useAppContext();
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-    const searchParams = useSearchParams();
-    const router = useRouter();
-
-    useEffect(() => {
-        const patientId = searchParams.get('patientId');
-        if (patientId) {
-            const exists = patients.some(p => p.id === patientId);
-            if (exists) {
-                // Wait briefly to ensure state updates smoothly
-                setTimeout(() => setSelectedPatientId(patientId), 50);
-
-                // Use Next.js router so internal state unmounts the query parameter, 
-                // allowing subsequent clicks on the *same* patient to work again.
-                router.replace('/admin/patients', { scroll: false });
-            }
-        }
-    }, [searchParams, patients, router]);
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const activePatient = patients.find(p => p.id === selectedPatientId);
+    const activePatient = patients.find(p => p.id === selectedGlobalPatientId);
 
     const getPatientPendingBalance = (patientId: string) => {
         return charges
@@ -92,7 +73,7 @@ function PatientCRMContent() {
                             const percentForms = patient.requiredForms.length === 0 ? 0 : Math.round((patient.completedForms.length / patient.requiredForms.length) * 100);
 
                             return (
-                                <TableRow key={patient.id} className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedPatientId(patient.id)}>
+                                <TableRow key={patient.id} className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedGlobalPatientId(patient.id)}>
                                     <TableCell className="pl-6 py-4">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 rounded-full bg-[#1A2332] flex items-center justify-center font-serif text-lg text-white border border-white/5 shadow-inner">
@@ -150,7 +131,7 @@ function PatientCRMContent() {
                         <Button
                             variant="outline"
                             className="bg-transparent border-white/10 text-white hover:bg-white/10"
-                            onClick={() => setSelectedPatientId(null)}
+                            onClick={() => setSelectedGlobalPatientId(null)}
                         >
                             Close Profile
                         </Button>
@@ -254,13 +235,5 @@ function PatientCRMContent() {
             )}
 
         </div>
-    );
-}
-
-export default function PatientsManagementPage() {
-    return (
-        <Suspense fallback={<div className="p-10 text-white/50 text-center font-serif">Loading Patient CRM...</div>}>
-            <PatientCRMContent />
-        </Suspense>
     );
 }

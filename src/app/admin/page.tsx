@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboardPage() {
-    const { currentUser, logout, patients, charges, addCharge, authorizeTreatment } = useAppContext();
+    const { currentUser, logout, patients, charges, addCharge, authorizeTreatment, setSelectedGlobalPatientId } = useAppContext();
     const router = useRouter();
 
     // Form state
@@ -156,7 +156,10 @@ export default function AdminDashboardPage() {
                                     <TableRow
                                         key={patient.id}
                                         className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer transition-colors"
-                                        onClick={() => router.push(`/admin/patients?patientId=${patient.id}`)}
+                                        onClick={() => {
+                                            setSelectedGlobalPatientId(patient.id);
+                                            router.push('/admin/patients');
+                                        }}
                                     >
                                         <TableCell className="font-medium text-white flex items-center gap-3 py-4">
                                             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white">

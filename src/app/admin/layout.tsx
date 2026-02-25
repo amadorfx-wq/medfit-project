@@ -24,7 +24,7 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { currentUser, logout, patients } = useAppContext();
+    const { currentUser, logout, patients, setSelectedGlobalPatientId } = useAppContext();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -157,11 +157,9 @@ export default function AdminLayout({
                                                 className="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center justify-between group transition-colors"
                                                 onClick={() => {
                                                     setSearchQuery("");
-                                                    if (pathname === '/admin/patients') {
-                                                        // Ensure the page rerenders or we push properly
-                                                        router.push(`/admin/patients?patientId=${patient.id}`, { scroll: false });
-                                                    } else {
-                                                        router.push(`/admin/patients?patientId=${patient.id}`);
+                                                    setSelectedGlobalPatientId(patient.id);
+                                                    if (pathname !== '/admin/patients') {
+                                                        router.push('/admin/patients');
                                                     }
                                                 }}
                                             >
