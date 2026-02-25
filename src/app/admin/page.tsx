@@ -150,7 +150,17 @@ export default function AdminDashboardPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {patients.map(patient => {
+                            {[...patients].sort((a, b) => {
+                                const aPendingBalance = charges.some(c => c.patientId === a.id && c.status === "PENDING");
+                                const bPendingBalance = charges.some(c => c.patientId === b.id && c.status === "PENDING");
+
+                                const aNeedsAttention = a.approvalStatus === "PENDING_APPROVAL" || a.approvalStatus === "PENDING_FORMS" || aPendingBalance;
+                                const bNeedsAttention = b.approvalStatus === "PENDING_APPROVAL" || b.approvalStatus === "PENDING_FORMS" || bPendingBalance;
+
+                                if (aNeedsAttention && !bNeedsAttention) return -1;
+                                if (!aNeedsAttention && bNeedsAttention) return 1;
+                                return 0;
+                            }).map(patient => {
                                 const balance = getPatientPendingBalance(patient.id);
                                 return (
                                     <TableRow

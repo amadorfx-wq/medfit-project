@@ -16,7 +16,17 @@ export default function PatientsManagementPage() {
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ).sort((a, b) => {
+        const aPendingBalance = charges.some(c => c.patientId === a.id && c.status === "PENDING");
+        const bPendingBalance = charges.some(c => c.patientId === b.id && c.status === "PENDING");
+
+        const aNeedsAttention = a.approvalStatus === "PENDING_APPROVAL" || a.approvalStatus === "PENDING_FORMS" || aPendingBalance;
+        const bNeedsAttention = b.approvalStatus === "PENDING_APPROVAL" || b.approvalStatus === "PENDING_FORMS" || bPendingBalance;
+
+        if (aNeedsAttention && !bNeedsAttention) return -1;
+        if (!aNeedsAttention && bNeedsAttention) return 1;
+        return 0;
+    });
 
     const activePatient = patients.find(p => p.id === selectedGlobalPatientId);
 
