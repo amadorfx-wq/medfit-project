@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAppContext } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,8 @@ import {
     BarChart3,
     LogOut,
     Search,
-    DollarSign
+    DollarSign,
+    ChevronRight
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -24,6 +26,17 @@ export default function AdminLayout({
 }) {
     const { currentUser, logout, patients } = useAppContext();
     const pathname = usePathname();
+    const router = useRouter();
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+    // Filter top 5 patients
+    const searchResults = patients.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.phone && p.phone.includes(searchQuery))
+    ).slice(0, 5);
 
     // Basic RBAC
     if (currentUser?.role !== "ADMIN") {
@@ -126,8 +139,52 @@ export default function AdminLayout({
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                         <Input
                             placeholder="Global Search: Patient Name, Email, or Phone..."
-                            className="w-full bg-white/5 border-white/10 text-white pl-10 h-10 rounded-full focus-visible:ring-[#B8977E]/50"
+                            className="w-full bg-[#111A27] border-white/10 text-white pl-10 h-10 rounded-full focus-visible:ring-1 focus-visible:ring-[#B8977E]/50 focus-visible:bg-[#0C1420] transition-colors"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                         />
+
+                        {/* Dropdown de Resultados */}
+                        {isSearchFocused && searchQuery.length > 1 && (
+                            <div className="absolute top-12 left-0 w-full bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-50">
+                                {searchResults.length > 0 ? (
+                                    <ul className="py-2">
+                                        {searchResults.map(patient => (
+                                            <li
+                                                key={patient.id}
+                                                className="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center justify-between group transition-colors"
+                                                onClick={() => {
+                                                    setSearchQuery("");
+                                                    if (pathname === '/admin/patients') {
+                                                        // Ensure the page rerenders or we push properly
+                                                        router.push(`/admin/patients?patientId=${patient.id}`, { scroll: false });
+                                                    } else {
+                                                        router.push(`/admin/patients?patientId=${patient.id}`);
+                                                    }
+                                                }}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white group-hover:bg-[#B8977E]/20 group-hover:text-[#B8977E] transition-colors">
+                                                        {patient.name.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-medium text-white group-hover:text-[#B8977E] transition-colors">{patient.name}</div>
+                                                        <div className="text-[10px] text-white/50">{patient.email} {patient.phone ? `• ${patient.phone}` : ''}</div>
+                                                    </div>
+                                                </div>
+                                                <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors" />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="p-4 text-center text-sm text-white/50 bg-[#0C1420]">
+                                        No matching patients found for "{searchQuery}"
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </header>
 
