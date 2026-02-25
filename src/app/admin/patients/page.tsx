@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAppContext } from "@/lib/store";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -8,25 +8,27 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
 
-export default function PatientsManagementPage() {
+function PatientCRMContent() {
     const { patients, charges } = useAppContext();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const params = new URLSearchParams(window.location.search);
-            const patientId = params.get('patientId');
-            if (patientId) {
-                const exists = patients.some(p => p.id === patientId);
-                if (exists) {
-                    setSelectedPatientId(patientId);
+        const patientId = searchParams.get('patientId');
+        if (patientId) {
+            const exists = patients.some(p => p.id === patientId);
+            if (exists) {
+                setSelectedPatientId(patientId);
+                // Clear the URL to avoid re-triggering if modal is closed and reopened
+                if (typeof window !== 'undefined') {
                     window.history.replaceState(null, '', '/admin/patients');
                 }
             }
         }
-    }, [patients]);
+    }, [searchParams, patients]);
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -250,5 +252,13 @@ export default function PatientsManagementPage() {
             )}
 
         </div>
+    );
+}
+
+export default function PatientsManagementPage() {
+    return (
+        <Suspense fallback={<div className="p-10 text-white/50 text-center font-serif">Loading Patient CRM...</div>}>
+            <PatientCRMContent />
+        </Suspense>
     );
 }
