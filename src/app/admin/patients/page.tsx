@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppContext } from "@/lib/store";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,20 @@ export default function PatientsManagementPage() {
     const { patients, charges } = useAppContext();
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const patientId = params.get('patientId');
+            if (patientId) {
+                const exists = patients.some(p => p.id === patientId);
+                if (exists) {
+                    setSelectedPatientId(patientId);
+                    window.history.replaceState(null, '', '/admin/patients');
+                }
+            }
+        }
+    }, [patients]);
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

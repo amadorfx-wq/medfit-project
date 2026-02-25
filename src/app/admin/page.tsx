@@ -12,9 +12,12 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Search, Users, CreditCard, DollarSign, Calendar, LogOut, FileText, ChevronRight, AlertCircle, Mail } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboardPage() {
     const { currentUser, logout, patients, charges, addCharge, authorizeTreatment } = useAppContext();
+    const router = useRouter();
 
     // Form state
     const [selectedPatientId, setSelectedPatientId] = useState<string>("p1");
@@ -72,54 +75,67 @@ export default function AdminDashboardPage() {
 
                 {/* KPIs */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                    <Card className="bg-[#0C1420] border-border/50 text-white">
-                        <CardContent className="p-5">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-white/60">Total Patients</span>
-                                <Users className="w-4 h-4 text-white/40" />
-                            </div>
-                            <div className="text-3xl font-serif">{patients.length}</div>
-                        </CardContent>
-                    </Card>
+                    <Link href="/admin/patients" className="block focus:outline-none">
+                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-white/10 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] transition-all duration-300 cursor-pointer group">
+                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Total Patients</span>
+                                    <Users className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors" />
+                                </div>
+                                <div className="text-3xl font-serif text-white group-hover:text-[#B8977E] transition-colors">{patients.length}</div>
+                            </CardContent>
+                        </Card>
+                    </Link>
 
-                    <Card className="bg-[#0C1420] border-border/50 text-white">
-                        <CardContent className="p-5 relative overflow-hidden">
-                            {totalPending > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-white/60">Pending Invoices</span>
-                                <CreditCard className={`w-4 h-4 ${totalPending > 0 ? 'text-[#E8A838]' : 'text-white/40'}`} />
-                            </div>
-                            <div className={`text-3xl font-serif ${totalPending > 0 ? 'text-[#E8A838]' : 'text-white'}`}>{totalPending}</div>
-                        </CardContent>
-                    </Card>
+                    <Link href="/admin/billing" className="block focus:outline-none">
+                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#E8A838]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(232,168,56,0.05)] transition-all duration-300 cursor-pointer group">
+                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
+                                {totalPending > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Pending Invoices</span>
+                                    <CreditCard className={`w-4 h-4 transition-colors ${totalPending > 0 ? 'text-[#E8A838]' : 'text-white/40 group-hover:text-white/60'}`} />
+                                </div>
+                                <div className={`text-3xl font-serif transition-colors ${totalPending > 0 ? 'text-[#E8A838] group-hover:text-[#E8A838]/80' : 'text-white group-hover:text-[#B8977E]'}`}>{totalPending}</div>
+                            </CardContent>
+                        </Card>
+                    </Link>
 
-                    <Card className="bg-[#0C1420] border-border/50 text-white">
-                        <CardContent className="p-5">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-white/60">Revenue (MTD)</span>
-                                <DollarSign className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="text-3xl font-serif">${revenueAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                        </CardContent>
-                    </Card>
+                    <Link href="/admin/analytics" className="block focus:outline-none">
+                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#8FA677]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(143,166,119,0.05)] transition-all duration-300 cursor-pointer group">
+                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Revenue (MTD)</span>
+                                    <DollarSign className="w-4 h-4 text-[#8FA677] group-hover:text-[#8FA677]/80 transition-colors" />
+                                </div>
+                                <div className="text-3xl font-serif text-white group-hover:text-[#8FA677] transition-colors">${revenueAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                            </CardContent>
+                        </Card>
+                    </Link>
 
-                    <Card className="bg-[#0C1420] border-border/50 text-white cursor-pointer hover:bg-white/5 transition-colors">
-                        <CardContent className="p-5 relative overflow-hidden">
-                            {pendingAuthorizations > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-white/60">Pending Approvals</span>
-                                <AlertCircle className={`w-4 h-4 ${pendingAuthorizations > 0 ? 'text-[#E8A838]' : 'text-white/40'}`} />
-                            </div>
-                            <div className={`text-3xl font-serif ${pendingAuthorizations > 0 ? 'text-[#E8A838]' : 'text-white'}`}>{pendingAuthorizations}</div>
-                        </CardContent>
-                    </Card>
+                    <Link href="/admin/approvals" className="block focus:outline-none">
+                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#E8A838]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(232,168,56,0.05)] transition-all duration-300 cursor-pointer group">
+                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
+                                {pendingAuthorizations > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Pending Approvals</span>
+                                    <AlertCircle className={`w-4 h-4 transition-colors ${pendingAuthorizations > 0 ? 'text-[#E8A838]' : 'text-white/40 group-hover:text-white/60'}`} />
+                                </div>
+                                <div className={`text-3xl font-serif transition-colors ${pendingAuthorizations > 0 ? 'text-[#E8A838] group-hover:text-[#E8A838]/80' : 'text-white group-hover:text-[#B8977E]'}`}>{pendingAuthorizations}</div>
+                            </CardContent>
+                        </Card>
+                    </Link>
                 </div>
 
                 {/* Patients Table */}
                 <div className="bg-[#0C1420] border border-border/50 rounded-xl overflow-hidden shadow-2xl">
                     <div className="p-5 border-b border-border/50 flex justify-between items-center">
                         <h2 className="text-lg font-serif text-white">Patient Accounts</h2>
-                        <Button variant="outline" size="sm" className="bg-transparent border-white/10 text-white hover:bg-white/5">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-transparent border-white/10 text-white hover:bg-white/5"
+                            onClick={() => router.push('/admin/patients')}
+                        >
                             View All Directory
                         </Button>
                     </div>
@@ -137,7 +153,11 @@ export default function AdminDashboardPage() {
                             {patients.map(patient => {
                                 const balance = getPatientPendingBalance(patient.id);
                                 return (
-                                    <TableRow key={patient.id} className="border-border/50 text-white/80 hover:bg-white/5">
+                                    <TableRow
+                                        key={patient.id}
+                                        className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer transition-colors"
+                                        onClick={() => router.push(`/admin/patients?patientId=${patient.id}`)}
+                                    >
                                         <TableCell className="font-medium text-white flex items-center gap-3 py-4">
                                             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white">
                                                 {patient.name.charAt(0)}
