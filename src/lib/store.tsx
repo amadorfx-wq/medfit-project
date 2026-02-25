@@ -50,6 +50,7 @@ interface AppContextType {
     submitForm: (formId: string) => void;
     authorizeTreatment: (patientId: string, amount: number, description: string) => void;
     enrollTreatment: (patientId: string, treatment: string) => void;
+    addRequiredFormToPatient: (patientId: string, formSlug: string) => void;
     // Core Navigation State
     selectedGlobalPatientId: string | null;
     setSelectedGlobalPatientId: (id: string | null) => void;
@@ -172,9 +173,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }));
     };
 
+    const addRequiredFormToPatient = (patientId: string, formSlug: string) => {
+        setPatients(prev => prev.map(p => {
+            if (p.id === patientId) {
+                // Return early if already required
+                if (p.requiredForms.includes(formSlug)) return p;
+
+                const combinedRequired = [...p.requiredForms, formSlug];
+                const allDone = combinedRequired.every(req => p.completedForms.includes(req));
+
+                return {
+                    ...p,
+                    requiredForms: combinedRequired,
+                    formsStatus: allDone ? "COMPLETED" : "PENDING",
+                    approvalStatus: allDone ? "PENDING_APPROVAL" : "PENDING_FORMS"
+                };
+            }
+            return p;
+        }));
+    };
+
     return (
         <AppContext.Provider value={{
-            currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment, selectedGlobalPatientId, setSelectedGlobalPatientId
+            currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment, addRequiredFormToPatient, selectedGlobalPatientId, setSelectedGlobalPatientId
         }}>
             {children}
         </AppContext.Provider>

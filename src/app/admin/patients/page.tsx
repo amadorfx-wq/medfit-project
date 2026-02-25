@@ -12,8 +12,22 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 export default function PatientsManagementPage() {
-    const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId } = useAppContext();
+    const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId, addRequiredFormToPatient } = useAppContext();
     const [searchTerm, setSearchTerm] = useState("");
+
+    // Document Management States
+    const [selectedDocumentPreview, setSelectedDocumentPreview] = useState<string | null>(null);
+    const [isMapFormModalOpen, setIsMapFormModalOpen] = useState(false);
+    const [selectedFormToMap, setSelectedFormToMap] = useState<string>("");
+
+    const AVAILABLE_FORM_TEMPLATES = [
+        "wellness-intake",
+        "medical-weight-loss",
+        "semaglutide-instructions",
+        "testosterone-therapy",
+        "peptide-therapy",
+        "nfc-hipaa"
+    ];
 
     const filteredPatients = patients.filter(p =>
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -46,6 +60,32 @@ export default function PatientsManagementPage() {
 
     const formatFormName = (slug: string) => {
         return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
+    const handleDownloadDocument = (formName: string) => {
+        const promise = new Promise((resolve) => {
+            setTimeout(() => {
+                // Mock a PDF Download
+                const blob = new Blob([`Mock PDF content for ${formName}`], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${activePatient?.name.replace(' ', '_')}_${formName}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                resolve(true);
+            }, 1500);
+        });
+
+        toast.promise(promise, {
+            loading: `Decrypting & Assembling ${formatFormName(formName)}...`,
+            success: 'Secure PDF downloaded to your local drive.',
+            error: 'Failed to access encrypted filesystem.',
+        });
     };
 
     return (
@@ -284,10 +324,20 @@ export default function PatientsManagementPage() {
                                                         </div>
                                                         {isCompleted ? (
                                                             <div className="flex items-center gap-2">
-                                                                <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 h-9">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="text-white/70 hover:text-white hover:bg-white/10 h-9"
+                                                                    onClick={() => setSelectedDocumentPreview(reqFormSlug)}
+                                                                >
                                                                     Open
                                                                 </Button>
-                                                                <Button variant="outline" size="sm" className="border-white/10 text-white hover:bg-white/10 h-9">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="border-white/10 text-white hover:bg-white/10 h-9"
+                                                                    onClick={() => handleDownloadDocument(reqFormSlug)}
+                                                                >
                                                                     Download
                                                                 </Button>
                                                             </div>
@@ -302,7 +352,11 @@ export default function PatientsManagementPage() {
                                         </div>
                                     )}
 
-                                    <Button variant="outline" className="w-full mt-4 border-dashed border-white/10 text-white/50 hover:text-white hover:bg-white/5 h-12">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full mt-4 border-dashed border-white/10 text-white/50 hover:text-white hover:bg-white/5 h-12"
+                                        onClick={() => setIsMapFormModalOpen(true)}
+                                    >
                                         <Plus className="w-4 h-4 mr-2" />
                                         Map New Form Template to Protocol
                                     </Button>
@@ -379,6 +433,88 @@ export default function PatientsManagementPage() {
                             </Tabs>
                         </div>
                     </div>
+
+                    {/* Document Viewer Modal */}
+                    <Dialog open={!!selectedDocumentPreview} onOpenChange={(open) => !open && setSelectedDocumentPreview(null)}>
+                        <DialogContent className="bg-[#0A0F17] border-white/10 text-white sm:max-w-2xl">
+                            <DialogHeader>
+                                <DialogTitle className="font-serif text-2xl flex items-center gap-2">
+                                    <FileCheck2 className="w-6 h-6 text-[#8FA677]" />
+                                    Clinical Document Viewer
+                                </DialogTitle>
+                                <DialogDescription className="text-white/50">
+                                    Encrypted read-only access to signed HIPAA agreements and intake protocols.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="bg-[#080D15] rounded-lg border border-white/5 p-8 mt-4 min-h-[400px] flex flex-col">
+                                <div className="border-b border-white/10 pb-6 mb-6">
+                                    <h4 className="text-xl font-medium text-white">{selectedDocumentPreview ? formatFormName(selectedDocumentPreview) : ''}</h4>
+                                    <div className="flex gap-4 mt-3">
+                                        <span className="text-xs text-white/40 flex items-center gap-1">
+                                            <Users className="w-3 h-3" /> {activePatient.name}
+                                        </span>
+                                        <span className="text-xs text-[#8FA677] flex items-center gap-1">
+                                            <CheckCircle2 className="w-3 h-3" /> Verified Signature
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 flex items-center justify-center">
+                                    <div className="text-center">
+                                        <FileText className="w-16 h-16 text-white/5 mx-auto mb-4" />
+                                        <p className="text-white/30 text-sm">Secure document contents are loaded visually here in production via PDF.js or an embedded secure iframe.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Map New Form Template Modal */}
+                    <Dialog open={isMapFormModalOpen} onOpenChange={setIsMapFormModalOpen}>
+                        <DialogContent className="bg-[#0C1420] border-white/10 text-white">
+                            <DialogHeader>
+                                <DialogTitle className="font-serif text-2xl">Map Template to Protocol</DialogTitle>
+                                <DialogDescription className="text-white/50">
+                                    Assign a new intake form or clinical consent requirement to this patient. It will appear pending on their portal.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-6 py-4">
+                                <div className="space-y-3">
+                                    <label className="text-sm text-white/70">Select Template Library</label>
+                                    <div className="flex flex-col gap-2">
+                                        {AVAILABLE_FORM_TEMPLATES.map((template) => {
+                                            const isAlreadyRequired = activePatient.requiredForms.includes(template);
+                                            return (
+                                                <Button
+                                                    key={template}
+                                                    variant="outline"
+                                                    onClick={() => !isAlreadyRequired && setSelectedFormToMap(template)}
+                                                    className={`justify-start h-12 w-full border-white/5 ${isAlreadyRequired ? 'opacity-50 cursor-not-allowed bg-white/5 text-white/30' : selectedFormToMap === template ? 'bg-[#B8977E]/20 text-[#B8977E] border-[#B8977E]/50' : 'bg-black/20 text-white/70 hover:bg-white/5'}`}
+                                                >
+                                                    <FileText className="w-4 h-4 mr-3 opacity-50" />
+                                                    {formatFormName(template)}
+                                                    {isAlreadyRequired && <span className="ml-auto text-xs">Already Assigned</span>}
+                                                </Button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                                <Button
+                                    className="w-full bg-[#B8977E] text-black hover:bg-[#B8977E]/90"
+                                    disabled={!selectedFormToMap}
+                                    onClick={() => {
+                                        addRequiredFormToPatient(activePatient.id, selectedFormToMap);
+                                        toast.success("Template mapped successfully to patient protocol.");
+                                        setIsMapFormModalOpen(false);
+                                        setSelectedFormToMap("");
+                                    }}
+                                >
+                                    Confirm & Requirements Injection
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             )}
 
