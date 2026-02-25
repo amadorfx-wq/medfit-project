@@ -10,6 +10,8 @@ export interface Patient {
     name: string;
     email: string;
     phone?: string;
+    address?: string;
+    dob?: string;
     activeTreatment: string;
     formsStatus: "PENDING" | "COMPLETED";
     approvalStatus: "PENDING_FORMS" | "PENDING_APPROVAL" | "APPROVED";
@@ -55,10 +57,10 @@ interface AppContextType {
 
 // Initial Mock Data
 const MOCK_PATIENTS: Patient[] = [
-    { id: "p1", name: "Sarah Johnson", email: "sarah@example.com", phone: "+1 (404) 555-0198", activeTreatment: "Hormone Optimization - Month 3", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake"], completedForms: ["wellness-intake"] },
-    { id: "p2", name: "Michael Chang", email: "michael@example.com", phone: "+1 (404) 555-0245", activeTreatment: "Peptide Protocol", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake", "peptide-therapy"], completedForms: ["wellness-intake", "peptide-therapy"] },
-    { id: "p3", name: "Emma Davis", email: "emma@example.com", phone: "+1 (404) 555-0371", activeTreatment: "Medical Weight Loss", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake", "medical-weight-loss"], completedForms: ["wellness-intake", "medical-weight-loss"] },
-    { id: "test", name: "Test Patient", email: "test@medfit.com", phone: "+1 (404) 555-9999", activeTreatment: "Testosterone Therapy", formsStatus: "PENDING", approvalStatus: "PENDING_FORMS", requiredForms: ["wellness-intake", "testosterone-therapy"], completedForms: [] },
+    { id: "p1", name: "Sarah Johnson", email: "sarah@example.com", phone: "+1 (404) 555-0198", address: "123 Peachtree St, Atlanta, GA", dob: "1985-04-12", activeTreatment: "Hormone Optimization - Month 3", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake"], completedForms: ["wellness-intake"] },
+    { id: "p2", name: "Michael Chang", email: "michael@example.com", phone: "+1 (404) 555-0245", address: "456 Piedmont Ave, Atlanta, GA", dob: "1978-09-22", activeTreatment: "Peptide Protocol", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake", "peptide-therapy"], completedForms: ["wellness-intake", "peptide-therapy"] },
+    { id: "p3", name: "Emma Davis", email: "emma@example.com", phone: "+1 (404) 555-0371", address: "789 Ponce De Leon Ave, Atlanta, GA", dob: "1992-11-05", activeTreatment: "Medical Weight Loss", formsStatus: "COMPLETED", approvalStatus: "APPROVED", requiredForms: ["wellness-intake", "medical-weight-loss"], completedForms: ["wellness-intake", "medical-weight-loss"] },
+    { id: "test", name: "Test Patient", email: "test@medfit.com", phone: "+1 (404) 555-9999", address: "999 Buckhead Village, Atlanta, GA", dob: "1980-01-01", activeTreatment: "Testosterone Therapy", formsStatus: "PENDING", approvalStatus: "PENDING_FORMS", requiredForms: ["wellness-intake", "testosterone-therapy"], completedForms: [] },
 ];
 
 const MOCK_CHARGES: Charge[] = [

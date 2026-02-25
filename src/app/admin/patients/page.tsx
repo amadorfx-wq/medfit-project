@@ -6,8 +6,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign } from "lucide-react";
+import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 export default function PatientsManagementPage() {
     const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId } = useAppContext();
@@ -138,107 +140,243 @@ export default function PatientsManagementPage() {
                                 <span className="text-xs text-white/50 uppercase tracking-widest">{activePatient.id}</span>
                             </div>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="bg-transparent border-white/10 text-white hover:bg-white/10"
-                            onClick={() => setSelectedGlobalPatientId(null)}
-                        >
-                            Close Profile
-                        </Button>
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="outline"
+                                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                            >
+                                <Edit3 className="w-4 h-4 mr-2" />
+                                Edit Profile
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="bg-transparent border-white/10 text-white hover:bg-white/10"
+                                onClick={() => setSelectedGlobalPatientId(null)}
+                            >
+                                Close Directory
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-                        {/* Left Side: Demographic & Balance */}
-                        <div className="w-full lg:w-96 bg-[#080D15] p-6 lg:p-10 border-b lg:border-b-0 lg:border-r border-border/50 overflow-y-auto shrink-0">
-                            <div className="text-center mb-8">
-                                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1A2332] to-[#0A0F17] flex items-center justify-center font-serif text-5xl text-white border border-white/10 shadow-2xl mx-auto mb-6">
+                    <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-gradient-to-br from-[#0A0F17] to-[#080D15]">
+                        {/* Left Side: Demographic Panel */}
+                        <div className="w-full md:w-80 lg:w-[400px] border-b md:border-b-0 md:border-r border-border/50 shrink-0 flex flex-col bg-[#0C1420]/50 backdrop-blur-xl">
+                            <div className="p-8 text-center border-b border-border/50">
+                                <div className="w-32 h-32 rounded-full bg-black/40 flex items-center justify-center font-serif text-5xl text-[#B8977E] border border-white/10 shadow-2xl mx-auto mb-6 relative">
                                     {activePatient.name.charAt(0)}
+                                    <div className="absolute bottom-2 right-2 w-4 h-4 rounded-full bg-green-500 border-2 border-[#0A0F17]" />
                                 </div>
-                                <h2 className="text-3xl font-serif text-white">{activePatient.name}</h2>
-                                <p className="text-white/50 text-base mt-2">{activePatient.email}</p>
+                                <h2 className="text-2xl font-serif text-white">{activePatient.name}</h2>
+                                <p className="text-[#8FA677] text-sm mt-1 flex items-center justify-center gap-1.5 font-medium">
+                                    <Activity className="w-4 h-4" />
+                                    {activePatient.activeTreatment}
+                                </p>
                             </div>
 
-                            <div className="space-y-8">
-                                <div>
-                                    <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Current Active Treatment</p>
-                                    <div className="flex items-center gap-2 p-4 bg-white/5 rounded-xl border border-white/5">
-                                        <Activity className="w-5 h-5 text-[#8FA677]" />
-                                        <p className="text-white text-base font-medium">{activePatient.activeTreatment}</p>
-                                    </div>
-                                </div>
+                            <div className="p-8 flex-1 overflow-y-auto">
+                                <h3 className="text-xs text-white/40 uppercase tracking-widest mb-6 font-semibold">Contact & Demographics</h3>
 
-                                <div className="p-5 bg-black/40 rounded-xl border border-white/5 shadow-inner">
-                                    <p className="text-xs text-white/40 uppercase tracking-wider mb-4">Financial Standing</p>
-                                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-white/5">
-                                        <span className="text-base text-white/70">Unpaid Balances</span>
-                                        <span className="text-red-400 font-serif text-xl">${getPatientPendingBalance(activePatient.id).toFixed(2)}</span>
+                                <div className="space-y-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                                            <Phone className="w-4 h-4 text-[#B8977E]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/50 mb-1">Phone Number</p>
+                                            <p className="text-sm text-white">{activePatient.phone}</p>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-base text-white/70">Lifetime Value</span>
-                                        <span className="text-[#8FA677] font-serif text-xl">${getPatientPaidTotal(activePatient.id).toFixed(2)}</span>
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                                            <Mail className="w-4 h-4 text-[#B8977E]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/50 mb-1">Email Address</p>
+                                            <p className="text-sm text-white break-all">{activePatient.email}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                                            <MapPin className="w-4 h-4 text-[#B8977E]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/50 mb-1">Physical Address</p>
+                                            <p className="text-sm text-white leading-relaxed">{activePatient.address}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+                                            <Calendar className="w-4 h-4 text-[#B8977E]" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-white/50 mb-1">Date of Birth</p>
+                                            <p className="text-sm text-white">{activePatient.dob}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Side: Compliance Logs */}
-                        <div className="flex-1 p-6 lg:p-12 overflow-y-auto bg-gradient-to-b from-[#0C1420] to-[#080D15]">
-                            <div className="max-w-4xl mx-auto">
-                                <div className="mb-10">
-                                    <h3 className="text-3xl font-serif flex items-center gap-3 text-white mb-2">
-                                        <FileCheck2 className="w-8 h-8 text-[#B8977E]" />
+                        {/* Right Side: Consolidated History (Tabs) */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8">
+                            <Tabs defaultValue="medical" className="w-full max-w-5xl mx-auto">
+                                <TabsList className="bg-[#0C1420] border border-white/10 p-1 mb-8">
+                                    <TabsTrigger value="medical" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-white/50">
                                         Medical Records & Forms
-                                    </h3>
-                                    <p className="text-white/50 text-base">
-                                        Digital footprint of all medical intake forms and signed consents securely logged. Ready for HIPAA audit.
-                                    </p>
-                                </div>
+                                    </TabsTrigger>
+                                    <TabsTrigger value="financial" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-white/50">
+                                        Purchases & Financial History
+                                    </TabsTrigger>
+                                </TabsList>
 
-                                <div className="space-y-4">
+                                {/* TAB 1: Medical Records */}
+                                <TabsContent value="medical" className="space-y-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                        <div>
+                                            <h3 className="text-2xl font-serif text-white">Clinical Footprint</h3>
+                                            <p className="text-white/50 text-sm mt-1">Legally binding intake consents and laboratory logs.</p>
+                                        </div>
+                                        {activePatient.completedForms.length > 0 && (
+                                            <Button
+                                                className="bg-[#B8977E] text-black hover:bg-[#B8977E]/90 h-11 px-6 font-medium shadow-[0_0_20px_rgba(184,151,126,0.15)]"
+                                                onClick={() => {
+                                                    const promise = new Promise((resolve) => setTimeout(resolve, 2000));
+                                                    toast.promise(promise, {
+                                                        loading: 'Compiling Encrypted Medical File...',
+                                                        success: 'Secure PDF Ready for Download.',
+                                                        error: 'Error Compiling Data.',
+                                                    });
+                                                }}
+                                            >
+                                                <Download className="w-4 h-4 mr-2" />
+                                                Export Medical Record
+                                            </Button>
+                                        )}
+                                    </div>
+
                                     {activePatient.requiredForms.length === 0 ? (
-                                        <div className="text-center py-20 bg-black/20 rounded-2xl border border-white/5 border-dashed">
+                                        <div className="text-center py-24 bg-black/20 rounded-2xl border border-white/5 border-dashed">
                                             <FileText className="w-12 h-12 text-white/10 mx-auto mb-4" />
                                             <p className="text-white/40">No records or forms are associated with this patient account yet.</p>
                                         </div>
                                     ) : (
-                                        activePatient.requiredForms.map((reqFormSlug, i) => {
-                                            const isCompleted = activePatient.completedForms.includes(reqFormSlug);
-                                            return (
-                                                <div key={i} className={`flex items-center justify-between p-6 rounded-2xl border transition-colors ${isCompleted ? 'bg-[#8FA677]/5 border-[#8FA677]/20 hover:bg-[#8FA677]/10' : 'bg-black/20 border-white/5 border-dashed'}`}>
-                                                    <div className="flex items-center gap-6">
-                                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${isCompleted ? 'bg-[#8FA677]/20 text-[#8FA677]' : 'bg-white/5 text-white/30'}`}>
-                                                            <FileText className="w-6 h-6" />
+                                        <div className="grid gap-3">
+                                            {activePatient.requiredForms.map((reqFormSlug, i) => {
+                                                const isCompleted = activePatient.completedForms.includes(reqFormSlug);
+                                                return (
+                                                    <div key={i} className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border transition-all ${isCompleted ? 'bg-black/40 border-white/5 hover:bg-white/5' : 'bg-black/20 border-white/5 border-dashed opacity-70'}`}>
+                                                        <div className="flex items-center gap-5 mb-4 sm:mb-0">
+                                                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${isCompleted ? 'bg-[#8FA677]/10 text-[#8FA677]' : 'bg-white/5 text-white/30'}`}>
+                                                                <FileText className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-base font-medium ${isCompleted ? 'text-white' : 'text-white/50'}`}>{formatFormName(reqFormSlug)}</h4>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                    {isCompleted ? (
+                                                                        <span className="flex items-center text-xs text-[#8FA677]">
+                                                                            <CheckCircle2 className="w-3 h-3 mr-1" /> Verified
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-xs text-white/40">Awaiting Signature</span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <h4 className={`text-lg font-medium ${isCompleted ? 'text-white' : 'text-white/50'}`}>{formatFormName(reqFormSlug)}</h4>
-                                                            <p className="text-sm text-white/40 mt-1">
-                                                                {isCompleted ? 'Digitally Signed & Verified' : 'Awaiting Patient Signature'}
-                                                            </p>
-                                                        </div>
+                                                        {isCompleted ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 h-9">
+                                                                    Open
+                                                                </Button>
+                                                                <Button variant="outline" size="sm" className="border-white/10 text-white hover:bg-white/10 h-9">
+                                                                    Download
+                                                                </Button>
+                                                            </div>
+                                                        ) : (
+                                                            <Badge variant="outline" className="text-[#E8A838] border-[#E8A838]/20 bg-[#E8A838]/5 uppercase px-3 py-1 text-[10px] w-fit">
+                                                                Required for MD Auth
+                                                            </Badge>
+                                                        )}
                                                     </div>
-                                                    {isCompleted ? (
-                                                        <Button variant="outline" className="border-[#B8977E]/50 text-[#B8977E] hover:bg-[#B8977E] hover:text-black bg-transparent h-10 px-6 shrink-0 shadow-[0_0_15px_rgba(184,151,126,0.1)]">
-                                                            Abre & Descarga
-                                                        </Button>
-                                                    ) : (
-                                                        <Badge variant="outline" className="text-white/30 border-white/10 uppercase text-xs px-3 py-1 cursor-not-allowed hidden md:flex">
-                                                            Pending Action
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            );
-                                        })
+                                                );
+                                            })}
+                                        </div>
                                     )}
-                                </div>
 
-                                {activePatient.completedForms.length > 0 && (
-                                    <div className="mt-12 flex justify-end">
-                                        <Button className="bg-[#B8977E] text-black hover:bg-[#B8977E]/90 shadow-[0_4px_20px_rgba(184,151,126,0.2)] h-12 px-8 font-semibold">
-                                            Export Medical Record (Encrypted PDF)
+                                    <Button variant="outline" className="w-full mt-4 border-dashed border-white/10 text-white/50 hover:text-white hover:bg-white/5 h-12">
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Map New Form Template to Protocol
+                                    </Button>
+                                </TabsContent>
+
+                                {/* TAB 2: Financial History */}
+                                <TabsContent value="financial" className="space-y-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                        <div>
+                                            <h3 className="text-2xl font-serif text-white">Transaction Logs</h3>
+                                            <p className="text-white/50 text-sm mt-1">Lifetime value and pending billing actions.</p>
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <div className="px-4 py-2 bg-black/40 border border-white/5 rounded-lg text-center">
+                                                <p className="text-[10px] uppercase text-white/40 tracking-wider">Unpaid Blnc.</p>
+                                                <p className="text-red-400 font-serif text-lg leading-tight mt-0.5">${getPatientPendingBalance(activePatient.id).toFixed(2)}</p>
+                                            </div>
+                                            <div className="px-4 py-2 bg-black/40 border border-white/5 rounded-lg text-center">
+                                                <p className="text-[10px] uppercase text-white/40 tracking-wider">Lifetime LTV</p>
+                                                <p className="text-[#8FA677] font-serif text-lg leading-tight mt-0.5">${getPatientPaidTotal(activePatient.id).toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-white/5 rounded-xl overflow-hidden bg-black/20">
+                                        <Table>
+                                            <TableHeader className="bg-white/5">
+                                                <TableRow className="border-white/5 hover:bg-transparent">
+                                                    <TableHead className="text-white/50 text-xs">Date</TableHead>
+                                                    <TableHead className="text-white/50 text-xs">Description</TableHead>
+                                                    <TableHead className="text-white/50 text-xs text-right">Amount</TableHead>
+                                                    <TableHead className="text-white/50 text-xs text-right">Status</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {charges.filter(c => c.patientId === activePatient.id).map(charge => (
+                                                    <TableRow key={charge.id} className="border-white/5 hover:bg-white/5">
+                                                        <TableCell className="text-white/70 py-4">
+                                                            <span className="flex items-center gap-2">
+                                                                <Clock className="w-3.5 h-3.5 text-white/40" />
+                                                                {charge.date}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell className="text-white font-medium py-4">{charge.description}</TableCell>
+                                                        <TableCell className="text-right text-white font-serif py-4">${charge.amount.toFixed(2)}</TableCell>
+                                                        <TableCell className="text-right py-4">
+                                                            {charge.status === "PAID" ? (
+                                                                <Badge className="bg-[#8FA677]/10 text-[#8FA677] border-none">Paid</Badge>
+                                                            ) : (
+                                                                <Badge className="bg-red-500/10 text-red-400 border-none px-3 font-normal">Pending</Badge>
+                                                            )}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                                {charges.filter(c => c.patientId === activePatient.id).length === 0 && (
+                                                    <TableRow className="border-white/5 hover:bg-transparent">
+                                                        <TableCell colSpan={4} className="text-center py-12 text-white/30">
+                                                            <CreditCard className="w-8 h-8 mx-auto mb-3 opacity-20" />
+                                                            No transaction history found for this account.
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+
+                                    <div className="flex justify-end pt-2">
+                                        <Button variant="outline" className="border-white/10 text-white hover:bg-white/5 h-10 px-6">
+                                            <DollarSign className="w-4 h-4 mr-2" />
+                                            Billing Interruption / Manual Action
                                         </Button>
                                     </div>
-                                )}
-                            </div>
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     </div>
                 </div>
