@@ -381,8 +381,8 @@ export default function PatientsManagementPage() {
                                         </div>
                                     </div>
 
-                                    <div className="border border-white/5 rounded-xl overflow-hidden bg-black/20">
-                                        <Table>
+                                    <div className="border border-white/5 rounded-xl overflow-x-auto bg-black/20">
+                                        <Table className="min-w-[600px]">
                                             <TableHeader className="bg-white/5">
                                                 <TableRow className="border-white/5 hover:bg-transparent">
                                                     <TableHead className="text-white/50 text-xs">Date</TableHead>

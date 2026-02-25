@@ -139,73 +139,83 @@ export default function AdminDashboardPage() {
                             View All Directory
                         </Button>
                     </div>
-                    <Table>
-                        <TableHeader className="bg-white/5">
-                            <TableRow className="border-border/50 hover:bg-transparent">
-                                <TableHead className="text-white/50 text-xs tracking-wider uppercase">Patient Name</TableHead>
-                                <TableHead className="text-white/50 text-xs tracking-wider uppercase">Active Treatment</TableHead>
-                                <TableHead className="text-white/50 text-xs tracking-wider uppercase">Balance Due</TableHead>
-                                <TableHead className="text-white/50 text-xs tracking-wider uppercase">Forms Intake</TableHead>
-                                <TableHead className="text-white/50 text-xs tracking-wider uppercase text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {[...patients].sort((a, b) => {
-                                const aPendingBalance = charges.some(c => c.patientId === a.id && c.status === "PENDING");
-                                const bPendingBalance = charges.some(c => c.patientId === b.id && c.status === "PENDING");
+                    <div className="overflow-x-auto">
+                        <Table className="min-w-[800px]">
+                            <TableHeader className="bg-white/5">
+                                <TableRow className="border-border/50 hover:bg-transparent">
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Patient Name</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Active Treatment</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Balance Due</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Forms Intake</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {[...patients].sort((a, b) => {
+                                    const aPendingBalance = charges.some(c => c.patientId === a.id && c.status === "PENDING");
+                                    const bPendingBalance = charges.some(c => c.patientId === b.id && c.status === "PENDING");
 
-                                const aNeedsAttention = a.approvalStatus === "PENDING_APPROVAL" || a.approvalStatus === "PENDING_FORMS" || aPendingBalance;
-                                const bNeedsAttention = b.approvalStatus === "PENDING_APPROVAL" || b.approvalStatus === "PENDING_FORMS" || bPendingBalance;
+                                    const aNeedsAttention = a.approvalStatus === "PENDING_APPROVAL" || a.approvalStatus === "PENDING_FORMS" || aPendingBalance;
+                                    const bNeedsAttention = b.approvalStatus === "PENDING_APPROVAL" || b.approvalStatus === "PENDING_FORMS" || bPendingBalance;
 
-                                if (aNeedsAttention && !bNeedsAttention) return -1;
-                                if (!aNeedsAttention && bNeedsAttention) return 1;
-                                return 0;
-                            }).map(patient => {
-                                const balance = getPatientPendingBalance(patient.id);
-                                return (
-                                    <TableRow
-                                        key={patient.id}
-                                        className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer transition-colors"
-                                        onClick={() => {
-                                            setSelectedGlobalPatientId(patient.id);
-                                            router.push('/admin/patients');
-                                        }}
-                                    >
-                                        <TableCell className="font-medium text-white flex items-center gap-3 py-4">
-                                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white">
-                                                {patient.name.charAt(0)}
-                                            </div>
-                                            {patient.name}
-                                        </TableCell>
-                                        <TableCell className="py-4 text-sm">
-                                            {patient.activeTreatment}
-                                            {patient.approvalStatus === "PENDING_APPROVAL" && (
-                                                <Badge variant="outline" className="ml-2 border-[#E8A838]/50 text-[#E8A838]/90 bg-[#E8A838]/10 text-[10px] uppercase">
-                                                    Requires Auth
-                                                </Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="py-4">
-                                            {balance > 0 ? (
-                                                <Badge variant="outline" className="border-red-500/50 text-red-400 bg-red-500/10 font-normal">
-                                                    ${balance.toFixed(2)}
-                                                </Badge>
-                                            ) : (
-                                                <span className="text-white/40 text-sm">Clear</span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right py-4">
-                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-white/50 hover:text-white">
-                                                <ChevronRight className="w-4 h-4" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                                    if (aNeedsAttention && !bNeedsAttention) return -1;
+                                    if (!aNeedsAttention && bNeedsAttention) return 1;
+                                    return 0;
+                                }).map(patient => {
+                                    const balance = getPatientPendingBalance(patient.id);
+                                    return (
+                                        <TableRow
+                                            key={patient.id}
+                                            className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer transition-colors"
+                                            onClick={() => {
+                                                setSelectedGlobalPatientId(patient.id);
+                                                router.push('/admin/patients');
+                                            }}
+                                        >
+                                            <TableCell className="font-medium text-white flex items-center gap-3 py-4">
+                                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white">
+                                                    {patient.name.charAt(0)}
+                                                </div>
+                                                {patient.name}
+                                            </TableCell>
+                                            <TableCell className="py-4 text-sm">
+                                                {patient.activeTreatment}
+                                                {patient.approvalStatus === "PENDING_APPROVAL" && (
+                                                    <Badge variant="outline" className="ml-2 border-[#E8A838]/50 text-[#E8A838]/90 bg-[#E8A838]/10 text-[10px] uppercase">
+                                                        Requires Auth
+                                                    </Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="py-4">
+                                                {balance > 0 ? (
+                                                    <Badge variant="outline" className="border-red-500/50 text-red-400 bg-red-500/10 font-normal">
+                                                        ${balance.toFixed(2)}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-white/40 text-sm">Clear</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="py-4">
+                                                {patient.formsStatus === "COMPLETED" ? (
+                                                    <Badge variant="outline" className="border-[#8FA677]/50 text-[#8FA677] bg-[#8FA677]/10 font-normal">
+                                                        Completed
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-[#E8A838]/80 text-sm">Action Needed</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right py-4">
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-white/50 hover:text-white">
+                                                    <ChevronRight className="w-4 h-4" />
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
-
             </main>
         </div>
     );
