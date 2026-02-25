@@ -6,6 +6,7 @@ export interface BlogPost {
     category: string;
     date: string;
     readTime: string;
+    image?: string;
 }
 
 export const academyPosts: BlogPost[] = [
@@ -16,6 +17,7 @@ export const academyPosts: BlogPost[] = [
         category: "Precisión Diagnóstica",
         date: "Feb 22, 2026",
         readTime: "4 min read",
+        image: "/images/academy/academy_nfc_panel.png",
         content: (
             <>
                 <p>La medicina tradicional a menudo espera a que aparezcan los síntomas para actuar. En el ámbito del bienestar premium, el enfoque es la optimización proactiva. Las pruebas de laboratorio NFC (Nutricionales, Funcionales y Celulares) representan el estándar de oro en la evaluación de la salud personalizada.</p>
@@ -40,6 +42,7 @@ export const academyPosts: BlogPost[] = [
         category: "Control de Peso",
         date: "Feb 18, 2026",
         readTime: "5 min read",
+        image: "/images/academy/academy_weight_loss.png",
         content: (
             <>
                 <p>El ciclo de las dietas restrictivas y el ejercicio extremo está obsoleto. Hoy en día, alcanzar y mantener un peso saludable requiere un enfoque clínico que entienda que la ganancia de peso rara vez es solo una cuestión de fuerza de voluntad; es una interacción compleja de genética, hormonas y metabolismo.</p>
@@ -64,6 +67,7 @@ export const academyPosts: BlogPost[] = [
         category: "Optimización Hormonal",
         date: "Feb 10, 2026",
         readTime: "6 min read",
+        image: "/images/academy/academy_trt.png",
         content: (
             <>
                 <p>A medida que los hombres envejecen, la producción natural de testosterona disminuye, llevando a lo que muchos asumen erróneamente como signos inevitables del envejecimiento: fatiga persistente, niebla mental, pérdida de masa muscular y disminución del impulso vital. La Terapia de Reemplazo de Testosterona (TRT) desafía esta narrativa.</p>
@@ -88,6 +92,7 @@ export const academyPosts: BlogPost[] = [
         category: "Medicina Regenerativa",
         date: "Feb 05, 2026",
         readTime: "4 min read",
+        image: "/images/academy/academy_peptides.png",
         content: (
             <>
                 <p>En la frontera de la medicina regenerativa y el anti-aging se encuentra la Terapia de Péptidos. Aunque a menudo se mantiene como el secreto mejor guardado de los atletas de élite y los altos ejecutivos, su ciencia es accesible y profundamente efectiva.</p>
@@ -113,6 +118,7 @@ export const academyPosts: BlogPost[] = [
         category: "Terapias Metabólicas",
         date: "Jan 28, 2026",
         readTime: "5 min read",
+        image: "/images/academy/academy_glp1.png",
         content: (
             <>
                 <p>En los últimos años, ningún avance en la ciencia metabólica ha causado tanto impacto como los agonistas del receptor GLP-1 y GIP, conocidos comúnmente por nombres como Semaglutida y Tirzepatida. Esta innovación médica está cambiando el paradigma de la pérdida de peso para siempre.</p>

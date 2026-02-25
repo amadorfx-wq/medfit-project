@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,9 +38,20 @@ export default function AcademyPage() {
                         <Link href={`/academy/${post.slug}`} key={idx} className="group">
                             <Card className="bg-[#080808] border-border/50 hover:border-[#8FA677]/50 transition-all h-full flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: `${idx * 100}ms` }}>
                                 <div className="h-48 bg-white/5 w-full flex items-center justify-center relative overflow-hidden">
-                                    {/* Abstract generic thumbnail using gradients based on category */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-background opacity-50 group-hover:scale-105 transition-transform duration-700" />
-                                    <span className="font-serif text-2xl text-white/20 italic tracking-widest">{post.category}</span>
+                                    {post.image ? (
+                                        <Image
+                                            src={post.image}
+                                            alt={post.title}
+                                            fill
+                                            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <>
+                                            {/* Abstract generic thumbnail using gradients based on category */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-background opacity-50 group-hover:scale-105 transition-transform duration-700" />
+                                            <span className="font-serif text-2xl text-white/20 italic tracking-widest">{post.category}</span>
+                                        </>
+                                    )}
                                 </div>
                                 <CardContent className="p-6 flex flex-col flex-1">
                                     <div className="flex items-center gap-4 text-xs tracking-wider text-muted-foreground mb-4 uppercase">
