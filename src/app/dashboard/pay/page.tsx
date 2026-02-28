@@ -1,21 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { CreditCard, CheckCircle2, Apple, Smartphone, Building2, ShieldCheck, Mail } from "lucide-react";
+import { CheckCircle2, Building2, ShieldCheck, Mail } from "lucide-react";
+import { Elements } from "@stripe/react-stripe-js";
+import { getStripe } from "@/lib/stripe-client";
+import CheckoutForm from "@/components/CheckoutForm";
 
 export default function PaymentPage() {
     const router = useRouter();
     const { currentUser, patients, charges, payCharge } = useAppContext();
-    const [selectedMethod, setSelectedMethod] = useState<"card" | "apple" | "google" | "ach">("card");
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [clientSecret, setClientSecret] = useState<string | null>(null);
 
     if (!currentUser) return null;
 
@@ -23,20 +24,33 @@ export default function PaymentPage() {
     const userCharges = charges.filter(c => c.patientId === currentUser.id && c.status === "PENDING");
     const pendingBalance = userCharges.reduce((acc, curr) => acc + curr.amount, 0);
 
-    const handlePayment = () => {
-        setIsProcessing(true);
-        // Simulate network delay
-        setTimeout(() => {
-            userCharges.forEach(charge => payCharge(charge.id));
-            setIsProcessing(false);
+    useEffect(() => {
+        if (pendingBalance > 0 && !clientSecret) {
+            // Ask our Next.js API for a fresh Stripe PaymentIntent
+            fetch("/api/create-payment-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: pendingBalance,
+                    description: `MedFit Protocol Payment for ${currentPatient?.name}`
+                }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.clientSecret) {
+                        setClientSecret(data.clientSecret);
+                    }
+                })
+                .catch((err) => console.error("Failed to fetch payment intent:", err));
+        }
+    }, [pendingBalance, clientSecret, currentPatient]);
 
-            toast("Payment Successful & Confirmed", {
-                description: `A detailed receipt for $${pendingBalance.toFixed(2)} has been sent to ${currentPatient?.email || "your registered email"}`,
-                icon: <Mail className="w-4 h-4 text-green-500" />
-            });
-
-            router.push("/dashboard?paid=true");
-        }, 1500);
+    const handleSuccess = () => {
+        userCharges.forEach(charge => payCharge(charge.id));
+        toast.success("Payment Successful & Confirmed", {
+            description: `A detailed receipt for $${pendingBalance.toFixed(2)} has been sent to ${currentPatient?.email || "your email"}`,
+        });
+        router.push("/dashboard?paid=true");
     };
 
     return (
@@ -138,74 +152,36 @@ export default function PaymentPage() {
                         </div>
                     </div>
 
-                    {/* Right Col: Payment Method */}
+                    {/* Right Col: Secure Payment Terminal */}
                     <div className="bg-[#050505] -m-6 p-6 md:-m-12 md:p-12 md:border-l border-border/50 min-h-full">
-                        <h3 className="text-lg font-serif mb-6">Payment Method</h3>
+                        <h3 className="text-lg font-serif mb-6 text-foreground">Secure Checkout</h3>
 
-                        <div className="space-y-3 mb-8">
-                            <button
-                                onClick={() => setSelectedMethod("card")}
-                                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${selectedMethod === "card" ? "border-primary bg-primary/5" : "border-border/50 bg-white/5 hover:border-white/20"}`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <CreditCard className={`w-5 h-5 ${selectedMethod === "card" ? "text-primary" : "text-muted-foreground"}`} />
-                                    <span className="font-medium">Credit / Debit Card</span>
-                                </div>
-                                {selectedMethod === "card" && <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_2px_rgba(143,166,119,0.5)]" />}
-                            </button>
-
-                            <button
-                                onClick={() => setSelectedMethod("apple")}
-                                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${selectedMethod === "apple" ? "border-foreground bg-white/5" : "border-border/50 bg-white/5 hover:border-white/20"}`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Apple className={`w-5 h-5 ${selectedMethod === "apple" ? "text-foreground" : "text-muted-foreground"}`} />
-                                    <span className="font-medium">Apple Pay</span>
-                                </div>
-                                {selectedMethod === "apple" && <div className="w-2 h-2 rounded-full bg-foreground shadow-[0_0_10px_2px_rgba(255,255,255,0.3)]" />}
-                            </button>
-
-                            <button
-                                onClick={() => setSelectedMethod("google")}
-                                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${selectedMethod === "google" ? "border-foreground bg-white/5" : "border-border/50 bg-white/5 hover:border-white/20"}`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Smartphone className={`w-5 h-5 ${selectedMethod === "google" ? "text-foreground" : "text-muted-foreground"}`} />
-                                    <span className="font-medium">Google Pay</span>
-                                </div>
-                                {selectedMethod === "google" && <div className="w-2 h-2 rounded-full bg-foreground shadow-[0_0_10px_2px_rgba(255,255,255,0.3)]" />}
-                            </button>
-
-                            <button
-                                onClick={() => setSelectedMethod("ach")}
-                                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${selectedMethod === "ach" ? "border-primary bg-primary/5" : "border-border/50 bg-white/5 hover:border-white/20"}`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <Building2 className={`w-5 h-5 ${selectedMethod === "ach" ? "text-primary" : "text-muted-foreground"}`} />
-                                    <span className="font-medium">ACH Bank Transfer</span>
-                                </div>
-                                {selectedMethod === "ach" && <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_2px_rgba(143,166,119,0.5)]" />}
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {selectedMethod === "card" && (
-                                <div className="bg-black/40 p-4 rounded-xl border border-white/5 text-sm text-muted-foreground text-center">
-                                    Stripe Elements (Card Input) will render here securely in production.
+                        <div className="bg-black/20 p-6 rounded-xl border border-white/5 shadow-inner">
+                            {clientSecret ? (
+                                <Elements
+                                    stripe={getStripe()}
+                                    options={{
+                                        clientSecret,
+                                        appearance: {
+                                            theme: 'night',
+                                            variables: {
+                                                colorPrimary: '#8FA677',
+                                                colorBackground: '#1A1A1A',
+                                                colorText: '#F9F7F2',
+                                                colorDanger: '#ef4444',
+                                                fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <CheckoutForm amount={pendingBalance} onSuccess={handleSuccess} />
+                                </Elements>
+                            ) : (
+                                <div className="h-48 flex flex-col items-center justify-center text-muted-foreground animate-pulse gap-3">
+                                    <ShieldCheck className="w-8 h-8 opacity-50" />
+                                    <span>Initializing 256-bit encrypted terminal...</span>
                                 </div>
                             )}
-
-                            <Button
-                                onClick={handlePayment}
-                                disabled={isProcessing}
-                                className="w-full h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-lg shadow-[0_0_20px_rgba(143,166,119,0.3)] transition-all"
-                            >
-                                {isProcessing ? "Processing Securely..." : `Pay $${pendingBalance.toFixed(2)}`}
-                            </Button>
-
-                            <p className="text-xs text-center text-muted-foreground opacity-70 flex items-center justify-center gap-1">
-                                Protected with 256-bit encryption. <ShieldCheck className="w-3 h-3" />
-                            </p>
                         </div>
                     </div>
                 </div>

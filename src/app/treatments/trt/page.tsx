@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { AddToCartButton } from "@/components/AddToCartButton";
 
 export default function TRTLandingPage() {
     return (
@@ -34,11 +35,18 @@ export default function TRTLandingPage() {
                     <p className="text-xl md:text-2xl text-[#2D2D2D]/80 leading-relaxed font-light mb-12 max-w-2xl mx-auto">
                         Comprehensive TRT to restore optimal balance, increase lean muscle mass, improve libido, and overcome andropause symptoms.
                     </p>
-                    <Link href="/login">
-                        <Button className="bg-[#1A1A1A] hover:bg-[#2D2D2D] text-white font-medium text-lg px-8 h-16 rounded-full w-full sm:w-auto shadow-xl transition-all hover:scale-105">
-                            Start Your Journey
-                        </Button>
-                    </Link>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                        <AddToCartButton
+                            item={{ name: "TRT Protocol (Bio-identical)", price: "$249.00/mo" }}
+                            label="Add Protocol to Request Cart"
+                            className="bg-[#1A1A1A] hover:bg-[#2D2D2D] text-white font-medium text-lg px-8 h-16 rounded-full w-full sm:w-auto shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2"
+                        />
+                        <Link href="/login">
+                            <Button variant="outline" className="border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A]/5 font-medium text-lg px-8 h-16 rounded-full w-full sm:w-auto transition-all">
+                                Patient Portal Login
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </section>
 

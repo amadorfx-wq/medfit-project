@@ -15,7 +15,13 @@ import {
     LogOut,
     Search,
     DollarSign,
-    ChevronRight
+    ChevronRight,
+    Bell,
+    MessageSquare,
+    ShoppingCart,
+    ShieldCheck,
+    UserPlus,
+    Video
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -24,12 +30,15 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { currentUser, logout, patients, setSelectedGlobalPatientId } = useAppContext();
+    const { currentUser, logout, patients, setSelectedGlobalPatientId, adminNotifications, markNotificationRead } = useAppContext();
     const pathname = usePathname();
     const router = useRouter();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+    const unreadCount = adminNotifications?.filter(n => !n.read).length || 0;
 
     // Filter top 5 patients
     const searchResults = patients.filter(p =>
@@ -63,6 +72,9 @@ export default function AdminLayout({
         { name: "Billing & Invoices", href: "/admin/billing", icon: DollarSign },
         { name: "Treatments & Forms", href: "/admin/forms", icon: FileText },
         { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+        { name: "Telehealth HD", href: "/admin/telehealth", icon: Video, badge: "Locked" },
+        { name: "Staff & Roles", href: "/admin/staff", icon: UserPlus },
+        { name: "Security & Audit", href: "/admin/security", icon: ShieldCheck },
     ];
 
     return (
@@ -129,7 +141,7 @@ export default function AdminLayout({
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
                 {/* Topbar (Mobile menu toggle & Search) */}
-                <header className="h-20 border-b border-border/50 bg-[#0C1420] flex items-center justify-between px-6 lg:px-10 shrink-0">
+                <header className="h-20 border-b border-border/50 bg-[#0C1420] flex items-center justify-between px-6 lg:px-10 shrink-0 relative z-20">
                     <div className="flex items-center gap-4 lg:hidden">
                         {/* Mobile Logo placeholder */}
                         <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
@@ -184,10 +196,68 @@ export default function AdminLayout({
                             </div>
                         )}
                     </div>
+
+                    <div className="flex items-center gap-4 ml-6 relative">
+                        <button
+                            onClick={() => setIsNotifOpen(!isNotifOpen)}
+                            className="relative w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                        >
+                            <Bell className="w-5 h-5 text-white/70" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0C1420]" />
+                            )}
+                        </button>
+
+                        {/* Notification Dropdown */}
+                        {isNotifOpen && (
+                            <div className="absolute top-12 right-0 w-80 sm:w-96 bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-50">
+                                <div className="p-4 border-b border-white/5 flex items-center justify-between">
+                                    <h3 className="font-serif text-white flex items-center gap-2">
+                                        <Bell className="w-4 h-4 text-[#B8977E]" />
+                                        Notifications
+                                    </h3>
+                                    {unreadCount > 0 && (
+                                        <Badge className="bg-[#B8977E] text-black hover:bg-[#B8977E] px-2">
+                                            {unreadCount} New
+                                        </Badge>
+                                    )}
+                                </div>
+                                <div className="max-h-[300px] overflow-y-auto">
+                                    {!adminNotifications || adminNotifications.length === 0 ? (
+                                        <div className="p-8 text-center text-white/40">
+                                            <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                            <p className="text-sm">No new notifications</p>
+                                        </div>
+                                    ) : (
+                                        <ul className="divide-y divide-white/5">
+                                            {adminNotifications.map((notif) => (
+                                                <li key={notif.id} className={`p-4 transition-colors hover:bg-white/5 cursor-pointer ${notif.read ? 'opacity-60' : 'bg-white/5'}`} onClick={() => markNotificationRead(notif.id)}>
+                                                    <div className="flex items-start gap-3">
+                                                        <div className={`mt-1 p-2 rounded-full ${notif.type === 'CART_REQUEST' ? 'bg-[#8FA677]/20 text-[#8FA677]' : 'bg-[#E8A838]/20 text-[#E8A838]'}`}>
+                                                            {notif.type === 'CART_REQUEST' ? <ShoppingCart className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center justify-between mb-1">
+                                                                <p className="text-sm font-medium text-white">{notif.patientName}</p>
+                                                                <span className="text-[10px] text-white/40">
+                                                                    {new Date(notif.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-white/60 line-clamp-2">{notif.content}</p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto p-6 lg:p-10">
+                <main className="flex-1 overflow-y-auto p-6 lg:p-10 relative z-10 pointer-events-auto">
                     {children}
                 </main>
             </div>

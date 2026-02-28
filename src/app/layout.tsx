@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import { Toaster } from "@/components/ui/sonner";
+import { GlobalCart } from "@/components/GlobalCart";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         <AppProvider>
           {children}
+          <GlobalCart />
           <Toaster position="top-center" />
         </AppProvider>
       </body>

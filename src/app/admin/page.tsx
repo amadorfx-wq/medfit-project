@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Search, Users, CreditCard, DollarSign, Calendar, LogOut, FileText, ChevronRight, AlertCircle, Mail } from "lucide-react";
+import { Search, Users, CreditCard, DollarSign, Calendar, LogOut, FileText, ChevronRight, AlertCircle, Mail, Activity, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -124,6 +124,57 @@ export default function AdminDashboardPage() {
                             </CardContent>
                         </Card>
                     </Link>
+                </div>
+
+                {/* Intake & Cart Recovery Engine */}
+                <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 className="text-xl font-serif text-white flex items-center gap-2">
+                                <Activity className="w-5 h-5 text-[#E8A838]" />
+                                Intake & Cart Recovery Engine
+                            </h2>
+                            <p className="text-sm text-white/50 mt-1">Automated follow-ups for stalled patients (M&A Revenue Retention)</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {patients.filter(p => p.formsStatus === "PENDING" || p.approvalStatus === "PENDING_FORMS").map((patient, idx) => (
+                            <Card key={idx} className="bg-[#0C1420] border-border/50 hover:border-[#E8A838]/30 transition-colors">
+                                <CardContent className="p-5 flex flex-col h-full justify-between gap-4">
+                                    <div>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="font-medium text-white text-lg">{patient.name}</h3>
+                                            <Badge variant="outline" className="border-[#E8A838]/50 text-[#E8A838] bg-[#E8A838]/10 text-[10px] uppercase">Stalled</Badge>
+                                        </div>
+                                        <p className="text-xs text-white/40 mb-3">{patient.activeTreatment}</p>
+                                        <p className="text-sm text-[#E8A838]/90 flex items-center gap-2 bg-[#E8A838]/5 w-fit px-2 py-1 rounded border border-[#E8A838]/10">
+                                            <AlertCircle className="w-3 h-3" />
+                                            Pending: {patient.requiredForms.length - patient.completedForms.length} Forms
+                                        </p>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full bg-[#E8A838]/10 border-[#E8A838]/20 text-[#E8A838] hover:bg-[#E8A838] hover:text-black transition-colors"
+                                        onClick={() => {
+                                            toast.success("Recovery sequence initiated", {
+                                                description: `Automated SMS & Email sent to ${patient.name}.`
+                                            });
+                                        }}
+                                    >
+                                        <Mail className="w-4 h-4 mr-2" />
+                                        Trigger Auto-Reminder
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ))}
+                        {patients.filter(p => p.formsStatus === "PENDING" || p.approvalStatus === "PENDING_FORMS").length === 0 && (
+                            <div className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-[#0C1420] border border-border/50 rounded-xl text-center">
+                                <CheckCircle2 className="w-8 h-8 text-[#8FA677] mx-auto mb-3" />
+                                <p className="text-white/50 text-sm">All active patients are fully onboarded. No stalled accounts detected.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Patients Table */}

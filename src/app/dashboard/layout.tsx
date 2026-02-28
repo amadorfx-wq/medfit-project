@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CreditCard, Stethoscope, BookOpen, User, LogOut } from "lucide-react";
+import { LayoutDashboard, CreditCard, Stethoscope, BookOpen, User, LogOut, Receipt } from "lucide-react";
 import { useAppContext } from "@/lib/store";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function DashboardLayout({
     children,
@@ -12,11 +15,12 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const { currentUser, logout } = useAppContext();
+    const { currentUser, logout, cart } = useAppContext();
 
     const navItems = [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
         { name: "My Balance & Pay", href: "/dashboard/pay", icon: CreditCard },
+        { name: "Billing & Subscriptions", href: "/dashboard/billing", icon: Receipt },
         { name: "My Treatments", href: "/dashboard/treatments", icon: Stethoscope },
         { name: "Academy", href: "/dashboard/academy", icon: BookOpen },
         { name: "Profile", href: "/dashboard/profile", icon: User },

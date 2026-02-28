@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail } from "lucide-react";
+import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail, AlertTriangle, ShieldAlert, Lock, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -108,6 +108,36 @@ export default function PatientsManagementPage() {
                     />
                 </div>
             </div>
+
+            {/* MÓDULO 1: VIP Cart & Consent Recovery (Rescue Engine) Banner */}
+            {filteredPatients.some(p => p.approvalStatus === "PENDING_FORMS" || charges.some(c => c.patientId === p.id && c.status === "PENDING")) && (
+                <div className="mb-8 border border-red-500/20 bg-red-500/5 rounded-xl p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                            <AlertTriangle className="w-5 h-5 text-red-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-white font-medium text-lg flex items-center gap-2">
+                                Revenue at Risk (Cart Abandonment)
+                                <Badge variant="outline" className="text-red-400 border-red-400/20 bg-red-400/10 text-xs">Action Required</Badge>
+                            </h3>
+                            <p className="text-white/60 text-sm mt-1">
+                                {filteredPatients.filter(p => p.approvalStatus === "PENDING_FORMS" || charges.some(c => c.patientId === p.id && c.status === "PENDING")).length} VIP patients have paused their intake or payment process.
+                            </p>
+                        </div>
+                    </div>
+                    <Button
+                        onClick={() => {
+                            toast.success("Rescue SMS Workflow Triggered.", {
+                                description: "Automated reminders sent to stalled patients with deep-links to complete checkout."
+                            });
+                        }}
+                        className="bg-red-500/80 hover:bg-red-500 text-white shadow-lg shadow-red-500/20 whitespace-nowrap h-11"
+                    >
+                        Trigger Rescue SMS Flow
+                    </Button>
+                </div>
+            )}
 
             <div className="bg-[#0C1420] border border-border/50 rounded-xl overflow-hidden shadow-2xl">
                 <Table>
@@ -360,6 +390,45 @@ export default function PatientsManagementPage() {
                                         <Plus className="w-4 h-4 mr-2" />
                                         Map New Form Template to Protocol
                                     </Button>
+
+                                    {/* MÓDULO 2: Fast-Track Compliance Auditor (Upsell Paywall) */}
+                                    <div className="mt-12 rounded-2xl border border-[#B8977E]/20 bg-gradient-to-br from-[#1A2332]/50 to-[#0C1420] p-8 overflow-hidden relative">
+                                        <div className="absolute top-0 right-0 p-32 bg-[#B8977E]/5 blur-[100px] rounded-full pointer-events-none" />
+
+                                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+                                            <div className="flex gap-5">
+                                                <div className="w-12 h-12 rounded-xl bg-black flex items-center justify-center border border-white/5 shrink-0 shadow-lg">
+                                                    <ShieldAlert className="w-6 h-6 text-[#B8977E]" />
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h3 className="text-lg font-serif text-white">Fast-Track Compliance Auditor</h3>
+                                                        <Badge variant="outline" className="border-[#B8977E]/30 text-[#B8977E] bg-[#B8977E]/10 text-[10px] uppercase font-bold tracking-widest shrink-0">Premium Add-on</Badge>
+                                                    </div>
+                                                    <p className="text-white/50 text-sm max-w-lg leading-relaxed">
+                                                        Generate a military-grade, encrypted Mega-PDF dossier with all verified e-signatures, timestamps, and audit trails for this patient. Ready for State Board Medical Audits or M&A Due Diligence in 1-click.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="w-full md:w-auto flex flex-col items-center gap-3 shrink-0">
+                                                <Button
+                                                    className="w-full bg-white text-black hover:bg-white/90 h-11 px-6 shadow-xl shadow-white/5"
+                                                    onClick={() => {
+                                                        toast("M&A Compliance Module Locked", {
+                                                            description: "Contact your MedFit Account Executive to upgrade your SaaS tier and enable automated legal diligence.",
+                                                            icon: <Lock className="w-4 h-4 text-[#B8977E]" />,
+                                                            duration: 5000,
+                                                        })
+                                                    }}
+                                                >
+                                                    <Lock className="w-4 h-4 mr-2 text-black/60" />
+                                                    Upgrade to Unlock
+                                                </Button>
+                                                <span className="text-[10px] text-white/30 tracking-widest uppercase">Increase valuation with 1-click M&A audits</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </TabsContent>
 
                                 {/* TAB 2: Financial History */}

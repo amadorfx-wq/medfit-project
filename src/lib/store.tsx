@@ -1,9 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/lib/supabase";
 
 // Types
-export type Role = "PATIENT" | "ADMIN" | null;
+export type Role = "PATIENT" | "ADMIN" | "SUPERADMIN" | "RECEPTION" | null;
+
+export interface AuditLog {
+    id: string;
+    action: string;
+    userId: string;
+    userName: string;
+    userRole: Role;
+    details: string;
+    timestamp: string;
+}
 
 export interface Patient {
     id: string;
@@ -38,6 +49,23 @@ export interface Charge {
     date: string;
 }
 
+export interface CartItem {
+    id: string;
+    name: string;
+    price: string;
+}
+
+export interface AdminNotification {
+    id: string;
+    patientId: string;
+    patientName: string;
+    type: "MESSAGE" | "CART_REQUEST";
+    content: string;
+    date: string;
+    read: boolean;
+    data?: any;
+}
+
 interface AppContextType {
     currentUser: { id: string; role: Role; name: string } | null;
     login: (email: string, role: Role) => void;
@@ -54,6 +82,19 @@ interface AppContextType {
     // Core Navigation State
     selectedGlobalPatientId: string | null;
     setSelectedGlobalPatientId: (id: string | null) => void;
+    // Medical Cart (Order Requests)
+    cart: CartItem[];
+    addToCart: (item: Omit<CartItem, "id">) => void;
+    removeFromCart: (id: string) => void;
+    clearCart: () => void;
+    submitCartRequest: () => Promise<void>;
+    // Bidirectional Notification Engine
+    adminNotifications: AdminNotification[];
+    sendAdminNotification: (notif: Omit<AdminNotification, "id" | "date" | "read">) => void;
+    markNotificationRead: (id: string) => void;
+    // M&A Due Diligence: Audit Trail
+    auditLogs: AuditLog[];
+    logEvent: (action: string, details: string, actorOverride?: { id: string, name: string, role: Role }) => void;
 }
 
 // Initial Mock Data
@@ -76,19 +117,167 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [patients, setPatients] = useState<Patient[]>(MOCK_PATIENTS);
     const [charges, setCharges] = useState<Charge[]>(MOCK_CHARGES);
     const [selectedGlobalPatientId, setSelectedGlobalPatientId] = useState<string | null>(null);
+    const [cart, setCart] = useState<CartItem[]>([]);
+    const [adminNotifications, setAdminNotifications] = useState<AdminNotification[]>([
+        { id: "n1", patientId: "p1", patientName: "Sarah Johnson", type: "MESSAGE", content: "I have a question about my medication dosage instructions for this week.", date: new Date().toISOString(), read: false },
+        { id: "n2", patientId: "p3", patientName: "Emma Davis", type: "CART_REQUEST", content: "Requested Peptide Refill Protocol.", date: new Date().toISOString(), read: false }
+    ]);
+    const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            // Fetch Patients
+            const { data: pData } = await supabase.from('patients').select('*');
+            if (pData && pData.length > 0) {
+                const formattedPatients: Patient[] = pData.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    email: p.email,
+                    phone: p.phone,
+                    address: p.address,
+                    dob: p.dob,
+                    activeTreatment: p.active_treatment,
+                    formsStatus: p.forms_status,
+                    approvalStatus: p.approval_status,
+                    requiredForms: p.required_forms || [],
+                    completedForms: p.completed_forms || [],
+                }));
+                setPatients(formattedPatients);
+            } else {
+                setPatients(MOCK_PATIENTS);
+                for (const p of MOCK_PATIENTS) {
+                    await supabase.from('patients').insert({
+                        id: p.id, name: p.name, email: p.email, phone: p.phone, address: p.address, dob: p.dob,
+                        active_treatment: p.activeTreatment, forms_status: p.formsStatus, approval_status: p.approvalStatus,
+                        required_forms: p.requiredForms, completed_forms: p.completedForms
+                    });
+                }
+            }
+
+            // Fetch Charges
+            const { data: cData } = await supabase.from('charges').select('*');
+            if (cData && cData.length > 0) {
+                const formattedCharges: Charge[] = cData.map(c => ({
+                    id: c.id, patientId: c.patient_id, amount: Number(c.amount), description: c.description, status: c.status, date: c.date
+                }));
+                setCharges(formattedCharges);
+            } else {
+                setCharges(MOCK_CHARGES);
+                for (const c of MOCK_CHARGES) {
+                    await supabase.from('charges').insert({
+                        id: c.id, patient_id: c.patientId, amount: c.amount, description: c.description, status: c.status, date: c.date
+                    });
+                }
+            }
+
+            // Fetch Audit Logs
+            const { data: aData } = await supabase.from('audit_logs').select('*').order('created_at', { ascending: false }).limit(100);
+            if (aData && aData.length > 0) {
+                const formattedLogs: AuditLog[] = aData.map(a => ({
+                    id: a.id, action: a.action, userId: a.user_id, userName: a.user_name, userRole: a.user_role as Role, details: a.details, timestamp: a.timestamp
+                }));
+                setAuditLogs(formattedLogs);
+            } else {
+                setAuditLogs([{ id: "log1", action: "SYSTEM_INIT", userId: "system", userName: "System", userRole: "SUPERADMIN", details: "Security Audit Engine initialized.", timestamp: new Date(Date.now() - 86400000).toISOString() }]);
+            }
+        };
+
+        fetchInitialData();
+    }, []);
+
+    const logEvent = (action: string, details: string, actorOverride?: { id: string, name: string, role: Role }) => {
+        const actor = actorOverride || currentUser || { id: "system", name: "System", role: "SUPERADMIN" as Role };
+        const newLog: AuditLog = {
+            id: `log_${Math.random().toString(36).substr(2, 9)}`,
+            action,
+            userId: actor.id,
+            userName: actor.name,
+            userRole: actor.role,
+            details,
+            timestamp: new Date().toISOString()
+        };
+        // Keep only last 100 logs to prevent memory leak
+        setAuditLogs(prev => [newLog, ...prev].slice(0, 100));
+
+        // Supabase insertion
+        supabase.from('audit_logs').insert({
+            id: newLog.id,
+            action: newLog.action,
+            user_id: newLog.userId,
+            user_name: newLog.userName,
+            user_role: newLog.userRole,
+            details: newLog.details,
+            timestamp: newLog.timestamp
+        }).then();
+    };
+
+    const addToCart = (item: Omit<CartItem, "id">) => {
+        setCart(prev => [...prev, { ...item, id: `cart_item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` }]);
+    };
+
+    const removeFromCart = (id: string) => {
+        setCart(prev => prev.filter(c => c.id !== id));
+    };
+
+    const clearCart = () => setCart([]);
+
+    const sendAdminNotification = (notif: Omit<AdminNotification, "id" | "date" | "read">) => {
+        const newNotif: AdminNotification = {
+            ...notif,
+            id: `notif_${Date.now()}`,
+            date: new Date().toISOString(),
+            read: false,
+        };
+        setAdminNotifications(prev => [newNotif, ...prev]);
+    };
+
+    const markNotificationRead = (id: string) => {
+        setAdminNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    };
+
+    const submitCartRequest = async () => {
+        if (cart.length === 0) return;
+
+        const pId = currentUser?.id || "guest";
+        const pName = currentUser?.role === "PATIENT" ? currentUser.name : "New Lead (Guest)";
+        const content = `Requested ${cart.length} item(s): ` + cart.map(c => c.name).join(", ");
+
+        sendAdminNotification({
+            patientId: pId,
+            patientName: pName,
+            type: "CART_REQUEST",
+            content: content,
+            data: { items: [...cart] }
+        });
+
+        logEvent("CART_REQUEST_SUBMITTED", `Submitted request for ${cart.length} item(s).`);
+
+        // Simulate network delay for sending the request to the clinic
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                setCart([]);
+                resolve();
+            }, 1000);
+        });
+    };
 
     const login = (email: string, role: Role) => {
-        if (role === "ADMIN") {
-            setCurrentUser({ id: "admin1", role: "ADMIN", name: "Dr. Kitchens" });
+        if (role === "ADMIN" || role === "SUPERADMIN") {
+            const adminUser = { id: "admin1", role: role as Role, name: "Dr. Kitchens" };
+            setCurrentUser(adminUser);
+            logEvent("USER_LOGIN", `Clinical Staff signed in.`, adminUser);
         } else {
             // Find patient or default to Sarah
+            let userObj;
             const patient = patients.find(p => p.email === email);
             if (patient) {
-                setCurrentUser({ id: patient.id, role: "PATIENT", name: patient.name });
+                userObj = { id: patient.id, role: "PATIENT" as Role, name: patient.name };
             } else {
                 // Fallback for demo
-                setCurrentUser({ id: MOCK_PATIENTS[0].id, role: "PATIENT", name: MOCK_PATIENTS[0].name });
+                userObj = { id: MOCK_PATIENTS[0].id, role: "PATIENT" as Role, name: MOCK_PATIENTS[0].name };
             }
+            setCurrentUser(userObj);
+            logEvent("PATIENT_LOGIN", `Patient Portal session started.`, userObj);
         }
     };
 
@@ -106,7 +295,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
             completedForms: []
         };
         setPatients(prev => [newPatient, ...prev]);
-        setCurrentUser({ id: newPatient.id, role: "PATIENT", name: newPatient.name });
+
+        supabase.from('patients').insert({
+            id: newPatient.id,
+            name: newPatient.name,
+            email: newPatient.email,
+            active_treatment: newPatient.activeTreatment,
+            forms_status: newPatient.formsStatus,
+            approval_status: newPatient.approvalStatus,
+            required_forms: newPatient.requiredForms,
+            completed_forms: newPatient.completedForms
+        }).then();
+
+        const userObj = { id: newPatient.id, role: "PATIENT" as Role, name: newPatient.name };
+        setCurrentUser(userObj);
+        logEvent("PATIENT_REGISTERED", `New patient lead registered: ${email}`, userObj);
     };
 
     const submitForm = (formId: string) => {
@@ -116,19 +319,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     const updatedCompleted = p.completedForms.includes(formId) ? p.completedForms : [...p.completedForms, formId];
                     // Check if all required are completed
                     const allDone = p.requiredForms.every(req => updatedCompleted.includes(req));
-                    return {
+                    const updatedPatient = {
                         ...p,
                         completedForms: updatedCompleted,
-                        formsStatus: allDone ? "COMPLETED" : "PENDING",
-                        approvalStatus: allDone ? "PENDING_APPROVAL" : "PENDING_FORMS"
+                        formsStatus: (allDone ? "COMPLETED" : "PENDING") as "COMPLETED" | "PENDING",
+                        approvalStatus: (allDone ? "PENDING_APPROVAL" : "PENDING_FORMS") as "PENDING_APPROVAL" | "PENDING_FORMS"
                     };
+
+                    supabase.from('patients').update({
+                        completed_forms: updatedPatient.completedForms,
+                        forms_status: updatedPatient.formsStatus,
+                        approval_status: updatedPatient.approvalStatus
+                    }).eq('id', p.id).then();
+
+                    return updatedPatient;
                 }
                 return p;
             }));
+            logEvent("FORM_SUBMITTED", `Patient completed form: ${formId}`);
         }
     };
 
-    const logout = () => setCurrentUser(null);
+    const logout = () => {
+        logEvent("USER_LOGOUT", `Session ended`);
+        setCurrentUser(null);
+    };
 
     const addCharge = (chargeData: Omit<Charge, "id" | "date" | "status">) => {
         const newCharge: Charge = {
@@ -138,12 +353,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
             date: new Date().toISOString().split('T')[0],
         };
         setCharges(prev => [newCharge, ...prev]);
+
+        supabase.from('charges').insert({
+            id: newCharge.id,
+            patient_id: newCharge.patientId,
+            amount: newCharge.amount,
+            description: newCharge.description,
+            status: newCharge.status,
+            date: newCharge.date
+        }).then();
+
+        logEvent("CHARGE_CREATED", `Created charge $${chargeData.amount} for patient ${chargeData.patientId}`);
     };
 
     const payCharge = (chargeId: string) => {
         setCharges(prev => prev.map(c =>
             c.id === chargeId ? { ...c, status: "PAID" } : c
         ));
+        supabase.from('charges').update({ status: "PAID" }).eq('id', chargeId).then();
+        logEvent("PAYMENT_PROCESSED", `Charge ${chargeId} marked as PAID`);
     };
 
     const authorizeTreatment = (patientId: string, amount: number, description: string) => {
@@ -151,6 +379,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPatients(prev => prev.map(p =>
             p.id === patientId ? { ...p, approvalStatus: "APPROVED" } : p
         ));
+        supabase.from('patients').update({ approval_status: "APPROVED" }).eq('id', patientId).then();
         // Add the authorized charge
         addCharge({ patientId, amount, description });
     };
@@ -161,16 +390,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 const newRequired = getRequiredFormsForTreatment(treatment);
                 const combinedRequired = Array.from(new Set([...p.requiredForms, ...newRequired]));
                 const allDone = combinedRequired.every(req => p.completedForms.includes(req));
-                return {
+                const updatedPatient = {
                     ...p,
                     activeTreatment: p.activeTreatment === "Pending Evaluation" ? treatment : `${p.activeTreatment} + ${treatment}`,
                     requiredForms: combinedRequired,
-                    formsStatus: allDone ? "COMPLETED" : "PENDING",
-                    approvalStatus: allDone ? "PENDING_APPROVAL" : "PENDING_FORMS"
+                    formsStatus: (allDone ? "COMPLETED" : "PENDING") as "COMPLETED" | "PENDING",
+                    approvalStatus: (allDone ? "PENDING_APPROVAL" : "PENDING_FORMS") as "PENDING_APPROVAL" | "PENDING_FORMS"
                 };
+
+                supabase.from('patients').update({
+                    active_treatment: updatedPatient.activeTreatment,
+                    required_forms: updatedPatient.requiredForms,
+                    forms_status: updatedPatient.formsStatus,
+                    approval_status: updatedPatient.approvalStatus
+                }).eq('id', p.id).then();
+
+                return updatedPatient;
             }
             return p;
         }));
+        logEvent("TREATMENT_ENROLLED", `Patient ${patientId} enrolled in ${treatment}`);
     };
 
     const addRequiredFormToPatient = (patientId: string, formSlug: string) => {
@@ -182,12 +421,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 const combinedRequired = [...p.requiredForms, formSlug];
                 const allDone = combinedRequired.every(req => p.completedForms.includes(req));
 
-                return {
+                const updatedPatient = {
                     ...p,
                     requiredForms: combinedRequired,
-                    formsStatus: allDone ? "COMPLETED" : "PENDING",
-                    approvalStatus: allDone ? "PENDING_APPROVAL" : "PENDING_FORMS"
+                    formsStatus: (allDone ? "COMPLETED" : "PENDING") as "COMPLETED" | "PENDING",
+                    approvalStatus: (allDone ? "PENDING_APPROVAL" : "PENDING_FORMS") as "PENDING_APPROVAL" | "PENDING_FORMS"
                 };
+
+                supabase.from('patients').update({
+                    required_forms: updatedPatient.requiredForms,
+                    forms_status: updatedPatient.formsStatus,
+                    approval_status: updatedPatient.approvalStatus
+                }).eq('id', p.id).then();
+
+                return updatedPatient;
             }
             return p;
         }));
@@ -195,7 +442,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     return (
         <AppContext.Provider value={{
-            currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment, addRequiredFormToPatient, selectedGlobalPatientId, setSelectedGlobalPatientId
+            currentUser, login, logout, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, enrollTreatment, addRequiredFormToPatient, selectedGlobalPatientId, setSelectedGlobalPatientId,
+            cart, addToCart, removeFromCart, clearCart, submitCartRequest,
+            adminNotifications, sendAdminNotification, markNotificationRead,
+            auditLogs, logEvent
         }}>
             {children}
         </AppContext.Provider>

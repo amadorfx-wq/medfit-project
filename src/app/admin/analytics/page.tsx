@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from 'recharts';
-import { TrendingUp, Users, DollarSign, Activity } from "lucide-react";
+import { TrendingUp, Users, DollarSign, Activity, Infinity, RefreshCcw, TrendingDown } from "lucide-react";
 
 // Mock Data
 const revenueData = [
@@ -48,63 +48,81 @@ export default function AnalyticsPage() {
             <div className="mb-8">
                 <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
                     <TrendingUp className="w-8 h-8 text-[#B8977E]" />
-                    Business Intelligence
+                    Financial Analytics
                 </h1>
-                <p className="text-white/50">Real-time clinical analytics, revenue tracking, and patient volume insights.</p>
+                <p className="text-white/50">SaaS Metrics Overview: MRR, LTV, and Retention Data for Investors.</p>
             </div>
 
-            {/* Top Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-[#0C1420] border-border/50">
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-white/50 uppercase tracking-widest mb-1">MTD Revenue</p>
-                                <h3 className="text-4xl font-serif text-white">$35,000</h3>
-                            </div>
-                            <div className="w-12 h-12 rounded-full bg-[#8FA677]/10 flex items-center justify-center">
-                                <DollarSign className="w-6 h-6 text-[#8FA677]" />
+            {/* SaaS KPIs Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="bg-[#0C1420] border-border/50 shadow-2xl hover:border-[#8FA677]/30 transition-colors">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-xs text-white/50 uppercase tracking-widest font-medium">Monthly Recurring Rev (MRR)</p>
+                            <div className="w-10 h-10 rounded-full bg-[#8FA677]/10 flex items-center justify-center">
+                                <RefreshCcw className="w-5 h-5 text-[#8FA677]" />
                             </div>
                         </div>
-                        <div className="mt-4 flex items-center gap-2 text-sm">
-                            <span className="text-[#8FA677] font-medium">+14.2%</span>
-                            <span className="text-white/40">from last month</span>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-[#0C1420] border-border/50">
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-white/50 uppercase tracking-widest mb-1">Active Patients</p>
-                                <h3 className="text-4xl font-serif text-white">432</h3>
+                        <div>
+                            <h3 className="text-4xl font-serif text-white">$124,500</h3>
+                            <div className="mt-2 flex items-center gap-2 text-sm">
+                                <span className="text-[#8FA677] font-medium">+12.4%</span>
+                                <span className="text-white/40">vs last month</span>
                             </div>
-                            <div className="w-12 h-12 rounded-full bg-[#B8977E]/10 flex items-center justify-center">
-                                <Users className="w-6 h-6 text-[#B8977E]" />
-                            </div>
-                        </div>
-                        <div className="mt-4 flex items-center gap-2 text-sm">
-                            <span className="text-[#8FA677] font-medium">+8.5%</span>
-                            <span className="text-white/40">from last month</span>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-[#0C1420] border-border/50">
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm text-white/50 uppercase tracking-widest mb-1">Avg. Patient Value</p>
-                                <h3 className="text-4xl font-serif text-white">$810.00</h3>
-                            </div>
-                            <div className="w-12 h-12 rounded-full bg-[#E8A838]/10 flex items-center justify-center">
-                                <Activity className="w-6 h-6 text-[#E8A838]" />
+                <Card className="bg-[#0C1420] border-border/50 shadow-2xl hover:border-[#8FA677]/30 transition-colors">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-xs text-white/50 uppercase tracking-widest font-medium">Annual Run Rate (ARR)</p>
+                            <div className="w-10 h-10 rounded-full bg-[#8FA677]/10 flex items-center justify-center">
+                                <DollarSign className="w-5 h-5 text-[#8FA677]" />
                             </div>
                         </div>
-                        <div className="mt-4 flex items-center gap-2 text-sm">
-                            <span className="text-[#8FA677] font-medium">+2.1%</span>
-                            <span className="text-white/40">from last month</span>
+                        <div>
+                            <h3 className="text-4xl font-serif text-white">$1.49M</h3>
+                            <div className="mt-2 flex items-center gap-2 text-sm">
+                                <span className="text-[#8FA677] font-medium">On Track</span>
+                                <span className="text-white/40">for FY2026</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-[#0C1420] border-border/50 shadow-2xl hover:border-[#E8A838]/30 transition-colors">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-xs text-white/50 uppercase tracking-widest font-medium">Lifetime Value (LTV)</p>
+                            <div className="w-10 h-10 rounded-full bg-[#E8A838]/10 flex items-center justify-center">
+                                <Infinity className="w-5 h-5 text-[#E8A838]" />
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-4xl font-serif text-white">$4,850</h3>
+                            <div className="mt-2 flex items-center gap-2 text-sm">
+                                <span className="text-[#8FA677] font-medium">+5.2%</span>
+                                <span className="text-white/40">Avg 14mo retention</span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-[#0C1420] border-border/50 shadow-2xl hover:border-red-500/30 transition-colors">
+                    <CardContent className="p-6 flex flex-col justify-between h-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-xs text-white/50 uppercase tracking-widest font-medium">Gross Churn Rate</p>
+                            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                                <TrendingDown className="w-5 h-5 text-red-500" />
+                            </div>
+                        </div>
+                        <div>
+                            <h3 className="text-4xl font-serif text-white">1.1%</h3>
+                            <div className="mt-2 flex items-center gap-2 text-sm">
+                                <span className="text-[#8FA677] font-medium">-0.3%</span>
+                                <span className="text-white/40">industry avg is 4%</span>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -112,11 +130,11 @@ export default function AnalyticsPage() {
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Revenue Area Chart */}
+                {/* MRR Growth Pipeline Area Chart */}
                 <Card className="bg-[#0C1420] border-border/50 shadow-2xl">
                     <CardHeader className="border-b border-white/5 pb-4">
-                        <CardTitle className="text-lg font-serif text-white font-medium">Revenue Growth Pipeline</CardTitle>
-                        <CardDescription className="text-white/40">Gross generated revenue over the last 7 months</CardDescription>
+                        <CardTitle className="text-lg font-serif text-white font-medium">MRR Growth Pipeline</CardTitle>
+                        <CardDescription className="text-white/40">Monthly Recurring Revenue path to $1.5M ARR</CardDescription>
                     </CardHeader>
                     <CardContent className="p-6 h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
@@ -137,11 +155,11 @@ export default function AnalyticsPage() {
                     </CardContent>
                 </Card>
 
-                {/* Patient Acquisition Bar Chart */}
+                {/* Subscriptions Bar Chart */}
                 <Card className="bg-[#0C1420] border-border/50 shadow-2xl">
                     <CardHeader className="border-b border-white/5 pb-4">
-                        <CardTitle className="text-lg font-serif text-white font-medium">Patient Acquisition</CardTitle>
-                        <CardDescription className="text-white/40">Monthly active patient volume</CardDescription>
+                        <CardTitle className="text-lg font-serif text-white font-medium">Active Subscriptions</CardTitle>
+                        <CardDescription className="text-white/40">Total recurring patients per month</CardDescription>
                     </CardHeader>
                     <CardContent className="p-6 h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
