@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Comprehensive NFC Lab Panel in Atlanta | Baseline Diagnostics | Medfit",
+    description: "Discover your metabolic, hormonal, and cellular health with our advanced NFC Panel diagnostics in Atlanta. Precision longevity mapping.",
+};
 
 export default function NfcPanelLandingPage() {
     return (
@@ -30,10 +36,10 @@ export default function NfcPanelLandingPage() {
                 <div className="max-w-4xl mx-auto text-center">
                     <span className="text-[#8FA677] text-xs font-bold tracking-[0.2em] uppercase mb-6 block">Diagnostics & Baseline Assessment</span>
                     <h1 className="text-5xl md:text-7xl font-serif text-[#1A1A1A] leading-tight mb-8">
-                        Comprehensive NFC Panel
+                        Comprehensive NFC Panel Atlanta
                     </h1>
                     <p className="text-xl md:text-2xl text-[#2D2D2D]/80 leading-relaxed font-light mb-12 max-w-2xl mx-auto">
-                        Advanced clinical laboratory testing and hormonal profiling. The absolute baseline for your metamorphic journey to optimal health.
+                        Advanced clinical laboratory testing and hormonal profiling in Atlanta. The absolute baseline for your metamorphic journey to optimal health.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <AddToCartButton
@@ -64,7 +70,7 @@ export default function NfcPanelLandingPage() {
                             />
                         </div>
                         <div className="space-y-8">
-                            <h2 className="text-4xl font-serif text-[#1A1A1A]">The Deep Dive Into Your Biology</h2>
+                            <h2 className="text-4xl font-serif text-[#1A1A1A]">The Deep Clinical Dive Into Your Biology</h2>
                             <div className="space-y-6 text-[#2D2D2D]/80 leading-relaxed text-lg">
                                 <p>
                                     True wellness begins with understanding. Our Comprehensive NFC Panel goes far beyond a standard physical exam. We extract over 50 crucial biomarkers to map your metabolic, hormonal, and cellular health.

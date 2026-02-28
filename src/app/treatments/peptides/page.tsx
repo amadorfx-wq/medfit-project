@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Peptide Therapy in Atlanta | BPC-157 & CJC-1295 | Medfit",
+    description: "Accelerate recovery and cellular longevity with advanced Peptide Therapy in Atlanta. Custom protocols by Board-Certified physicians.",
+};
 
 export default function PeptidesLandingPage() {
     return (
@@ -30,10 +36,10 @@ export default function PeptidesLandingPage() {
                 <div className="max-w-4xl mx-auto text-center">
                     <span className="text-[#8FA677] text-xs font-bold tracking-[0.2em] uppercase mb-6 block">Cellular Longevity & Repair</span>
                     <h1 className="text-5xl md:text-7xl font-serif text-[#1A1A1A] leading-tight mb-8">
-                        Peptide Therapy
+                        Peptide Therapy in Atlanta
                     </h1>
                     <p className="text-xl md:text-2xl text-[#2D2D2D]/80 leading-relaxed font-light mb-12 max-w-2xl mx-auto">
-                        Targeted amino acid sequencing designed to accelerate recovery, enhance cognitive function, and optimize cellular longevity.
+                        Targeted amino acid sequencing (BPC-157, CJC-1295) designed to accelerate recovery, enhance cognitive function, and optimize cellular longevity.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <AddToCartButton
@@ -64,7 +70,7 @@ export default function PeptidesLandingPage() {
                             />
                         </div>
                         <div className="space-y-8">
-                            <h2 className="text-4xl font-serif text-[#1A1A1A]">Cellular Targeting Precision</h2>
+                            <h2 className="text-4xl font-serif text-[#1A1A1A]">Advanced Cellular Targeting Precision</h2>
                             <div className="space-y-6 text-[#2D2D2D]/80 leading-relaxed text-lg">
                                 <p>
                                     Peptides are short chains of amino acids that act as biological signaling molecules. Our protocols, including BPC-157 for profound tissue healing and Sermorelin for natural growth hormone stimulation, are engineered to drastically improve your biological resilience.

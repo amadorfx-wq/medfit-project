@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Medical Weight Loss in Atlanta | Semaglutide & Tirzepatide | Medfit",
+    description: "Atlanta's premier medically supervised weight loss clinic. Achieve sustainable fat loss with custom GLP-1 (Semaglutide/Tirzepatide) protocols by Board-Certified MDs.",
+};
 
 export default function WeightLossLandingPage() {
     return (
@@ -30,10 +36,10 @@ export default function WeightLossLandingPage() {
                 <div className="max-w-4xl mx-auto text-center">
                     <span className="text-[#8FA677] text-xs font-bold tracking-[0.2em] uppercase mb-6 block">GLP-1/GIP Receptor Agonists</span>
                     <h1 className="text-5xl md:text-7xl font-serif text-[#1A1A1A] leading-tight mb-8">
-                        Medical Weight Loss
+                        Medical Weight Loss in Atlanta, GA.
                     </h1>
                     <p className="text-xl md:text-2xl text-[#2D2D2D]/80 leading-relaxed font-light mb-12 max-w-2xl mx-auto">
-                        An advanced metabolic reset combining customized GLP-1 therapy (Semaglutide / Tirzepatide). Clinically proven to drive sustainable fat loss.
+                        An advanced metabolic reset combining customized GLP-1 therapy (Semaglutide & Tirzepatide). Clinically proven to drive sustainable fat loss under strict MD supervision.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <AddToCartButton
@@ -64,7 +70,7 @@ export default function WeightLossLandingPage() {
                             />
                         </div>
                         <div className="space-y-8">
-                            <h2 className="text-4xl font-serif text-[#1A1A1A]">Science-Backed Metabolic Reset</h2>
+                            <h2 className="text-4xl font-serif text-[#1A1A1A]">How Our Customized GLP-1 Protocol Transforms Your Metabolism</h2>
                             <div className="space-y-6 text-[#2D2D2D]/80 leading-relaxed text-lg">
                                 <p>
                                     Our program utilizes revolutionary GLP-1 and GIP medications including Semaglutide and Tirzepatide. By mimicking naturally occurring hormones, these weekly subcutaneous protocols regulate appetite, improve insulin sensitivity, and promote consistent weight loss.

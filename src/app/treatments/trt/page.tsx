@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "TRT & Testosterone Replacement in Atlanta | Medfit",
+    description: "Regain your energy and vitality with Medically Supervised TRT (Testosterone Replacement Therapy) in Atlanta, GA. Expert hormone optimization.",
+};
 
 export default function TRTLandingPage() {
     return (
@@ -30,10 +36,10 @@ export default function TRTLandingPage() {
                 <div className="max-w-4xl mx-auto text-center">
                     <span className="text-[#8FA677] text-xs font-bold tracking-[0.2em] uppercase mb-6 block">Hormonal Optimization</span>
                     <h1 className="text-5xl md:text-7xl font-serif text-[#1A1A1A] leading-tight mb-8">
-                        Testosterone Replacement
+                        Testosterone Replacement (TRT) in Atlanta
                     </h1>
                     <p className="text-xl md:text-2xl text-[#2D2D2D]/80 leading-relaxed font-light mb-12 max-w-2xl mx-auto">
-                        Comprehensive TRT to restore optimal balance, increase lean muscle mass, improve libido, and overcome andropause symptoms.
+                        Comprehensive Testosterone Replacement Therapy in Atlanta to restore optimal balance, increase lean muscle mass, improve libido, and overcome andropause.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <AddToCartButton
@@ -64,7 +70,7 @@ export default function TRTLandingPage() {
                             />
                         </div>
                         <div className="space-y-8">
-                            <h2 className="text-4xl font-serif text-[#1A1A1A]">Restoring Optimal Vitality</h2>
+                            <h2 className="text-4xl font-serif text-[#1A1A1A]">Restoring Optimal Vitality & Hormone Balance</h2>
                             <div className="space-y-6 text-[#2D2D2D]/80 leading-relaxed text-lg">
                                 <p>
                                     As we age, testosterone levels naturally decline, often leading to fatigue, reduced muscle mass, cognitive fog, and diminished libido. Our Testosterone Replacement Therapy (TRT) is a precision-driven protocol designed to safely elevate your hormone levels back to their optimal, youthful range.

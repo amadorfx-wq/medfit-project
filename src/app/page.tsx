@@ -50,7 +50,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-24 overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center pt-36 lg:pt-40 pb-20 overflow-hidden">
         {/* Abstract Dark Background */}
         <div className="absolute inset-0 bg-background z-0" />
 
@@ -70,8 +70,8 @@ export default function Home() {
         <div className="container mx-auto px-6 relative z-20">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-7xl font-serif leading-tight mb-6">
-              Reclaim Your <span className="text-primary italic">Best Self.</span><br />
-              Feel Welcomed.
+              Reclaim Your <span className="text-primary italic">Vitality.</span><br />
+              <span className="text-3xl md:text-4xl">Atlanta&apos;s Premier Clinic for Longevity.</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-xl leading-relaxed">
               Experience compassionate, high-end medical weight loss and hormone therapy designed for your unique biology. The new standard in medical wellness.
@@ -84,18 +84,18 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="mt-16 flex items-center gap-8 text-sm text-muted-foreground">
+            <div className="mt-16 flex flex-wrap items-center gap-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                Medically Supervised
+                Board-Certified Physicians
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                Fully Personalized
+                100% HIPAA Compliant
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                Discreet & Confidential
+                Authentic US-Compounded Medicine
               </div>
             </div>
           </div>
@@ -106,8 +106,8 @@ export default function Home() {
       <section id="treatments" className="py-32 bg-[#080808] relative">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <span className="text-[#B8977E] text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Experience</span>
-            <h2 className="text-4xl md:text-5xl font-serif">Our Treatment Portfolio</h2>
+            <span className="text-[#B8977E] text-xs font-bold tracking-[0.2em] uppercase mb-4 block">Science-Backed Protocols</span>
+            <h2 className="text-4xl md:text-5xl font-serif">From Custom GLP-1 Weight Loss to Peptide Therapy in Atlanta.</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
