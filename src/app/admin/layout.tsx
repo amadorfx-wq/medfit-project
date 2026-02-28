@@ -105,7 +105,7 @@ export default function AdminLayout({
                                 >
                                     <item.icon className="w-4 h-4" />
                                     <span className="font-medium text-sm">{item.name}</span>
-                                    {item.badge && item.badge > 0 ? (
+                                    {item.badge && (typeof item.badge === "number" ? item.badge > 0 : true) ? (
                                         <Badge className="ml-auto bg-[#E8A838] hover:bg-[#E8A838] text-black text-xs px-1.5 min-w-[20px] justify-center">
                                             {item.badge}
                                         </Badge>
