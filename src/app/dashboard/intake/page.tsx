@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/lib/store";
-import { ShieldCheck, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import {
     WellnessIntakeForm,
     MedicalWeightLossForm,

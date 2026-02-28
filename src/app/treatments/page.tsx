@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ArrowRight, Dna, Activity, Droplet, Pill, Users } from "lucide-react";
+import { ShieldCheck, ArrowRight, Dna, Activity, Pill, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function PublicTreatmentsPage() {

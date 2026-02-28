@@ -15,7 +15,7 @@ const MOCK_STAFF = [
 
 export default function StaffManagementPage() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [staff, setStaff] = useState(MOCK_STAFF);
+    const [staff] = useState(MOCK_STAFF);
 
     const filteredStaff = staff.filter(member =>
         member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

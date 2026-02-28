@@ -5,22 +5,18 @@ import { useAppContext } from "@/lib/store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { Search, Users, CreditCard, DollarSign, Calendar, LogOut, FileText, ChevronRight, AlertCircle, Mail, Activity, CheckCircle2 } from "lucide-react";
+import { Users, CreditCard, DollarSign, ChevronRight, AlertCircle, Mail, Activity, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboardPage() {
-    const { currentUser, logout, patients, charges, addCharge, authorizeTreatment, setSelectedGlobalPatientId } = useAppContext();
+    const { currentUser, patients, charges, addCharge, authorizeTreatment, setSelectedGlobalPatientId } = useAppContext();
     const router = useRouter();
 
     // Form state
-    const [selectedPatientId, setSelectedPatientId] = useState<string>("p1");
+    const [selectedPatientId] = useState<string>("p1");
     const [amount, setAmount] = useState<string>("");
     const [description, setDescription] = useState<string>("");
 

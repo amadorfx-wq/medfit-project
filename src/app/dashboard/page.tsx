@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useAppContext } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Clock, FileText, ChevronRight, AlertCircle, FileSignature, ArrowRight, MessageSquare, ShoppingBag, PhoneCall, CheckCircle2, Check, Stethoscope, ShieldCheck, Truck } from "lucide-react";
+import { Activity, Clock, AlertCircle, FileSignature, ArrowRight, MessageSquare, ShoppingBag, PhoneCall, CheckCircle2, Check, Stethoscope, ShieldCheck, Truck } from "lucide-react";
 
 export default function DashboardPage() {
     const { currentUser, charges, patients, addToCart } = useAppContext();
@@ -31,11 +30,7 @@ export default function DashboardPage() {
     const pendingBalance = userCharges.reduce((acc, curr) => curr.status === "PENDING" ? acc + curr.amount : acc, 0);
 
     const statusValue = userDetails?.approvalStatus || "PENDING_FORMS";
-
-    // Determine current active step (0-indexed)
-    let currentStep = 0;
-    if (statusValue === "PENDING_APPROVAL") currentStep = 1;
-    if (statusValue === "APPROVED") currentStep = 2;
+    const currentStep = statusValue === "PENDING_APPROVAL" ? 1 : statusValue === "APPROVED" ? 2 : 0;
 
     const trackerSteps = [
         { title: "Intake & Forms", description: "Patient profiling", icon: FileSignature },

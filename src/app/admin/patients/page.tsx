@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail, AlertTriangle, ShieldAlert, Lock, ArrowUpRight } from "lucide-react";
+import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail, AlertTriangle, ShieldAlert, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";

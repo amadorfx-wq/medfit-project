@@ -1,13 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CreditCard, Stethoscope, BookOpen, User, LogOut, Receipt } from "lucide-react";
 import { useAppContext } from "@/lib/store";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 
 export default function DashboardLayout({
     children,
@@ -15,7 +12,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const { currentUser, logout, cart } = useAppContext();
+    const { currentUser, logout } = useAppContext();
 
     const navItems = [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
