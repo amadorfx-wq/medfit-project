@@ -45,7 +45,7 @@ export default function IntakeFormsPage() {
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
                     <CheckCircle2 className="w-10 h-10 text-primary" />
                 </div>
-                <h1 className="text-3xl font-serif mb-4">You're All Set</h1>
+                <h1 className="text-3xl font-serif mb-4">You&apos;re All Set</h1>
                 <p className="text-muted-foreground mb-8">All required medical and consent forms for your current treatment protocol have been successfully completed and securely encrypted.</p>
                 <button
                     onClick={() => router.push("/dashboard")}

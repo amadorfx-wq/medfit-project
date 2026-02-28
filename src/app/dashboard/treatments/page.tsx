@@ -156,7 +156,7 @@ export default function TreatmentsPage() {
 
             <div className="mt-12 bg-[#080808] p-5 rounded-xl border border-white/5 flex gap-3 text-sm text-muted-foreground">
                 <Info className="w-5 h-5 text-primary shrink-0" />
-                <p>Enrolling in a new protocol will securely redirect you to our medical onboarding system where you'll review strict instructions and sign digital consent forms prior to billing.</p>
+                <p>Enrolling in a new protocol will securely redirect you to our medical onboarding system where you&apos;ll review strict instructions and sign digital consent forms prior to billing.</p>
             </div>
         </div>
     );

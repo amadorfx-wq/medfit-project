@@ -344,7 +344,7 @@ export default function DashboardPage() {
                             { name: "D3/K2 Oral Supplements", desc: "Bone health and immune support. 60 capsules.", price: "$45.00" }
                         ].filter(s => s.name.toLowerCase().includes(shopSearchQuery.toLowerCase()) || s.desc.toLowerCase().includes(shopSearchQuery.toLowerCase())).length === 0 && (
                                 <div className="text-center py-8 text-white/50 text-sm">
-                                    No supplements found matching "{shopSearchQuery}"
+                                    No supplements found matching &quot;{shopSearchQuery}&quot;
                                 </div>
                             )}
                     </div>
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                             Request Appointment
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
-                            Let us know when you'd like to be seen. Our concierge will contact you to confirm the exact time.
+                            Let us know when you&apos;d like to be seen. Our concierge will contact you to confirm the exact time.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">

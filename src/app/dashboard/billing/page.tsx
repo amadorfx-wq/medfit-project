@@ -182,22 +182,22 @@ export default function BillingSubscriptionPage() {
                             <DialogHeader>
                                 <DialogTitle className="font-serif text-2xl text-[#1A1A1A]">Pause Subscription</DialogTitle>
                                 <DialogDescription className="text-[#666666]">
-                                    We're sorry to see you consider pausing your {patient.activeTreatment} protocol. To help us improve or assist you, please let us know why.
+                                    We&apos;re sorry to see you consider pausing your {patient.activeTreatment} protocol. To help us improve or assist you, please let us know why.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="py-6">
                                 <RadioGroup value={selectedReason} onValueChange={setSelectedReason} className="space-y-4">
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("nausea")}>
                                         <RadioGroupItem value="nausea" id="r1" className="text-[#8FA677] border-gray-300" />
-                                        <Label htmlFor="r1" className="cursor-pointer font-medium">I'm experiencing side effects (e.g., Nausea)</Label>
+                                        <Label htmlFor="r1" className="cursor-pointer font-medium">I&apos;m experiencing side effects (e.g., Nausea)</Label>
                                     </div>
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("price")}>
                                         <RadioGroupItem value="price" id="r2" className="text-[#8FA677] border-gray-300" />
-                                        <Label htmlFor="r2" className="cursor-pointer font-medium">It's too expensive right now</Label>
+                                        <Label htmlFor="r2" className="cursor-pointer font-medium">It&apos;s too expensive right now</Label>
                                     </div>
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("results")}>
                                         <RadioGroupItem value="results" id="r3" className="text-[#8FA677] border-gray-300" />
-                                        <Label htmlFor="r3" className="cursor-pointer font-medium">I'm not seeing the desired results</Label>
+                                        <Label htmlFor="r3" className="cursor-pointer font-medium">I&apos;m not seeing the desired results</Label>
                                     </div>
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("other")}>
                                         <RadioGroupItem value="other" id="r4" className="text-[#8FA677] border-gray-300" />
@@ -231,7 +231,7 @@ export default function BillingSubscriptionPage() {
                             <div className="w-16 h-16 bg-[#8FA677]/10 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <AlertCircle className="w-8 h-8 text-[#8FA677]" />
                             </div>
-                            <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Don't let side effects stop your progress.</h3>
+                            <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Don&apos;t let side effects stop your progress.</h3>
                             <p className="text-[#666666] mb-8">
                                 Mild nausea is very common. We can instantly pause your billing for 14 days and send a free prescription for Zofran (anti-nausea medication) to your local pharmacy so your body can adjust comfortably.
                             </p>
@@ -259,7 +259,7 @@ export default function BillingSubscriptionPage() {
                             </div>
                             <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Switch to the Maintenance Protocol.</h3>
                             <p className="text-[#666666] mb-8">
-                                Instead of losing all your momentum, we can step you down to our 'Maintenance Protocol'. You retain access to your doctor and receive a perfectly adjusted micro-dose at <strong className="text-[#B8977E]">50% off the standard monthly price</strong>.
+                                Instead of losing all your momentum, we can step you down to our &apos;Maintenance Protocol&apos;. You retain access to your doctor and receive a perfectly adjusted micro-dose at <strong className="text-[#B8977E]">50% off the standard monthly price</strong>.
                             </p>
                             <div className="flex flex-col gap-3">
                                 <Button
@@ -283,9 +283,9 @@ export default function BillingSubscriptionPage() {
                             <div className="w-16 h-16 bg-[#1A1A1A]/5 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <ShieldCheck className="w-8 h-8 text-[#1A1A1A]" />
                             </div>
-                            <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Let's adjust your dosage instantly.</h3>
+                            <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Let&apos;s adjust your dosage instantly.</h3>
                             <p className="text-[#666666] mb-8">
-                                Every body metabolizes differently. If the current dosage isn't yielding results, don't quit. Click below to schedule a priority 5-minute triage call with our MD to adjust your protocol and accelerate results.
+                                Every body metabolizes differently. If the current dosage isn&apos;t yielding results, don&apos;t quit. Click below to schedule a priority 5-minute triage call with our MD to adjust your protocol and accelerate results.
                             </p>
                             <div className="flex flex-col gap-3">
                                 <Button

@@ -80,7 +80,7 @@ export default function TelehealthHDPage() {
                             <div className="absolute top-0 right-0 p-16 bg-[#B8977E]/20 blur-[50px] rounded-full" />
                             <CreditCard className="w-6 h-6 text-[#B8977E] mb-3 relative z-10" />
                             <h3 className="text-[#B8977E] font-medium mb-1 relative z-10">Stripe Injection</h3>
-                            <p className="text-[#B8977E]/70 text-sm relative z-10">Push the payment checkout directly to the patient's screen during the video call to capture the sale instantly.</p>
+                            <p className="text-[#B8977E]/70 text-sm relative z-10">Push the payment checkout directly to the patient&apos;s screen during the video call to capture the sale instantly.</p>
                         </Card>
                     </div>
 

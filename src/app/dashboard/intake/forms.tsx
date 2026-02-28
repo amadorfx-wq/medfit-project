@@ -14,7 +14,15 @@ interface FormProps {
 }
 
 // Light Luxury Theme Wrapper
-const FormLayout = ({ title, subtitle, step, totalSteps, children, icon: Icon = FileText }: any) => (
+interface FormLayoutProps {
+    title: string;
+    subtitle: string;
+    step: number;
+    totalSteps: number;
+    children: React.ReactNode;
+    icon?: React.ElementType;
+}
+const FormLayout = ({ title, subtitle, step, totalSteps, children }: FormLayoutProps) => (
     <div className="bg-[#F9F7F2] text-[#2D2D2D] p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E5E5] w-full max-w-3xl mx-auto animate-in fade-in zoom-in-95 duration-500">
         <header className="mb-8 border-b border-[#E5E5E5] pb-6">
             <div className="flex items-center justify-between mb-4">

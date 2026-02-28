@@ -26,10 +26,11 @@ export async function POST(req: Request) {
         return NextResponse.json({
             clientSecret: paymentIntent.client_secret,
         });
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Stripe PaymentIntent Error:', err);
+        const message = err instanceof Error ? err.message : 'Internal Server Error';
         return NextResponse.json(
-            { error: err.message || 'Internal Server Error' },
+            { error: message },
             { status: 500 }
         );
     }

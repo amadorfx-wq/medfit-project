@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/lib/store";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { CheckCircle2, Building2, ShieldCheck, Mail } from "lucide-react";
+import { CheckCircle2, Building2, ShieldCheck } from "lucide-react";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "@/lib/stripe-client";
 import CheckoutForm from "@/components/CheckoutForm";
@@ -18,15 +18,12 @@ export default function PaymentPage() {
     const { currentUser, patients, charges, payCharge } = useAppContext();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-    if (!currentUser) return null;
-
-    const currentPatient = patients.find(p => p.id === currentUser.id);
-    const userCharges = charges.filter(c => c.patientId === currentUser.id && c.status === "PENDING");
+    const currentPatient = currentUser ? patients.find(p => p.id === currentUser.id) : undefined;
+    const userCharges = currentUser ? charges.filter(c => c.patientId === currentUser.id && c.status === "PENDING") : [];
     const pendingBalance = userCharges.reduce((acc, curr) => acc + curr.amount, 0);
 
     useEffect(() => {
-        if (pendingBalance > 0 && !clientSecret) {
-            // Ask our Next.js API for a fresh Stripe PaymentIntent
+        if (currentUser && pendingBalance > 0 && !clientSecret) {
             fetch("/api/create-payment-intent", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -43,7 +40,9 @@ export default function PaymentPage() {
                 })
                 .catch((err) => console.error("Failed to fetch payment intent:", err));
         }
-    }, [pendingBalance, clientSecret, currentPatient]);
+    }, [currentUser, pendingBalance, clientSecret, currentPatient]);
+
+    if (!currentUser) return null;
 
     const handleSuccess = () => {
         userCharges.forEach(charge => payCharge(charge.id));

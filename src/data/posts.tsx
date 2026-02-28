@@ -23,7 +23,7 @@ export const academyPosts: BlogPost[] = [
                 <p>La medicina tradicional a menudo espera a que aparezcan los síntomas para actuar. En el ámbito del bienestar premium, el enfoque es la optimización proactiva. Las pruebas de laboratorio NFC (Nutricionales, Funcionales y Celulares) representan el estándar de oro en la evaluación de la salud personalizada.</p>
 
                 <h2>¿Por qué un análisis de sangre estándar no es suficiente?</h2>
-                <p>Los paneles tradicionales suelen medir rangos "normales" basados en promedios de la población. Sin embargo, "normal" no siempre significa "óptimo". Nuestros paneles de laboratorio NFC profundizan en:</p>
+                <p>Los paneles tradicionales suelen medir rangos &quot;normales&quot; basados en promedios de la población. Sin embargo, &quot;normal&quot; no siempre significa &quot;óptimo&quot;. Nuestros paneles de laboratorio NFC profundizan en:</p>
                 <ul>
                     <li><strong>Equilibrio Hormonal:</strong> Evaluando testosterona, estrógeno, tiroides y cortisol.</li>
                     <li><strong>Marcadores Metabólicos:</strong> Entendiendo cómo tu cuerpo procesa la energía.</li>
@@ -47,7 +47,7 @@ export const academyPosts: BlogPost[] = [
             <>
                 <p>El ciclo de las dietas restrictivas y el ejercicio extremo está obsoleto. Hoy en día, alcanzar y mantener un peso saludable requiere un enfoque clínico que entienda que la ganancia de peso rara vez es solo una cuestión de fuerza de voluntad; es una interacción compleja de genética, hormonas y metabolismo.</p>
 
-                <h2>El Enfoque del "Lujo Silencioso" en la Pérdida de Peso</h2>
+                <h2>El Enfoque del &quot;Lujo Silencioso&quot; en la Pérdida de Peso</h2>
                 <p>Nuestro programa de Medical Weight Loss no se basa en soluciones rápidas, sino en una transformación metabólica sostenible. El proceso incluye:</p>
                 <ul>
                     <li><strong>Evaluación Biométrica Completa:</strong> Entendiendo tu punto de partida a nivel celular.</li>
@@ -127,7 +127,7 @@ export const academyPosts: BlogPost[] = [
                 <p>Estos tratamientos no son estimulantes; son moléculas sofisticadas que imitan las hormonas naturales de tu cuerpo. Actúan en dos frentes principales:</p>
                 <ul>
                     <li><strong>Regulación de la Insulina:</strong> Mejorando la forma en que tu cuerpo procesa los azúcares.</li>
-                    <li><strong>Control del Apetito:</strong> Retrasando el vaciamiento gástrico y enviando señales de saciedad al cerebro, eliminando la ansiedad por la comida o el "ruido mental" constante.</li>
+                    <li><strong>Control del Apetito:</strong> Retrasando el vaciamiento gástrico y enviando señales de saciedad al cerebro, eliminando la ansiedad por la comida o el &quot;ruido mental&quot; constante.</li>
                 </ul>
 
                 <h2>Un Protocolo Estrictamente Médico</h2>

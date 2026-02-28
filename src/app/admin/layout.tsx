@@ -190,7 +190,7 @@ export default function AdminLayout({
                                     </ul>
                                 ) : (
                                     <div className="p-4 text-center text-sm text-white/50 bg-[#0C1420]">
-                                        No matching patients found for "{searchQuery}"
+                                        No matching patients found for &quot;{searchQuery}&quot;
                                     </div>
                                 )}
                             </div>

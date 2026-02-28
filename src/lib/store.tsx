@@ -63,7 +63,7 @@ export interface AdminNotification {
     content: string;
     date: string;
     read: boolean;
-    data?: any;
+    data?: Record<string, unknown>;
 }
 
 interface AppContextType {
