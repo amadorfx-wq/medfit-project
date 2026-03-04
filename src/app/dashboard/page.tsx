@@ -9,7 +9,7 @@ import { useAppContext } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Clock, AlertCircle, FileSignature, ArrowRight, MessageSquare, ShoppingBag, PhoneCall, CheckCircle2, Check, Stethoscope, ShieldCheck, Truck } from "lucide-react";
+import { Activity, Clock, AlertCircle, FileSignature, ArrowRight, MessageSquare, ShoppingBag, PhoneCall, CheckCircle2, Check, Stethoscope, ShieldCheck, Truck, Pill, Sparkles } from "lucide-react";
 
 export default function DashboardPage() {
     const { currentUser, charges, patients, addToCart } = useAppContext();
@@ -30,22 +30,69 @@ export default function DashboardPage() {
     const pendingBalance = userCharges.reduce((acc, curr) => curr.status === "PENDING" ? acc + curr.amount : acc, 0);
 
     const statusValue = userDetails?.approvalStatus || "PENDING_FORMS";
-    const currentStep = statusValue === "PENDING_APPROVAL" ? 1 : statusValue === "APPROVED" ? 2 : 0;
+    const stepMapping: Record<string, number> = {
+        "PENDING_FORMS": 0,
+        "PENDING_APPROVAL": 1,
+        "PENDING_PAYMENT": 2,
+        "PENDING_SHIPMENT": 3,
+        "APPROVED": 4
+    };
+    const currentStep = stepMapping[statusValue] || 0;
+
+    // Derive medication list from activeTreatment (real data)
+    const PROTOCOL_MEDS: Record<string, { name: string; dose: string }[]> = {
+        "Medical Weight Loss": [
+            { name: "Semaglutide", dose: "0.25–1mg / week (Subcutaneous)" },
+            { name: "Vitamin B12 (Methylcobalamin)", dose: "1ml / week injection" }
+        ],
+        "Medical Weight Loss (Tirzepatide)": [
+            { name: "Tirzepatide", dose: "2.5–5mg / week (Subcutaneous)" },
+            { name: "Vitamin B12 (Methylcobalamin)", dose: "1ml / week injection" }
+        ],
+        "Peptide Protocol": [
+            { name: "BPC-157", dose: "250mcg / day (Subcutaneous)" },
+            { name: "CJC-1295/Ipamorelin", dose: "100mcg / daily (Subcutaneous)" }
+        ],
+        "Testosterone Therapy": [
+            { name: "Testosterone Cypionate", dose: "140mg / week (Injected)" },
+            { name: "Anastrozole", dose: "0.5mg / twice a week" }
+        ],
+        "Comprehensive NFC Panel": [
+            { name: "Lab Work Panel", dose: "Comprehensive blood draw" }
+        ]
+    };
+    const activeMeds = userDetails?.activeTreatment
+        ? (PROTOCOL_MEDS[userDetails.activeTreatment] ||
+            Object.entries(PROTOCOL_MEDS).find(([key]) => userDetails.activeTreatment?.toLowerCase().includes(key.toLowerCase()))?.[1] ||
+            [])
+        : [];
 
     const trackerSteps = [
         { title: "Intake & Forms", description: "Patient profiling", icon: FileSignature },
         { title: "Clinical Review", description: "Physician assessment", icon: Stethoscope },
-        { title: "Protocol Authorized", description: "Rx generated", icon: ShieldCheck },
-        { title: "Medication Shipped", description: "Pharmacy fulfillment", icon: Truck },
+        { title: "Protocol Authorized", description: "Payment & Rx generation", icon: ShieldCheck },
+        { title: "Fulfillment & Shipping", description: "Pharmacy processing", icon: Truck },
     ];
 
     return (
         <div className="p-6 md:p-12 max-w-6xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
 
             {/* Header */}
-            <header className="mb-10 border-b border-border/50 pb-6">
-                <h1 className="text-3xl md:text-4xl font-serif mb-2">Welcome, {currentUser.name}</h1>
-                <p className="text-muted-foreground">Your personalized wellness dashboard.</p>
+            <header className="mb-10 border-b border-border/50 pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl md:text-4xl font-serif mb-2">Welcome, {currentUser.name}</h1>
+                    <p className="text-muted-foreground">Your personalized wellness dashboard.</p>
+                </div>
+                <Link href="/dashboard/treatments" className="shrink-0 relative group">
+                    {/* Premium Glow Effect */}
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#B8977E]/40 via-[#B8977E]/20 to-[#B8977E]/40 rounded-xl blur-md opacity-75 group-hover:opacity-100 transition duration-500 animate-pulse-slow"></div>
+
+                    <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl border border-[#B8977E]/50 bg-[#0A0F17] hover:bg-[#B8977E]/10 transition-all duration-300 cursor-pointer shadow-[0_0_20px_rgba(184,151,126,0.15)] group-hover:shadow-[0_0_30px_rgba(184,151,126,0.3)]">
+                        <Sparkles className="w-4 h-4 text-[#B8977E]" />
+                        <span className="text-sm font-medium text-[#B8977E] tracking-wide">Our Protocols</span>
+                        <ArrowRight className="w-4 h-4 text-[#B8977E] group-hover:translate-x-1 transition-transform" />
+                    </div>
+                </Link>
             </header>
 
             {hasPendingForms && (
@@ -172,6 +219,63 @@ export default function DashboardPage() {
                 </Card>
             </div>
 
+            {/* ─── Subscription / Billing Self-Service ────────────────── */}
+            {userDetails?.activeTreatment && (
+                <Card className="border border-border/50 bg-card backdrop-blur-sm mb-10 overflow-hidden">
+                    <CardContent className="p-0">
+                        <div className="flex flex-col sm:flex-row items-stretch">
+                            <div className="flex-1 p-6 space-y-2">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-7 h-7 rounded-full bg-[#B8977E]/10 flex items-center justify-center">
+                                        <Sparkles className="w-3.5 h-3.5 text-[#B8977E]" />
+                                    </div>
+                                    <span className="text-xs uppercase tracking-wider text-[#B8977E] font-medium">Active Subscription</span>
+                                </div>
+                                <h3 className="text-lg font-serif">{userDetails.activeTreatment}</h3>
+                                <p className="text-sm text-muted-foreground">Your monthly protocol is active. Manage your payment methods, view invoices, or update your subscription below.</p>
+                            </div>
+                            <div className="sm:border-l border-t sm:border-t-0 border-border/50 p-6 flex flex-col items-center justify-center bg-white/[0.02]">
+                                <Button
+                                    variant="outline"
+                                    className="rounded-xl border-[#B8977E]/30 text-[#B8977E] hover:bg-[#B8977E]/10 h-12 px-6 w-full"
+                                    onClick={async () => {
+                                        const patient = patients.find(p => p.id === currentUser.id);
+                                        if (!patient?.email) {
+                                            toast.error("No email found for your account.");
+                                            return;
+                                        }
+                                        toast.loading("Opening secure portal...", { id: "portal" });
+                                        try {
+                                            const res = await fetch("/api/stripe-portal", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ customerEmail: patient.email }),
+                                            });
+                                            const data = await res.json();
+                                            if (data.error) {
+                                                toast.error(data.error, { id: "portal" });
+                                                return;
+                                            }
+                                            toast.dismiss("portal");
+                                            window.open(data.url, "_blank");
+                                        } catch {
+                                            toast.error("Failed to open billing portal.", { id: "portal" });
+                                        }
+                                    }}
+                                >
+                                    Manage Billing & Payment <ArrowRight className="w-4 h-4 ml-2" />
+                                </Button>
+                                {/* Trust Badge */}
+                                <div className="flex items-center gap-1.5 mt-3 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+                                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                                    <span>Secured by Stripe</span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* Main Feed / Protocol List */}
@@ -181,20 +285,37 @@ export default function DashboardPage() {
                             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                             Your Current Meds
                         </h3>
-                        <div className="space-y-3">
-                            {[
-                                { name: "Testosterone Cypionate", dose: "140mg / week (Injected)", status: "Active" },
-                                { name: "Anastrozole", dose: "0.5mg / twice a week", status: "Active" }
-                            ].map((med, i) => (
-                                <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-white/5 hover:border-primary/30 transition-colors">
-                                    <div>
-                                        <p className="font-medium">{med.name}</p>
-                                        <p className="text-sm text-muted-foreground">{med.dose}</p>
+                        {activeMeds.length > 0 ? (
+                            <div className="space-y-3">
+                                {activeMeds.map((med, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-white/5 hover:border-primary/30 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                                <Pill className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">{med.name}</p>
+                                                <p className="text-sm text-muted-foreground">{med.dose}</p>
+                                            </div>
+                                        </div>
+                                        <Badge variant="outline" className="text-primary border-primary/20 bg-primary/10 shrink-0">Active</Badge>
                                     </div>
-                                    <Badge variant="outline" className="text-primary border-primary/20 bg-primary/10">{med.status}</Badge>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-10 text-center bg-white/[0.02] border border-border/50 rounded-xl">
+                                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                                    <Pill className="w-6 h-6 text-muted-foreground/40" />
                                 </div>
-                            ))}
-                        </div>
+                                <p className="text-sm font-medium text-muted-foreground">No Active Medications</p>
+                                <p className="text-xs text-muted-foreground/60 mt-1 max-w-[200px]">Enroll in a treatment protocol to see your prescribed medications here.</p>
+                                <Link href="/dashboard/treatments">
+                                    <Button variant="outline" size="sm" className="mt-4 h-8 text-xs border-primary/30 text-primary hover:bg-primary/10">
+                                        View Protocols <ArrowRight className="w-3 h-3 ml-1" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
                     </section>
 
                     <section>
@@ -223,6 +344,7 @@ export default function DashboardPage() {
 
                 {/* Sidebar / Quick Actions */}
                 <div className="space-y-6">
+
                     <Card className="border border-border/50 bg-card">
                         <CardContent className="p-6">
                             <h3 className="text-sm font-serif mb-4 text-muted-foreground uppercase tracking-widest">Quick Actions</h3>

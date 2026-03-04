@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, BarChart, LineChart } from "lucide-react";
+import { tenant } from "@/lib/theme.config";
 
 export default function ResultsPage() {
     return (
@@ -10,8 +11,8 @@ export default function ResultsPage() {
             <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
-                        <span className="font-serif text-xl tracking-wide">MedFit America</span>
+                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">{tenant.logoInitial}</div>
+                        <span className="font-serif text-xl tracking-wide">{tenant.name}</span>
                     </Link>
                     <Link href="/consultation">
                         <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm rounded-full px-6">
@@ -26,7 +27,7 @@ export default function ResultsPage() {
                     <p className="text-primary text-sm font-bold tracking-[0.2em] uppercase mb-4">Evidence-Based</p>
                     <h1 className="text-5xl md:text-6xl font-serif mb-6">Patient Outcomes</h1>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                        At MedFit America, we measure success not just in pounds lost or hormones optimized, but in the sustained quality of life our patients reclaim.
+                        At {tenant.name}, we measure success not just in pounds lost or hormones optimized, but in the sustained quality of life our patients reclaim.
                     </p>
                 </div>
 

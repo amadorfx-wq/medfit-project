@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/lib/store";
+import { tenant } from "@/lib/theme.config";
 import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { CheckCircle2, Building2, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Building2, ShieldCheck, Truck } from "lucide-react";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "@/lib/stripe-client";
 import CheckoutForm from "@/components/CheckoutForm";
@@ -29,7 +30,7 @@ export default function PaymentPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     amount: pendingBalance,
-                    description: `MedFit Protocol Payment for ${currentPatient?.name}`
+                    description: `${tenant.shortName} Protocol Payment for ${currentPatient?.name}`
                 }),
             })
                 .then((res) => res.json())
@@ -44,8 +45,10 @@ export default function PaymentPage() {
 
     if (!currentUser) return null;
 
-    const handleSuccess = () => {
-        userCharges.forEach(charge => payCharge(charge.id));
+    const handleSuccess = async () => {
+        // Wait for all payCharge promises to resolve (DB + State + Notifications)
+        await Promise.all(userCharges.map(charge => payCharge(charge.id)));
+
         toast.success("Payment Successful & Confirmed", {
             description: `A detailed receipt for $${pendingBalance.toFixed(2)} has been sent to ${currentPatient?.email || "your email"}`,
         });
@@ -98,6 +101,21 @@ export default function PaymentPage() {
                         </Button>
                     </CardContent>
                 </Card>
+            ) : currentPatient?.approvalStatus === "PENDING_SHIPMENT" && pendingBalance === 0 ? (
+                <Card className="bg-card border-border/50 text-center py-16 animate-in slide-in-from-bottom-4">
+                    <CardContent className="space-y-4 flex flex-col items-center">
+                        <div className="w-16 h-16 rounded-full bg-[#8FA677]/20 flex items-center justify-center animate-pulse">
+                            <Truck className="w-8 h-8 text-[#8FA677]" />
+                        </div>
+                        <CardTitle className="font-serif text-2xl">Processing Shipment</CardTitle>
+                        <CardDescription className="text-base max-w-sm mx-auto">
+                            Your payment was successful. The pharmacy is now preparing your protocol for shipping. You will receive tracking information soon.
+                        </CardDescription>
+                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">
+                            Return to Dashboard
+                        </Button>
+                    </CardContent>
+                </Card>
             ) : pendingBalance === 0 ? (
                 <Card className="bg-card border-border/50 text-center py-16">
                     <CardContent className="space-y-4 flex flex-col items-center">
@@ -106,7 +124,7 @@ export default function PaymentPage() {
                         </div>
                         <CardTitle className="font-serif text-2xl">Your account is up to date.</CardTitle>
                         <CardDescription className="text-base max-w-sm mx-auto">
-                            You have no pending charges. Thank you for your continued trust in MedFit America.
+                            You have no pending charges. Thank you for your continued trust in {tenant.name}.
                         </CardDescription>
                         <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">
                             Return to Dashboard

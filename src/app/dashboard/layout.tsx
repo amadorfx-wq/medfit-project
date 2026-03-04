@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CreditCard, Stethoscope, BookOpen, User, LogOut, Receipt } from "lucide-react";
 import { useAppContext } from "@/lib/store";
+import { tenant } from "@/lib/theme.config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function DashboardLayout({
@@ -40,9 +41,9 @@ export default function DashboardLayout({
             <aside className="w-72 hidden md:flex flex-col bg-[#050505] border-r border-border/50 p-6 fixed h-full z-10">
                 <div className="flex items-center gap-2 mb-12">
                     <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
-                        M
+                        {tenant.logoInitial}
                     </div>
-                    <span className="font-serif text-xl tracking-wide text-foreground">MedFit America</span>
+                    <span className="font-serif text-xl tracking-wide text-foreground">{tenant.name}</span>
                 </div>
 
                 <div className="mb-10">

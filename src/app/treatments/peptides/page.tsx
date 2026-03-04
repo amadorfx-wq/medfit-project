@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { tenant } from "@/lib/theme.config";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,8 +23,8 @@ export default function PeptidesLandingPage() {
                         <span className="text-sm font-medium uppercase tracking-widest">Back to Homepage</span>
                     </Link>
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded bg-[#8FA677] flex items-center justify-center text-white font-serif font-bold text-xl">M</div>
-                        <span className="font-serif text-xl tracking-wide text-[#1A1A1A]">MedFit America</span>
+                        <div className="w-8 h-8 rounded bg-[#8FA677] flex items-center justify-center text-white font-serif font-bold text-xl">{tenant.logoInitial}</div>
+                        <span className="font-serif text-xl tracking-wide text-[#1A1A1A]">{tenant.name}</span>
                     </div>
                     <Link href="/login" className="hidden sm:block text-sm font-medium text-[#8FA677] hover:text-[#7D9365] transition-colors">
                         Patient Portal
@@ -110,7 +111,7 @@ export default function PeptidesLandingPage() {
 
             {/* Simple Footer */}
             <footer className="py-10 border-t border-[#E5E5E5] text-center text-sm text-[#2D2D2D]/60">
-                <p>© 2026 MedFit America. Exceptional Care, Discreetly Provided.</p>
+                <p>© {tenant.legal.copyrightYear} {tenant.name}. {tenant.tagline}</p>
             </footer>
         </div>
     );

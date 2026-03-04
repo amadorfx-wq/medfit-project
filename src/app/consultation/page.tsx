@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
+import { tenant } from "@/lib/theme.config";
 
 export default function ConsultationPage() {
     return (
@@ -9,8 +10,8 @@ export default function ConsultationPage() {
             <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
-                        <span className="font-serif text-xl tracking-wide">MedFit America</span>
+                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">{tenant.logoInitial}</div>
+                        <span className="font-serif text-xl tracking-wide">{tenant.name}</span>
                     </Link>
                     <Link href="/login">
                         <Button variant="ghost" className="text-muted-foreground hover:text-white">

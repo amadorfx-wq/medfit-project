@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAppContext } from "@/lib/store";
+import { tenant } from "@/lib/theme.config";
+import { signOut as supabaseSignOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,7 +23,8 @@ import {
     ShoppingCart,
     ShieldCheck,
     UserPlus,
-    Video
+    Video,
+    AlertTriangle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -47,35 +50,50 @@ export default function AdminLayout({
         (p.phone && p.phone.includes(searchQuery))
     ).slice(0, 5);
 
-    // Basic RBAC
-    if (currentUser?.role !== "ADMIN") {
+    // RBAC: Only clinical staff can access the admin portal
+    const STAFF_ROLES = ["ADMIN", "SUPERADMIN", "DOCTOR", "RECEPTION"];
+    if (!currentUser || !STAFF_ROLES.includes(currentUser.role ?? "")) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[#0C1C30]">
                 <div className="text-center space-y-4 max-w-sm">
                     <div className="w-16 h-16 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-3xl mx-auto mb-6">
-                        M
+                        {tenant.logoInitial}
                     </div>
                     <h1 className="text-2xl font-serif text-white">Access Denied</h1>
-                    <p className="text-white/60">This area is restricted to MedFit America Clinical Staff only.</p>
+                    <p className="text-white/60">This area is restricted to {tenant.name} Clinical Staff only.</p>
                     <Link href="/login" className="text-[#B8977E] hover:underline block mt-4">Return to Login</Link>
                 </div>
             </div>
         );
     }
 
-    const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL").length;
+    // ─── NDA INTERCEPTOR: Block access until staff signs Confidentiality Agreement ───
+    const STAFF_ROLES_REQUIRING_NDA = ["ADMIN", "SUPERADMIN", "DOCTOR", "RECEPTION"];
+    const isOnboardingPage = pathname === "/admin/onboarding";
+    const needsNDA = STAFF_ROLES_REQUIRING_NDA.includes(currentUser.role ?? "") && !currentUser.ndaSignedAt && !isOnboardingPage;
 
-    const navItems = [
-        { name: "Dashboard Overview", href: "/admin", icon: LayoutDashboard },
-        { name: "Pending Approvals", href: "/admin/approvals", icon: ClipboardCheck, badge: pendingAuthorizations },
-        { name: "Patient Management", href: "/admin/patients", icon: Users },
-        { name: "Billing & Invoices", href: "/admin/billing", icon: DollarSign },
-        { name: "Treatments & Forms", href: "/admin/forms", icon: FileText },
-        { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-        { name: "Telehealth HD", href: "/admin/telehealth", icon: Video, badge: "Locked" },
-        { name: "Staff & Roles", href: "/admin/staff", icon: UserPlus },
-        { name: "Security & Audit", href: "/admin/security", icon: ShieldCheck },
+    if (needsNDA) {
+        // Instead of redirecting (which would cause layout issues), render inline
+        const OnboardingPage = require("./onboarding/page").default;
+        return <OnboardingPage />;
+    }
+
+    const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL" || p.approvalStatus === "PENDING_SHIPMENT").length;
+
+    const allNavItems = [
+        { name: "Dashboard Overview", href: "/admin", icon: LayoutDashboard, roles: ["SUPERADMIN", "ADMIN", "DOCTOR", "RECEPTION"] },
+        { name: "Approvals & Shipments", href: "/admin/approvals", icon: ClipboardCheck, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"], badge: pendingAuthorizations },
+        { name: "Patient Management", href: "/admin/patients", icon: Users, roles: ["SUPERADMIN", "ADMIN", "DOCTOR", "RECEPTION"] },
+        { name: "Billing & Invoices", href: "/admin/billing", icon: DollarSign, roles: ["SUPERADMIN", "ADMIN", "RECEPTION"] },
+        { name: "Treatments & Forms", href: "/admin/forms", icon: FileText, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"] },
+        { name: "Analytics", href: "/admin/analytics", icon: BarChart3, roles: ["SUPERADMIN", "ADMIN"] },
+        { name: "Telehealth HD", href: "/admin/telehealth", icon: Video, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"], badge: "Locked" },
+        { name: "Staff & Roles", href: "/admin/staff", icon: UserPlus, roles: ["SUPERADMIN"] },
+        { name: "Security & Audit", href: "/admin/security", icon: ShieldCheck, roles: ["SUPERADMIN"] },
     ];
+
+    // Filter nav items based on current user's role
+    const navItems = allNavItems.filter(item => item.roles.includes(currentUser.role ?? ""));
 
     return (
         <div className="min-h-screen flex bg-[#0A0F17] text-white">
@@ -85,10 +103,10 @@ export default function AdminLayout({
                 <div className="h-20 flex items-center px-6 border-b border-border/50">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
-                            M
+                            {tenant.logoInitial}
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-serif text-base tracking-wide leading-none">MedFit America</span>
+                            <span className="font-serif text-base tracking-wide leading-none">{tenant.name}</span>
                             <span className="text-[10px] text-[#B8977E] uppercase tracking-widest mt-1">Clinical Hub</span>
                         </div>
                     </div>
@@ -123,12 +141,16 @@ export default function AdminLayout({
                         </div>
                         <div>
                             <p className="text-sm font-medium">{currentUser.name}</p>
-                            <p className="text-xs text-white/50">Clinical Director</p>
+                            <p className="text-xs text-white/50 capitalize">{currentUser.role?.toLowerCase().replace('_', ' ')}</p>
                         </div>
                     </div>
                     <Button
                         variant="ghost"
-                        onClick={() => { logout(); window.location.href = '/login'; }}
+                        onClick={async () => {
+                            logout();
+                            try { await supabaseSignOut(); } catch (_) { }
+                            window.location.href = '/login';
+                        }}
                         className="w-full justify-start gap-3 text-white/50 hover:text-white hover:bg-white/5"
                     >
                         <LogOut className="w-4 h-4" />
@@ -141,7 +163,7 @@ export default function AdminLayout({
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
                 {/* Topbar (Mobile menu toggle & Search) */}
-                <header className="h-20 border-b border-border/50 bg-[#0C1420] flex items-center justify-between px-6 lg:px-10 shrink-0 relative z-20">
+                <header className="h-20 border-b border-border/50 bg-[#0C1420] flex items-center justify-between px-6 lg:px-10 shrink-0 relative z-[100]">
                     <div className="flex items-center gap-4 lg:hidden">
                         {/* Mobile Logo placeholder */}
                         <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
@@ -160,15 +182,18 @@ export default function AdminLayout({
 
                         {/* Dropdown de Resultados */}
                         {isSearchFocused && searchQuery.length > 1 && (
-                            <div className="absolute top-12 left-0 w-full bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-50">
+                            <div className="absolute top-12 left-0 w-full bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-[100]">
                                 {searchResults.length > 0 ? (
                                     <ul className="py-2">
                                         {searchResults.map(patient => (
                                             <li
                                                 key={patient.id}
                                                 className="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center justify-between group transition-colors"
-                                                onClick={() => {
+                                                onMouseDown={(e) => {
+                                                    // use onMouseDown instead of onClick to fire before the input's onBlur hides the dropdown
+                                                    e.preventDefault();
                                                     setSearchQuery("");
+                                                    setIsSearchFocused(false);
                                                     setSelectedGlobalPatientId(patient.id);
                                                     if (pathname !== '/admin/patients') {
                                                         router.push('/admin/patients');
@@ -231,10 +256,33 @@ export default function AdminLayout({
                                     ) : (
                                         <ul className="divide-y divide-white/5">
                                             {adminNotifications.map((notif) => (
-                                                <li key={notif.id} className={`p-4 transition-colors hover:bg-white/5 cursor-pointer ${notif.read ? 'opacity-60' : 'bg-white/5'}`} onClick={() => markNotificationRead(notif.id)}>
+                                                <li
+                                                    key={notif.id}
+                                                    className={`p-4 transition-colors hover:bg-white/5 cursor-pointer ${notif.read ? 'opacity-60' : 'bg-white/5'}`}
+                                                    onClick={() => {
+                                                        markNotificationRead(notif.id);
+                                                        setIsNotifOpen(false);
+
+                                                        // Ensure the patient is selected before routing
+                                                        if (notif.patientId !== "system" || notif.type !== "SYSTEM_ALERT") {
+                                                            setSelectedGlobalPatientId(notif.patientId);
+                                                        }
+
+                                                        if (notif.type === 'CART_REQUEST') {
+                                                            router.push('/admin/approvals');
+                                                        } else {
+                                                            router.push('/admin/patients');
+                                                        }
+                                                    }}
+                                                >
                                                     <div className="flex items-start gap-3">
-                                                        <div className={`mt-1 p-2 rounded-full ${notif.type === 'CART_REQUEST' ? 'bg-[#8FA677]/20 text-[#8FA677]' : 'bg-[#E8A838]/20 text-[#E8A838]'}`}>
-                                                            {notif.type === 'CART_REQUEST' ? <ShoppingCart className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
+                                                        <div className={`mt-1 p-2 rounded-full ${notif.type === 'CART_REQUEST' ? 'bg-[#8FA677]/20 text-[#8FA677]' :
+                                                            notif.type === 'SYSTEM_ALERT' ? 'bg-red-500/20 text-red-400' :
+                                                                'bg-[#E8A838]/20 text-[#E8A838]'
+                                                            }`}>
+                                                            {notif.type === 'CART_REQUEST' ? <ShoppingCart className="w-4 h-4" /> :
+                                                                notif.type === 'SYSTEM_ALERT' ? <AlertTriangle className="w-4 h-4" /> :
+                                                                    <MessageSquare className="w-4 h-4" />}
                                                         </div>
                                                         <div className="flex-1">
                                                             <div className="flex items-center justify-between mb-1">

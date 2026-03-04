@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
 
     // KPIs calculations
     const totalPending = charges.filter(c => c.status === "PENDING").length;
-    const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL").length;
+    const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL" || p.approvalStatus === "PENDING_SHIPMENT").length;
     const revenueAmount = charges.filter(c => c.status === "PAID").reduce((sum, c) => sum + c.amount, 0);
 
     const handleAddCharge = (e: React.FormEvent) => {
@@ -84,21 +84,25 @@ export default function AdminDashboardPage() {
                     </Link>
 
                     <Link href="/admin/billing" className="block focus:outline-none">
-                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#E8A838]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(232,168,56,0.05)] transition-all duration-300 cursor-pointer group">
-                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
+                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#E8A838]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(232,168,56,0.3)] transition-all duration-300 cursor-pointer group relative">
+                            {/* Premium Glow for Pending Revenue */}
+                            {totalPending > 0 && <div className="absolute -inset-0.5 bg-gradient-to-br from-[#E8A838]/20 to-transparent rounded-xl blur-md opacity-50 animate-pulse pointer-events-none" />}
+                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden bg-[#0C1420] rounded-xl z-10">
                                 {totalPending > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Pending Invoices</span>
                                     <CreditCard className={`w-4 h-4 transition-colors ${totalPending > 0 ? 'text-[#E8A838]' : 'text-white/40 group-hover:text-white/60'}`} />
                                 </div>
-                                <div className={`text-3xl font-serif transition-colors ${totalPending > 0 ? 'text-[#E8A838] group-hover:text-[#E8A838]/80' : 'text-white group-hover:text-[#B8977E]'}`}>{totalPending}</div>
+                                <div className={`text-3xl font-serif transition-colors ${totalPending > 0 ? 'text-[#E8A838] group-hover:text-[#E8A838]/90 text-shadow-sm' : 'text-white group-hover:text-[#B8977E]'}`}>{totalPending}</div>
                             </CardContent>
                         </Card>
                     </Link>
 
                     <Link href="/admin/analytics" className="block focus:outline-none">
-                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#8FA677]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(143,166,119,0.05)] transition-all duration-300 cursor-pointer group">
-                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
+                        <Card className="bg-[#0C1420] border-border/50 text-white h-full hover:bg-[#111A27] hover:border-[#8FA677]/30 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(143,166,119,0.3)] transition-all duration-300 cursor-pointer group relative">
+                            {/* Premium Glow for Earned Revenue */}
+                            {revenueAmount > 0 && <div className="absolute -inset-0.5 bg-gradient-to-br from-[#8FA677]/20 to-transparent rounded-xl blur-md opacity-50 animate-pulse pointer-events-none" />}
+                            <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden bg-[#0C1420] rounded-xl z-10">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Revenue (MTD)</span>
                                     <DollarSign className="w-4 h-4 text-[#8FA677] group-hover:text-[#8FA677]/80 transition-colors" />
@@ -113,7 +117,7 @@ export default function AdminDashboardPage() {
                             <CardContent className="p-5 h-full flex flex-col justify-between relative overflow-hidden">
                                 {pendingAuthorizations > 0 && <div className="absolute inset-0 border-l-2 border-[#E8A838]" />}
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Pending Approvals</span>
+                                    <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">Approvals & Shipments</span>
                                     <AlertCircle className={`w-4 h-4 transition-colors ${pendingAuthorizations > 0 ? 'text-[#E8A838]' : 'text-white/40 group-hover:text-white/60'}`} />
                                 </div>
                                 <div className={`text-3xl font-serif transition-colors ${pendingAuthorizations > 0 ? 'text-[#E8A838] group-hover:text-[#E8A838]/80' : 'text-white group-hover:text-[#B8977E]'}`}>{pendingAuthorizations}</div>
@@ -152,10 +156,32 @@ export default function AdminDashboardPage() {
                                     <Button
                                         variant="outline"
                                         className="w-full bg-[#E8A838]/10 border-[#E8A838]/20 text-[#E8A838] hover:bg-[#E8A838] hover:text-black transition-colors"
-                                        onClick={() => {
-                                            toast.success("Recovery sequence initiated", {
-                                                description: `Automated SMS & Email sent to ${patient.name}.`
-                                            });
+                                        onClick={async () => {
+                                            try {
+                                                const res = await fetch("/api/trigger-sms", {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({
+                                                        patientId: patient.id,
+                                                        patientName: patient.name,
+                                                        type: "ONBOARDING_RESCUE"
+                                                    })
+                                                });
+
+                                                if (res.ok) {
+                                                    toast.success("Recovery sequence initiated", {
+                                                        description: `Automated SMS & Email sent to ${patient.name}.`
+                                                    });
+                                                } else {
+                                                    toast.error("Failed to sequence", {
+                                                        description: "The communication gateway is currently unavailable."
+                                                    });
+                                                }
+                                            } catch (error) {
+                                                toast.error("Network Error", {
+                                                    description: "Could not reach the automated recovery engine."
+                                                });
+                                            }
                                         }}
                                     >
                                         <Mail className="w-4 h-4 mr-2" />

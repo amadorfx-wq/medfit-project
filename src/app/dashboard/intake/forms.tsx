@@ -1,10 +1,102 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck, AlertCircle } from "lucide-react";
+import { ShieldCheck, AlertCircle, MapPin } from "lucide-react";
+import { SignatureBlock, SignatureData } from "@/components/SignatureBlock";
+
+// Tell TypeScript about window.google (loaded via <Script> in layout.tsx)
+declare global { interface Window { google: any; } }
+
+// Native Google Maps Places Autocomplete — no library, direct API
+interface AddressDetails { street: string; city: string; state: string; zip: string; }
+function AddressAutocompleteSection({
+    addressDetails,
+    setAddressDetails,
+    inputClasses,
+    labelClasses,
+}: {
+    addressDetails: AddressDetails;
+    setAddressDetails: (d: AddressDetails) => void;
+    inputClasses: string;
+    labelClasses: string;
+}) {
+    // useCallback ref = fires exactly when the DOM element mounts (works inside Dialog portals too)
+    const inputCallbackRef = useCallback((inputEl: HTMLInputElement | null) => {
+        if (!inputEl) return; // element unmounted
+
+        const attachAutocomplete = () => {
+            if (!window.google?.maps?.places) {
+                setTimeout(attachAutocomplete, 300);
+                return;
+            }
+            const ac = new window.google.maps.places.Autocomplete(inputEl, {
+                types: ["address"],
+                componentRestrictions: { country: "us" },
+                fields: ["address_components", "formatted_address"],
+            });
+
+            ac.addListener("place_changed", () => {
+                const place = ac.getPlace();
+                if (!place?.address_components) return;
+
+                let streetNumber = "", route = "", city = "", state = "", zip = "";
+                for (const component of place.address_components) {
+                    const types = component.types;
+                    if (types.includes("street_number")) streetNumber = component.long_name;
+                    if (types.includes("route")) route = component.long_name;
+                    if (types.includes("locality") || types.includes("sublocality")) city = component.long_name;
+                    if (types.includes("administrative_area_level_1")) state = component.short_name;
+                    if (types.includes("postal_code")) zip = component.long_name;
+                }
+
+                setAddressDetails({
+                    street: `${streetNumber} ${route}`.trim(),
+                    city, state, zip,
+                });
+            });
+        };
+
+        attachAutocomplete();
+    }, []);
+
+
+    return (
+        <div className="md:col-span-2 bg-white/50 p-6 rounded-2xl border border-[#E5E5E5]/60 shadow-sm">
+            <Label className="text-xs font-semibold text-[#8FA677] uppercase tracking-wider mb-4 flex items-center gap-2">
+                <MapPin className="w-4 h-4" /> Intelligent Address Search
+            </Label>
+            <input
+                ref={inputCallbackRef}
+                className="w-full h-12 px-4 rounded-xl border border-[#E5E5E5] bg-white text-[#1A1A1A] focus:outline-none focus:border-[#8FA677] focus:ring-1 focus:ring-[#8FA677] transition-all mb-4 placeholder:text-[#2D2D2D]/40"
+                placeholder="Start typing your home address..."
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                    <Label className={labelClasses}>Street Address</Label>
+                    <Input required className={inputClasses} value={addressDetails.street} onChange={(e) => setAddressDetails({ ...addressDetails, street: e.target.value })} />
+                </div>
+                <div>
+                    <Label className={labelClasses}>City</Label>
+                    <Input required className={inputClasses} value={addressDetails.city} onChange={(e) => setAddressDetails({ ...addressDetails, city: e.target.value })} />
+                </div>
+                <div className="flex gap-4">
+                    <div className="flex-1">
+                        <Label className={labelClasses}>State</Label>
+                        <Input required className={inputClasses} value={addressDetails.state} onChange={(e) => setAddressDetails({ ...addressDetails, state: e.target.value })} />
+                    </div>
+                    <div className="flex-1">
+                        <Label className={labelClasses}>Zip</Label>
+                        <Input required className={inputClasses} value={addressDetails.zip} onChange={(e) => setAddressDetails({ ...addressDetails, zip: e.target.value })} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 interface FormProps {
     onSubmit: () => void;
@@ -53,7 +145,8 @@ const FormLayout = ({ title, subtitle, step, totalSteps, children }: FormLayoutP
 // Form 1: Wellness Intake (Global)
 export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
     const [step, setStep] = useState(1);
-    const [signature, setSignature] = useState("");
+    const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
+    const [addressDetails, setAddressDetails] = useState({ street: "", city: "", state: "", zip: "" });
 
     const handleNext = (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,6 +157,7 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
         e.preventDefault();
         onSubmit();
     };
+
 
     const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
     const labelClasses = "text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider mb-2 block";
@@ -76,12 +170,14 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div><Label className={labelClasses}>Name</Label><Input required className={inputClasses} /></div>
                         <div><Label className={labelClasses}>DOB</Label><Input type="date" required className={inputClasses} /></div>
-                        <div className="md:col-span-2"><Label className={labelClasses}>Address</Label><Input required className={inputClasses} /></div>
-                        <div><Label className={labelClasses}>City</Label><Input required className={inputClasses} /></div>
-                        <div className="flex gap-4">
-                            <div className="flex-1"><Label className={labelClasses}>State</Label><Input required className={inputClasses} /></div>
-                            <div className="flex-1"><Label className={labelClasses}>Zip</Label><Input required className={inputClasses} /></div>
-                        </div>
+
+                        <AddressAutocompleteSection
+                            addressDetails={addressDetails}
+                            setAddressDetails={setAddressDetails}
+                            inputClasses={inputClasses}
+                            labelClasses={labelClasses}
+                        />
+
                         <div><Label className={labelClasses}>Phone</Label><Input type="tel" required className={inputClasses} /></div>
                         <div><Label className={labelClasses}>Email</Label><Input type="email" required className={inputClasses} /></div>
                         <div><Label className={labelClasses}>Emergency Contact Name</Label><Input required className={inputClasses} /></div>
@@ -211,14 +307,15 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                     <p className="mt-2">I understand that if I withhold information or provide misinformation, incomplete results or recommendations can occur from treatments received. I am aware that it is my responsibility to inform you of my current medical or health conditions and to update this history. The treatments I receive here are voluntary and I release Medfit of Georgia from liability and assume full responsibility thereof.</p>
                 </div>
 
-                <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider">Patient Signature</Label>
-                    <Input required value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Type your full legal name to electronically sign" className={`${inputClasses} font-serif italic text-lg`} />
-                </div>
+                <SignatureBlock
+                    formTitle="MedFit Wellness Intake & Consent Form"
+                    onSign={(data) => setSignatureData(data)}
+                    signed={signatureData}
+                />
 
                 <div className="flex gap-4">
                     <Button type="button" variant="outline" onClick={() => setStep(2)} className="flex-1 h-14 rounded-2xl border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A]">Back</Button>
-                    <Button type="submit" disabled={isSubmitting} className="flex-[2] h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="flex-[2] h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
                         {isSubmitting ? "Finalizing..." : "Accept & Complete"}
                     </Button>
                 </div>
@@ -229,7 +326,7 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
 
 // Form 2: NFC HIPAA
 export function NfcHipaaForm({ onSubmit, isSubmitting }: FormProps) {
-    const [signature, setSignature] = useState("");
+    const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
     const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
 
     return (
@@ -256,12 +353,13 @@ export function NfcHipaaForm({ onSubmit, isSubmitting }: FormProps) {
                     <p>You have the right to inspect or copy the PHI to be used/disclosed.</p>
                 </div>
 
-                <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider">Print Name & Patient Signature</Label>
-                    <Input required value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Type your full legal name to electronically sign" className={`${inputClasses} font-serif italic text-lg`} />
-                </div>
+                <SignatureBlock
+                    formTitle="NFC HIPAA Health Care Authorization Form"
+                    onSign={(data) => setSignatureData(data)}
+                    signed={signatureData}
+                />
 
-                <Button type="submit" disabled={isSubmitting} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
                     {isSubmitting ? "Authorizing..." : "I Agree & Authorize"}
                 </Button>
             </form>
@@ -271,7 +369,7 @@ export function NfcHipaaForm({ onSubmit, isSubmitting }: FormProps) {
 
 // Form 3: Medical Weight Loss
 export function MedicalWeightLossForm({ onSubmit, isSubmitting }: FormProps) {
-    const [signature, setSignature] = useState("");
+    const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
     const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
 
     return (
@@ -284,11 +382,12 @@ export function MedicalWeightLossForm({ onSubmit, isSubmitting }: FormProps) {
                     <p>Risks associated with remaining overweight are tendencies to high blood pressure, diabetes, heart attack and heart disease, arthritis of the joints including hips, knees, feet and back, sleep apnea, and sudden death. I understand that these risks may be modest if I am not significantly overweight, but will increase with additional weight gain. I understand that much of the success of the program will depend on my efforts and that there are no guarantees or assurances that the program will be successful. I also understand that obesity may be a chronic, lifelong condition that may require changes in eating habits and permanent changes in behavior, including exercise, to be treated successfully.</p>
                     <p>I have read and fully understand this consent form and I realize I should not sign this form if all items have not been explained to me. My questions have been answered to my complete satisfaction. I have been urged and have been given all the time I need to read and understand this form. If you have any questions regarding the risks or hazards of the proposed treatment, or any questions whatsoever, concerning the proposed treatment or other possible treatments, ask your provider now before signing this consent form.</p>
                 </div>
-                <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider">Patient Signature</Label>
-                    <Input required value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Type your full legal name to electronically sign" className={`${inputClasses} font-serif italic text-lg`} />
-                </div>
-                <Button type="submit" disabled={isSubmitting} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                <SignatureBlock
+                    formTitle="Semaglutide/Tirzepatide Weight Loss Consent Form"
+                    onSign={(data) => setSignatureData(data)}
+                    signed={signatureData}
+                />
+                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
                     {isSubmitting ? "Processing..." : "Sign Consent"}
                 </Button>
             </form>
@@ -298,7 +397,7 @@ export function MedicalWeightLossForm({ onSubmit, isSubmitting }: FormProps) {
 
 // Form 4: Testosterone Therapy
 export function TestosteroneTherapyForm({ onSubmit, isSubmitting }: FormProps) {
-    const [signature, setSignature] = useState("");
+    const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
     const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
 
     return (
@@ -323,11 +422,12 @@ export function TestosteroneTherapyForm({ onSubmit, isSubmitting }: FormProps) {
                     </ol>
                     <p>All of my questions and concerns regarding treatment have been answered to my satisfaction. I further acknowledge that the risks and benefits of this treatment have been explained to me. I am of sound mind, under no undue influence and am competent to make this decision and do so of my own free will. I have no further questions. I consent to taking Testosterone as proposed by my clinical provider. I have complete understanding of and agree to follow the terms of this Informed Consent. A copy of this document has been given to me.</p>
                 </div>
-                <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider">Patient Signature</Label>
-                    <Input required value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Type your full legal name to electronically sign" className={`${inputClasses} font-serif italic text-lg`} />
-                </div>
-                <Button type="submit" disabled={isSubmitting} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                <SignatureBlock
+                    formTitle="Informed Consent for Testosterone Replacement Therapy"
+                    onSign={(data) => setSignatureData(data)}
+                    signed={signatureData}
+                />
+                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
                     {isSubmitting ? "Processing..." : "I Acknowledge & Consent"}
                 </Button>
             </form>
@@ -337,7 +437,7 @@ export function TestosteroneTherapyForm({ onSubmit, isSubmitting }: FormProps) {
 
 // Form 5: Peptide Therapy
 export function PeptideTherapyForm({ onSubmit, isSubmitting }: FormProps) {
-    const [signature, setSignature] = useState("");
+    const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
     const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
 
     return (
@@ -414,11 +514,12 @@ export function PeptideTherapyForm({ onSubmit, isSubmitting }: FormProps) {
                         </ul>
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider">Patient Signature</Label>
-                    <Input required value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Type your full legal name to electronically sign" className={`${inputClasses} font-serif italic text-lg`} />
-                </div>
-                <Button type="submit" disabled={isSubmitting} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                <SignatureBlock
+                    formTitle="Peptide Therapy Consent Form"
+                    onSign={(data) => setSignatureData(data)}
+                    signed={signatureData}
+                />
+                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
                     {isSubmitting ? "Processing..." : "Sign Consent"}
                 </Button>
             </form>
@@ -428,7 +529,7 @@ export function PeptideTherapyForm({ onSubmit, isSubmitting }: FormProps) {
 
 // Form 6: Semaglutide
 export function SemaglutideInstructionsForm({ onSubmit, isSubmitting }: FormProps) {
-    const [signature, setSignature] = useState("");
+    const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
     const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
 
     return (
@@ -469,14 +570,15 @@ export function SemaglutideInstructionsForm({ onSubmit, isSubmitting }: FormProp
                             By signing below, I confirm that I have read and understand the self-administration instructions provided.
                         </div>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider">Patient Signature</Label>
-                        <Input required value={signature} onChange={(e) => setSignature(e.target.value)} placeholder="Type your full legal name to electronically sign" className={`${inputClasses} font-serif italic text-lg`} />
-                    </div>
+                    <SignatureBlock
+                        formTitle="Semaglutide/Tirzepatide Self-Administration Instructions Acknowledgement"
+                        onSign={(data) => setSignatureData(data)}
+                        signed={signatureData}
+                    />
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                        {isSubmitting ? "Finalizing..." : "I Acknowledge & Sign"}
+                    </Button>
                 </div>
-                <Button type="submit" disabled={isSubmitting} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
-                    {isSubmitting ? "Finalizing..." : "I Acknowledge & Sign"}
-                </Button>
             </form>
         </FormLayout>
     );

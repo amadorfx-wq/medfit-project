@@ -15,7 +15,7 @@ import {
 
 export default function IntakeFormsPage() {
     const router = useRouter();
-    const { currentUser, patients, submitForm } = useAppContext();
+    const { currentUser, patients, submitForm, saveConsentForm } = useAppContext();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Protection mapping
@@ -29,13 +29,19 @@ export default function IntakeFormsPage() {
         formId => !currentPatient.completedForms.includes(formId)
     );
 
-    const handleFormComplete = (formId: string) => {
+    const handleFormComplete = async (formId: string) => {
         setIsSubmitting(true);
-        // Simulate network API delay for submitting secure forms
-        setTimeout(() => {
-            submitForm(formId);
-            setIsSubmitting(false);
-        }, 1500);
+
+        // Persist consent form signature to Supabase
+        await saveConsentForm(
+            currentUser.id,
+            formId,
+            { completedAt: new Date().toISOString(), patientName: currentUser.name },
+            { fullName: currentUser.name, image: "", timestamp: new Date().toISOString() }
+        );
+
+        submitForm(formId);
+        setIsSubmitting(false);
     };
 
     if (pendingForms.length === 0) {

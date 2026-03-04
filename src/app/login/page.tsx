@@ -2,20 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAppContext } from "@/lib/store";
+import { tenant } from "@/lib/theme.config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShieldCheck, HeartPulse, UserCircle2 } from "lucide-react";
+import { ShieldCheck, HeartPulse, UserCircle2, AlertCircle } from "lucide-react";
+import { DEV_CREDENTIALS } from "@/lib/auth";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { login, registerAndLogin } = useAppContext();
+    const { login, loginWithCredentials, registerAndLogin } = useAppContext();
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [isAdminLogin, setIsAdminLogin] = useState(false);
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+
+    // Staff login states
+    const [staffEmail, setStaffEmail] = useState(DEV_CREDENTIALS[0].email);
+    const [staffPassword, setStaffPassword] = useState("");
+    const [staffError, setStaffError] = useState("");
+    const [isStaffLoading, setIsStaffLoading] = useState(false);
 
     const handlePatientLogin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,10 +38,32 @@ export default function LoginPage() {
         router.push("/dashboard/intake");
     };
 
-    const handleAdminLogin = (e: React.FormEvent) => {
+    const handleAdminLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        login("admin@medfit.com", "ADMIN");
-        router.push("/admin");
+        setStaffError("");
+        setIsStaffLoading(true);
+        try {
+            await loginWithCredentials(staffEmail, staffPassword);
+            router.push("/admin");
+        } catch (err: any) {
+            // Graceful fallback: if Supabase Auth is not configured, use demo mode
+            if (err.message?.includes("Invalid login") || err.message?.includes("invalid_credentials")) {
+                setStaffError("Invalid email or password. Check your credentials and try again.");
+            } else if (err.message?.includes("Email not confirmed") || err.message?.includes("not confirmed")) {
+                setStaffError("Email not confirmed. Please contact your administrator.");
+            } else {
+                // Fallback to demo mode if Supabase Auth is not set up
+                const devCred = DEV_CREDENTIALS.find(c => c.email === staffEmail);
+                if (devCred && staffPassword === devCred.password) {
+                    login(staffEmail, devCred.role);
+                    router.push("/admin");
+                } else {
+                    setStaffError(err.message || "Authentication failed. Please try again.");
+                }
+            }
+        } finally {
+            setIsStaffLoading(false);
+        }
     };
 
     return (
@@ -40,12 +71,12 @@ export default function LoginPage() {
             {/* Left Panel: Branding (Hidden on mobile) */}
             <div className="hidden lg:flex flex-1 bg-[#080808] border-r border-border/50 flex-col justify-between p-16">
                 <div>
-                    <div className="flex items-center gap-3 mb-16">
+                    <Link href="/" className="flex items-center gap-3 mb-16 hover:opacity-80 transition-opacity">
                         <div className="w-10 h-10 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-2xl">
-                            M
+                            {tenant.logoInitial}
                         </div>
-                        <span className="font-serif text-2xl tracking-wide text-foreground">MedFit America</span>
-                    </div>
+                        <span className="font-serif text-2xl tracking-wide text-foreground">{tenant.name}</span>
+                    </Link>
                     <h1 className="text-5xl font-serif leading-tight mb-8">
                         Your <span className="text-primary italic">Health.</span><br />
                         Your <span className="text-primary italic">Protocol.</span><br />
@@ -76,12 +107,12 @@ export default function LoginPage() {
             <div className="flex-1 flex items-center justify-center p-8 sm:p-16 relative overflow-y-auto">
                 <div className="w-full max-w-md space-y-10 py-10">
 
-                    <div className="lg:hidden flex items-center gap-2 mb-8">
+                    <Link href="/" className="lg:hidden flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity w-fit">
                         <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
-                            M
+                            {tenant.logoInitial}
                         </div>
-                        <span className="font-serif text-xl tracking-wide text-foreground">MedFit America</span>
-                    </div>
+                        <span className="font-serif text-xl tracking-wide text-foreground">{tenant.name}</span>
+                    </Link>
 
                     <div className="text-left space-y-2">
                         <h2 className="text-3xl font-serif">{isAdminLogin ? "Clinical Access" : (isCreatingAccount ? "Begin Your Journey" : "Welcome Back")}</h2>
@@ -137,6 +168,21 @@ export default function LoginPage() {
                                             className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary text-lg h-12"
                                             required
                                         />
+                                    </div>
+
+                                    <div className="flex items-start gap-3 mt-4">
+                                        <input
+                                            type="checkbox"
+                                            id="agree-terms"
+                                            required
+                                            className="mt-1 accent-[#8FA677] w-4 h-4 rounded"
+                                        />
+                                        <label htmlFor="agree-terms" className="text-xs text-muted-foreground leading-relaxed">
+                                            I agree to the{" "}
+                                            <Link href="/legal/terms" target="_blank" className="text-primary hover:underline">Terms of Service</Link>,{" "}
+                                            <Link href="/legal/privacy" target="_blank" className="text-primary hover:underline">Privacy Policy</Link>, and{" "}
+                                            <Link href="/legal/hipaa-notice" target="_blank" className="text-primary hover:underline">Notice of Privacy Practices</Link>.
+                                        </label>
                                     </div>
 
                                     <Button type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md shadow-[0_0_15px_rgba(143,166,119,0.3)] mt-6">
@@ -206,32 +252,53 @@ export default function LoginPage() {
                         <TabsContent value="admin">
                             <form onSubmit={handleAdminLogin} className="space-y-6">
                                 <div className="space-y-1">
-                                    <Label htmlFor="admin-id" className="text-xs uppercase tracking-wider text-muted-foreground">Staff ID / Email</Label>
+                                    <Label htmlFor="admin-id" className="text-xs uppercase tracking-wider text-muted-foreground">Staff Email</Label>
                                     <Input
                                         id="admin-id"
+                                        type="email"
                                         placeholder="admin@medfit.com"
-                                        defaultValue="admin@medfit.com"
+                                        value={staffEmail}
+                                        onChange={(e) => setStaffEmail(e.target.value)}
                                         className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-[#B8977E] text-lg h-12"
                                         required
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="admin-pwd" className="text-xs uppercase tracking-wider text-muted-foreground">Master Password</Label>
+                                    <Label htmlFor="admin-pwd" className="text-xs uppercase tracking-wider text-muted-foreground">Password</Label>
                                     <Input
                                         id="admin-pwd"
                                         type="password"
                                         placeholder="••••••••"
-                                        defaultValue="supersecret"
+                                        value={staffPassword}
+                                        onChange={(e) => setStaffPassword(e.target.value)}
                                         className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-[#B8977E] text-lg h-12"
                                         required
                                     />
                                 </div>
-                                <Button type="submit" className="w-full rounded-full h-14 bg-card border border-border hover:bg-white/5 text-foreground text-md mt-8">
-                                    Access Admin Console
+
+                                {/* Error Message */}
+                                {staffError && (
+                                    <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                        <AlertCircle className="w-4 h-4 shrink-0" />
+                                        <span>{staffError}</span>
+                                    </div>
+                                )}
+
+                                <Button
+                                    type="submit"
+                                    disabled={isStaffLoading}
+                                    className="w-full rounded-full h-14 bg-card border border-border hover:bg-white/5 text-foreground text-md mt-8 disabled:opacity-60"
+                                >
+                                    {isStaffLoading ? "Authenticating..." : "Access Admin Console"}
                                 </Button>
+
+                                <p className="text-xs text-center text-white/30 pt-2">
+                                    Dev credentials: admin@medfit.com / MedFit2026!
+                                </p>
                             </form>
                         </TabsContent>
                     </Tabs>
+
 
                 </div>
             </div>

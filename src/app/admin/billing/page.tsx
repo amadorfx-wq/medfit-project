@@ -11,7 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { DollarSign, Search, CreditCard, Mail, CheckCircle2, Receipt, ArrowRight } from "lucide-react";
+import { DollarSign, Search, CreditCard, Mail, CheckCircle2, Receipt, ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { getPaymentPreview } from "@/lib/payment-nomenclature";
 
 export default function BillingInvoicesPage() {
     const { patients, charges, addCharge, authorizeTreatment } = useAppContext();
@@ -108,6 +109,27 @@ export default function BillingInvoicesPage() {
                                     required
                                 />
                             </div>
+
+                            {/* Nomenclature Preview */}
+                            {description.length > 2 && (
+                                <div className="bg-[#8FA677]/10 border border-[#8FA677]/20 rounded-xl p-3 space-y-2 animate-in fade-in duration-300">
+                                    <div className="flex items-center gap-2">
+                                        <ShieldCheck className="w-3.5 h-3.5 text-[#8FA677]" />
+                                        <span className="text-[10px] font-semibold text-[#8FA677] uppercase tracking-wider">Payment Processor Shield</span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 text-xs">
+                                        <div>
+                                            <p className="text-white/40 text-[10px] mb-0.5 flex items-center gap-1"><Eye className="w-2.5 h-2.5" /> Patient sees</p>
+                                            <p className="text-white/80 font-medium">{description}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-white/40 text-[10px] mb-0.5 flex items-center gap-1"><EyeOff className="w-2.5 h-2.5" /> Stripe sees</p>
+                                            <p className="text-[#8FA677] font-medium font-mono text-[11px]">{getPaymentPreview(description).stripeLabel}</p>
+                                        </div>
+                                    </div>
+                                    <p className="text-white/20 text-[9px]">Bank statement: MEDFIT WELLNESS</p>
+                                </div>
+                            )}
 
                             <div className="space-y-2">
                                 <Label htmlFor="amount" className="text-white/60">Amount to Charge ($)</Label>
@@ -233,6 +255,81 @@ export default function BillingInvoicesPage() {
                             )}
                         </CardContent>
                     </Card>
+                    {/* ─── Subscription Plans ─────────────────────────────── */}
+                    <div className="col-span-2">
+                        <Card className="bg-[#0C1420] border-border/50">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <CreditCard className="w-4 h-4 text-primary" />
+                                        </div>
+                                        <CardTitle className="text-lg font-serif">Recurring Subscription Plans</CardTitle>
+                                    </div>
+                                    <Badge variant="outline" className="text-primary border-primary/30 text-xs">Stripe Billing</Badge>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                    {[
+                                        { name: "Medical Weight Loss", price: 299, desc: "Monthly Semaglutide/Tirzepatide protocol" },
+                                        { name: "TRT Protocol", price: 199, desc: "Monthly testosterone optimization" },
+                                        { name: "Peptide Protocol", price: 349, desc: "Monthly peptide therapy management" },
+                                        { name: "Full Optimization", price: 599, desc: "All-inclusive longevity protocol" },
+                                    ].map((plan, i) => (
+                                        <div key={i} className="rounded-xl border border-border/50 bg-white/[0.02] p-4 space-y-3 hover:border-primary/30 transition-colors">
+                                            <h4 className="font-serif text-sm text-white">{plan.name}</h4>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-2xl font-serif text-primary">${plan.price}</span>
+                                                <span className="text-xs text-white/40">/month</span>
+                                            </div>
+                                            <p className="text-xs text-white/40 leading-relaxed">{plan.desc}</p>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="w-full rounded-lg text-xs border-primary/30 text-primary hover:bg-primary/10"
+                                                onClick={async () => {
+                                                    const patient = patients.find(p => p.id === selectedPatientId);
+                                                    if (!patient) {
+                                                        toast.error("Select a patient first.");
+                                                        return;
+                                                    }
+                                                    toast.loading(`Creating ${plan.name} subscription...`, { id: "sub" });
+                                                    try {
+                                                        const res = await fetch("/api/create-subscription", {
+                                                            method: "POST",
+                                                            headers: { "Content-Type": "application/json" },
+                                                            body: JSON.stringify({
+                                                                patientEmail: patient.email,
+                                                                patientName: patient.name,
+                                                                priceAmount: plan.price,
+                                                                planName: plan.name,
+                                                                patientId: patient.id,
+                                                            }),
+                                                        });
+                                                        const data = await res.json();
+                                                        if (data.error) throw new Error(data.error);
+                                                        toast.success(`${plan.name} subscription created!`, {
+                                                            id: "sub",
+                                                            description: `Subscription ID: ${data.subscriptionId?.slice(0, 20)}...`
+                                                        });
+                                                    } catch (err: any) {
+                                                        toast.error(err.message || "Failed to create subscription", { id: "sub" });
+                                                    }
+                                                }}
+                                            >
+                                                <ArrowRight className="w-3 h-3 mr-1" />
+                                                Enroll Patient
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-xs text-white/30 text-center">
+                                    Subscriptions are processed securely via Stripe Billing. Patients will be charged automatically each month.
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </div>
         </div>

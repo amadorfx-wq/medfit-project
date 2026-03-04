@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { tenant } from "@/lib/theme.config";
 
 export default function AboutPage() {
     return (
@@ -8,8 +9,8 @@ export default function AboutPage() {
             <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-md">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
-                        <span className="font-serif text-xl tracking-wide">MedFit America</span>
+                        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">{tenant.logoInitial}</div>
+                        <span className="font-serif text-xl tracking-wide">{tenant.name}</span>
                     </Link>
                     <Link href="/consultation">
                         <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm rounded-full px-6">
@@ -22,7 +23,7 @@ export default function AboutPage() {
             <main className="pt-32 pb-24 container mx-auto px-6 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="text-center mb-16">
                     <p className="text-primary text-sm font-bold tracking-[0.2em] uppercase mb-4">Corporate Heritage</p>
-                    <h1 className="text-5xl md:text-6xl font-serif mb-6">About MedFit America</h1>
+                    <h1 className="text-5xl md:text-6xl font-serif mb-6">About {tenant.name}</h1>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                         We are fundamentally changing the architecture of preventive medicine and concierge health optimization.
                     </p>
@@ -36,7 +37,7 @@ export default function AboutPage() {
                         </h2>
                         <div className="prose prose-invert max-w-none text-muted-foreground leading-relaxed">
                             <p>
-                                At MedFit America, we believe that true luxury is operating at peak biological capacity. For too long, the medical establishment has focused on treating sickness rather than optimizing health. We bridge the gap between reactive medicine and elite athletic performance care, making the world's most advanced longevity protocols accessible to discerning individuals.
+                                At {tenant.name}, we believe that true luxury is operating at peak biological capacity. For too long, the medical establishment has focused on treating sickness rather than optimizing health. We bridge the gap between reactive medicine and elite athletic performance care, making the world's most advanced longevity protocols accessible to discerning individuals.
                             </p>
                             <p>
                                 Using data-driven diagnostics like NFC panels, we eliminate the guesswork from hormone health, peptide therapy, and metabolic weight loss.

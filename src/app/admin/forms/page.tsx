@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
+import { WellnessIntakeForm, MedicalWeightLossForm, SemaglutideInstructionsForm, TestosteroneTherapyForm, PeptideTherapyForm, NfcHipaaForm } from "@/app/dashboard/intake/forms";
 
 type FormTemp = { title: string; required: boolean; updated: string; id?: string };
 type TreatmentCategory = { id: string; name: string; icon: any; activePatients: number; forms: FormTemp[]; color: string };
@@ -268,7 +269,7 @@ export default function TreatmentsAndFormsPage() {
                                                             type="button"
                                                             className="h-9 px-3 rounded-md text-sm font-medium text-white/50 hover:text-white hover:bg-white/10 transition-colors pointer-events-auto cursor-pointer"
                                                             title="Open Preview"
-                                                            onClick={(e) => { alert("Open clicked!"); handleOpenPreview(e, form.title); }}
+                                                            onClick={(e) => { handleOpenPreview(e, form.title); }}
                                                         >
                                                             Open
                                                         </button>
@@ -276,7 +277,7 @@ export default function TreatmentsAndFormsPage() {
                                                             type="button"
                                                             className="h-9 px-2 rounded-md text-sm font-medium text-white/50 hover:text-white hover:bg-white/10 transition-colors pointer-events-auto cursor-pointer flex items-center justify-center"
                                                             title="Download Template"
-                                                            onClick={(e) => { alert("Download clicked!"); handleDownload(e, form.title); }}
+                                                            onClick={(e) => { handleDownload(e, form.title); }}
                                                         >
                                                             <Download className="w-4 h-4" />
                                                         </button>
@@ -285,7 +286,7 @@ export default function TreatmentsAndFormsPage() {
                                                             type="button"
                                                             className="h-9 w-9 rounded-md text-sm font-medium text-white/50 hover:text-white hover:bg-white/10 transition-colors pointer-events-auto cursor-pointer flex items-center justify-center p-0"
                                                             title="Duplicate Template"
-                                                            onClick={(e) => { alert("Copy clicked!"); handleCopy(e, form); }}
+                                                            onClick={(e) => { handleCopy(e, form); }}
                                                         >
                                                             <Copy className="w-4 h-4" />
                                                         </button>
@@ -310,7 +311,7 @@ export default function TreatmentsAndFormsPage() {
 
                                             <button
                                                 type="button"
-                                                onClick={(e) => { alert("Map Form Clicked!"); setIsMapModalOpen(true); }}
+                                                onClick={(e) => { setIsMapModalOpen(true); }}
                                                 style={{ zIndex: 9999, pointerEvents: 'auto' }}
                                                 className="w-full p-5 rounded-xl border border-dashed border-white/10 text-white/50 font-medium hover:text-white hover:bg-white/5 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer relative"
                                             >
@@ -348,9 +349,20 @@ export default function TreatmentsAndFormsPage() {
                                 </span>
                             </div>
                         </div>
-                        <div className="flex-1 flex flex-col items-center justify-center">
-                            <FileText className="w-16 h-16 text-white/5 mb-4" />
-                            <p className="text-white/30 text-sm">Visual PDF embedded view of the master template loads here.</p>
+                        <div className="flex-1 overflow-y-auto max-h-[70vh] custom-scrollbar">
+                            {previewDoc === "Wellness Intake Form" && <WellnessIntakeForm onSubmit={() => { }} isSubmitting={false} />}
+                            {previewDoc === "Medical Weight Loss Consent" && <MedicalWeightLossForm onSubmit={() => { }} isSubmitting={false} />}
+                            {previewDoc === "Semaglutide Protocol Instructions" && <SemaglutideInstructionsForm onSubmit={() => { }} isSubmitting={false} />}
+                            {previewDoc === "Testosterone Therapy Consent" && <TestosteroneTherapyForm onSubmit={() => { }} isSubmitting={false} />}
+                            {previewDoc === "Peptide Therapy Consent" && <PeptideTherapyForm onSubmit={() => { }} isSubmitting={false} />}
+                            {previewDoc === "NFC HIPAA Authorization" && <NfcHipaaForm onSubmit={() => { }} isSubmitting={false} />}
+
+                            {!["Wellness Intake Form", "Medical Weight Loss Consent", "Semaglutide Protocol Instructions", "Testosterone Therapy Consent", "Peptide Therapy Consent", "NFC HIPAA Authorization"].includes(previewDoc || "") && (
+                                <div className="flex-1 flex flex-col items-center justify-center py-20">
+                                    <FileText className="w-16 h-16 text-white/5 mb-4" />
+                                    <p className="text-white/30 text-sm">Visual PDF embedded view of the master template loads here.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </DialogContent>

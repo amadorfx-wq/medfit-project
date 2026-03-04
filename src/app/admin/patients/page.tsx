@@ -6,19 +6,52 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail, AlertTriangle, ShieldAlert, Lock } from "lucide-react";
+import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign, MapPin, Phone, Calendar, Download, Edit3, Plus, CreditCard, Clock, CheckCircle2, Mail, AlertTriangle, ShieldAlert, Lock, Trash2, ArrowLeft, LayoutDashboard, Truck, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 export default function PatientsManagementPage() {
-    const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId, addRequiredFormToPatient } = useAppContext();
+    const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId, addRequiredFormToPatient, updatePatient, deletePatient, logEvent } = useAppContext();
     const [searchTerm, setSearchTerm] = useState("");
 
     // Document Management States
     const [selectedDocumentPreview, setSelectedDocumentPreview] = useState<string | null>(null);
     const [isMapFormModalOpen, setIsMapFormModalOpen] = useState(false);
     const [selectedFormToMap, setSelectedFormToMap] = useState<string>("");
+
+    // CRUD States
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [editForm, setEditForm] = useState<Partial<typeof patients[0]>>({});
+
+    const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    };
+
+    const handleSaveEdit = async () => {
+        if (!activePatient) return;
+        await updatePatient(activePatient.id, editForm);
+        setIsEditModalOpen(false);
+        toast.success("Patient profile updated successfully");
+    };
+
+    const handleDeletePatient = async () => {
+        if (!activePatient) return;
+        // Capture the ID and name BEFORE any async state changes happen
+        const patientIdToDelete = activePatient.id;
+        const patientNameToDelete = activePatient.name;
+
+        // Mock Stripe Deactivation
+        logEvent('STRIPE_SUBSCRIPTION_CANCELLED', `Cancelled active billing subscriptions for ${patientIdToDelete} prior to deletion.`);
+
+        // Close modals first to prevent UI referencing a deleted/null patient
+        setIsDeleteModalOpen(false);
+        setIsEditModalOpen(false);
+        // Now run the delete (this will clear activePatient from global state)
+        await deletePatient(patientIdToDelete);
+        toast.success(`Patient record and active subscriptions for ${patientNameToDelete} have been permanently deleted.`);
+    };
 
     const AVAILABLE_FORM_TEMPLATES = [
         "wellness-intake",
@@ -36,8 +69,8 @@ export default function PatientsManagementPage() {
         const aPendingBalance = charges.some(c => c.patientId === a.id && c.status === "PENDING");
         const bPendingBalance = charges.some(c => c.patientId === b.id && c.status === "PENDING");
 
-        const aNeedsAttention = a.approvalStatus === "PENDING_APPROVAL" || a.approvalStatus === "PENDING_FORMS" || aPendingBalance;
-        const bNeedsAttention = b.approvalStatus === "PENDING_APPROVAL" || b.approvalStatus === "PENDING_FORMS" || bPendingBalance;
+        const aNeedsAttention = a.approvalStatus === "PENDING_APPROVAL" || a.approvalStatus === "PENDING_FORMS" || a.approvalStatus === "PENDING_SHIPMENT" || aPendingBalance;
+        const bNeedsAttention = b.approvalStatus === "PENDING_APPROVAL" || b.approvalStatus === "PENDING_FORMS" || b.approvalStatus === "PENDING_SHIPMENT" || bPendingBalance;
 
         if (aNeedsAttention && !bNeedsAttention) return -1;
         if (!aNeedsAttention && bNeedsAttention) return 1;
@@ -90,143 +123,48 @@ export default function PatientsManagementPage() {
 
     return (
         <div className="animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                        <Users className="w-8 h-8 text-[#B8977E]" />
-                        Patient Unified CRM
-                    </h1>
-                    <p className="text-white/50">Search Directory, view profiles, and access HIPAA compliance logs.</p>
-                </div>
-                <div className="relative w-full md:w-80">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
-                    <Input
-                        placeholder="Search by name or email..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-[#0C1420] border-border/50 text-white pl-9 h-11 focus-visible:ring-[#B8977E]/50"
-                    />
-                </div>
-            </div>
 
-            {/* MÓDULO 1: VIP Cart & Consent Recovery (Rescue Engine) Banner */}
-            {filteredPatients.some(p => p.approvalStatus === "PENDING_FORMS" || charges.some(c => c.patientId === p.id && c.status === "PENDING")) && (
-                <div className="mb-8 border border-red-500/20 bg-red-500/5 rounded-xl p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
-                    <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                            <AlertTriangle className="w-5 h-5 text-red-400" />
+            {/* ── PROFILE VIEW: Shown when a patient is selected ── */}
+            {activePatient ? (
+                <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                    {/* In-page Breadcrumb Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
+                        <div className="flex items-center gap-2 text-sm min-w-0">
+                            <button
+                                onClick={() => setSelectedGlobalPatientId(null)}
+                                className="flex items-center gap-1.5 text-white/50 hover:text-white transition-colors group shrink-0"
+                            >
+                                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                                <span>Patients</span>
+                            </button>
+                            <ChevronRight className="w-3.5 h-3.5 text-white/20 shrink-0" />
+                            <span className="text-[#B8977E] font-medium truncate">{activePatient.name}</span>
                         </div>
-                        <div>
-                            <h3 className="text-white font-medium text-lg flex items-center gap-2">
-                                Revenue at Risk (Cart Abandonment)
-                                <Badge variant="outline" className="text-red-400 border-red-400/20 bg-red-400/10 text-xs">Action Required</Badge>
-                            </h3>
-                            <p className="text-white/60 text-sm mt-1">
-                                {filteredPatients.filter(p => p.approvalStatus === "PENDING_FORMS" || charges.some(c => c.patientId === p.id && c.status === "PENDING")).length} VIP patients have paused their intake or payment process.
-                            </p>
-                        </div>
-                    </div>
-                    <Button
-                        onClick={() => {
-                            toast.success("Rescue SMS Workflow Triggered.", {
-                                description: "Automated reminders sent to stalled patients with deep-links to complete checkout."
-                            });
-                        }}
-                        className="bg-red-500/80 hover:bg-red-500 text-white shadow-lg shadow-red-500/20 whitespace-nowrap h-11"
-                    >
-                        Trigger Rescue SMS Flow
-                    </Button>
-                </div>
-            )}
-
-            <div className="bg-[#0C1420] border border-border/50 rounded-xl overflow-hidden shadow-2xl">
-                <Table>
-                    <TableHeader className="bg-white/5">
-                        <TableRow className="border-border/50 hover:bg-transparent">
-                            <TableHead className="text-white/50 text-xs tracking-wider uppercase pl-6">Patient Core</TableHead>
-                            <TableHead className="text-white/50 text-xs tracking-wider uppercase">Active Treatment</TableHead>
-                            <TableHead className="text-white/50 text-xs tracking-wider uppercase">Approval Status</TableHead>
-                            <TableHead className="text-white/50 text-xs tracking-wider uppercase">Forms Done</TableHead>
-                            <TableHead className="text-white/50 text-xs tracking-wider uppercase text-right pr-6">Open Profile</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredPatients.map(patient => {
-                            const percentForms = patient.requiredForms.length === 0 ? 0 : Math.round((patient.completedForms.length / patient.requiredForms.length) * 100);
-
-                            return (
-                                <TableRow key={patient.id} className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedGlobalPatientId(patient.id)}>
-                                    <TableCell className="pl-6 py-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-[#1A2332] flex items-center justify-center font-serif text-lg text-white border border-white/5 shadow-inner">
-                                                {patient.name.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div className="font-medium text-white">{patient.name}</div>
-                                                <div className="text-xs text-white/40">{patient.email}</div>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-4 text-sm">
-                                        <span className="bg-white/5 border border-white/5 px-3 py-1.5 rounded-md text-white/80">
-                                            {patient.activeTreatment}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="py-4">
-                                        {patient.approvalStatus === "APPROVED" && <Badge className="bg-[#8FA677]/10 text-[#8FA677] border-[#8FA677]/30 font-normal hover:bg-[#8FA677]/20">Active / Approved</Badge>}
-                                        {patient.approvalStatus === "PENDING_APPROVAL" && <Badge className="bg-[#E8A838]/10 text-[#E8A838] border-[#E8A838]/30 font-normal hover:bg-[#E8A838]/20">Pending MD Auth</Badge>}
-                                        {patient.approvalStatus === "PENDING_FORMS" && <Badge className="bg-white/5 text-white/50 border-white/10 font-normal hover:bg-white/10">Incomplete Intake</Badge>}
-                                    </TableCell>
-                                    <TableCell className="py-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                                <div className="h-full bg-[#B8977E]" style={{ width: `${percentForms}%` }} />
-                                            </div>
-                                            <span className="text-xs text-white/50 w-8">{patient.completedForms.length}/{patient.requiredForms.length}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right pr-6 py-4">
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-[#B8977E] hover:text-[#B8977E] hover:bg-[#B8977E]/10">
-                                            <ChevronRight className="w-5 h-5" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </div>
-
-            {/* UPGRADED: Full-Screen Patient Profile View */}
-            {activePatient && (
-                <div className="fixed inset-0 z-50 bg-[#0A0F17] flex flex-col animate-in fade-in zoom-in-95 duration-300">
-                    <div className="h-20 border-b border-border/50 px-6 lg:px-10 flex items-center justify-between bg-[#0C1420] shrink-0">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded bg-white/5 flex items-center justify-center border border-white/10">
-                                <Users className="w-5 h-5 text-[#B8977E]" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-serif text-white leading-none">Complete Medical File</h2>
-                                <span className="text-xs text-white/50 uppercase tracking-widest">{activePatient.id}</span>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 shrink-0">
                             <Button
                                 variant="outline"
-                                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                                size="sm"
+                                className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 h-9"
+                                onClick={() => setIsDeleteModalOpen(true)}
                             >
-                                <Edit3 className="w-4 h-4 mr-2" />
+                                <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                                Delete Patient
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-white/5 border-white/10 text-white hover:bg-white/10 h-9"
+                                onClick={() => {
+                                    setEditForm(activePatient);
+                                    setIsEditModalOpen(true);
+                                }}
+                            >
+                                <Edit3 className="w-3.5 h-3.5 mr-1.5" />
                                 Edit Profile
                             </Button>
-                            <Button
-                                variant="outline"
-                                className="bg-transparent border-white/10 text-white hover:bg-white/10"
-                                onClick={() => setSelectedGlobalPatientId(null)}
-                            >
-                                Close Directory
-                            </Button>
                         </div>
                     </div>
+
 
                     <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-gradient-to-br from-[#0A0F17] to-[#080D15]">
                         {/* Left Side: Demographic Panel */}
@@ -289,6 +227,78 @@ export default function PatientsManagementPage() {
 
                         {/* Right Side: Consolidated History (Tabs) */}
                         <div className="flex-1 overflow-y-auto p-4 md:p-8">
+
+                            {/* --- PATIENT STATUS ALERT --- */}
+                            <div className="w-full max-w-5xl mx-auto mb-8 animate-in slide-in-from-bottom-2 duration-500">
+                                {activePatient.approvalStatus === "PENDING_FORMS" && (
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-start justify-between gap-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                                                <FileText className="w-5 h-5 text-white/50" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-white font-medium">Pending Patient Action: Clinical Intake</h4>
+                                                <p className="text-white/60 text-sm mt-1">Patient has not completed all required intake forms yet. Awaiting patient input before medical review can begin.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {activePatient.approvalStatus === "PENDING_APPROVAL" && (
+                                    <div className="bg-[#E8A838]/10 border border-[#E8A838]/20 rounded-xl p-4 flex items-start flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-full bg-[#E8A838]/20 flex items-center justify-center shrink-0">
+                                                <AlertTriangle className="w-5 h-5 text-[#E8A838]" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[#E8A838] font-medium">Action Required: Medical Review</h4>
+                                                <p className="text-[#E8A838]/70 text-sm mt-1">Patient forms are complete. Please review records and issue an invoice securely.</p>
+                                            </div>
+                                        </div>
+                                        <Button size="sm" className="bg-[#E8A838] text-black hover:bg-[#E8A838]/90 font-medium shrink-0" onClick={() => window.location.href = '/admin/approvals'}>
+                                            Issue Invoice
+                                        </Button>
+                                    </div>
+                                )}
+                                {activePatient.approvalStatus === "PENDING_PAYMENT" && (
+                                    <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                                            <DollarSign className="w-5 h-5 text-red-400" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-red-400 font-medium">Pending Patient Action: Payment</h4>
+                                            <p className="text-red-400/80 text-sm mt-1">Treatment authorized & invoice sent. Waiting for the patient to complete their payment.</p>
+                                        </div>
+                                    </div>
+                                )}
+                                {activePatient.approvalStatus === "PENDING_SHIPMENT" && (
+                                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                                                <Package className="w-5 h-5 text-blue-400" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-blue-400 font-medium">Action Required: Pharmacy Fulfillment</h4>
+                                                <p className="text-blue-400/80 text-sm mt-1">Patient payment received. Protocol is ready to be processed and shipped.</p>
+                                            </div>
+                                        </div>
+                                        <Button size="sm" className="bg-blue-500 text-white hover:bg-blue-600 font-medium shrink-0" onClick={() => window.location.href = '/admin/approvals'}>
+                                            Fulfill Order
+                                        </Button>
+                                    </div>
+                                )}
+                                {activePatient.approvalStatus === "APPROVED" && (
+                                    <div className="bg-[#8FA677]/10 border border-[#8FA677]/20 rounded-xl p-4 flex items-start gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-[#8FA677]/20 flex items-center justify-center shrink-0">
+                                            <CheckCircle2 className="w-5 h-5 text-[#8FA677]" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[#8FA677] font-medium">Case Active & Shipped</h4>
+                                            <p className="text-[#8FA677]/80 text-sm mt-1">Patient is fully onboarded, treatment authorized, and medication shipped.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
                             <Tabs defaultValue="medical" className="w-full max-w-5xl mx-auto">
                                 <TabsList className="bg-[#0C1420] border border-white/10 p-1 mb-8">
                                     <TabsTrigger value="medical" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-white/50">
@@ -584,7 +594,166 @@ export default function PatientsManagementPage() {
                             </div>
                         </DialogContent>
                     </Dialog>
+
+                    {/* Edit Patient Modal */}
+                    <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                        <DialogContent className="bg-[#0C1420] border-white/10 text-white sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle className="font-serif text-2xl">Edit Patient Profile</DialogTitle>
+                                <DialogDescription className="text-white/50">
+                                    Update demographic information or adjust pipeline status manually.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/70">Full Name</label>
+                                    <Input name="name" value={editForm.name || ""} onChange={handleEditInputChange} className="bg-black/20 border-white/10 text-white" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/70">Email Address</label>
+                                    <Input name="email" value={editForm.email || ""} onChange={handleEditInputChange} className="bg-black/20 border-white/10 text-white" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/70">Phone Number</label>
+                                    <Input name="phone" value={editForm.phone || ""} onChange={handleEditInputChange} className="bg-black/20 border-white/10 text-white" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/70">Physical Address</label>
+                                    <Input name="address" value={editForm.address || ""} onChange={handleEditInputChange} className="bg-black/20 border-white/10 text-white" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/70">Date of Birth</label>
+                                    <Input name="dob" type="date" value={editForm.dob || ""} onChange={handleEditInputChange} className="bg-black/20 border-white/10 text-white" />
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-2 mt-4">
+                                <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="border-white/10 text-white hover:bg-white/5">Cancel</Button>
+                                <Button onClick={handleSaveEdit} className="bg-[#B8977E] text-black hover:bg-[#B8977E]/90">Save Changes</Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
+                    {/* Delete Confirmation Modal */}
+                    <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+                        <DialogContent className="bg-[#0C1420] border-red-500/20 text-white sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle className="font-serif text-2xl text-red-500 flex items-center gap-2">
+                                    <AlertTriangle className="w-6 h-6" /> Destructive Action
+                                </DialogTitle>
+                                <DialogDescription className="text-white/70">
+                                    You are about to permanently delete <strong>{activePatient.name}</strong>. All associated medical records, consent forms, and invoice associations will be unlinked. This action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex justify-end gap-3 mt-6">
+                                <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="border-white/10 text-white hover:bg-white/5">Cancel</Button>
+                                <Button onClick={handleDeletePatient} className="bg-red-600 hover:bg-red-700 text-white">Permanently Delete</Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
                 </div>
+            ) : (
+                /* ── LIST VIEW: Shown when no patient is selected ── */
+                <>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
+                                <Users className="w-8 h-8 text-[#B8977E]" />
+                                Patient Unified CRM
+                            </h1>
+                            <p className="text-white/50">Search Directory, view profiles, and access HIPAA compliance logs.</p>
+                        </div>
+                        <div className="relative w-full md:w-80">
+                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                            <Input
+                                placeholder="Search by name or email..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-[#0C1420] border-border/50 text-white pl-9 h-11 focus-visible:ring-[#B8977E]/50"
+                            />
+                        </div>
+                    </div>
+
+                    {filteredPatients.some(p => p.approvalStatus === "PENDING_FORMS" || charges.some(c => c.patientId === p.id && c.status === "PENDING")) && (
+                        <div className="mb-8 border border-red-500/20 bg-red-500/5 rounded-xl p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                                    <AlertTriangle className="w-5 h-5 text-red-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-medium text-lg flex items-center gap-2">
+                                        Revenue at Risk (Cart Abandonment)
+                                        <Badge variant="outline" className="text-red-400 border-red-400/20 bg-red-400/10 text-xs">Action Required</Badge>
+                                    </h3>
+                                    <p className="text-white/60 text-sm mt-1">
+                                        {filteredPatients.filter(p => p.approvalStatus === "PENDING_FORMS" || charges.some(c => c.patientId === p.id && c.status === "PENDING")).length} VIP patients have paused their intake or payment process.
+                                    </p>
+                                </div>
+                            </div>
+                            <Button
+                                onClick={() => toast.success("Rescue SMS Workflow Triggered.", { description: "Automated reminders sent to stalled patients." })}
+                                className="bg-red-500/80 hover:bg-red-500 text-white whitespace-nowrap h-11"
+                            >
+                                Trigger Rescue SMS Flow
+                            </Button>
+                        </div>
+                    )}
+
+                    <div className="bg-[#0C1420] border border-border/50 rounded-xl overflow-hidden shadow-2xl">
+                        <Table>
+                            <TableHeader className="bg-white/5">
+                                <TableRow className="border-border/50 hover:bg-transparent">
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase pl-6">Patient Core</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Active Treatment</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Approval Status</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase">Forms Done</TableHead>
+                                    <TableHead className="text-white/50 text-xs tracking-wider uppercase text-right pr-6">Open Profile</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredPatients.map(patient => {
+                                    const percentForms = patient.requiredForms.length === 0 ? 0 : Math.round((patient.completedForms.length / patient.requiredForms.length) * 100);
+                                    return (
+                                        <TableRow key={patient.id} className="border-border/50 text-white/80 hover:bg-white/5 cursor-pointer" onClick={() => setSelectedGlobalPatientId(patient.id)}>
+                                            <TableCell className="pl-6 py-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-full bg-[#1A2332] flex items-center justify-center font-serif text-lg text-white border border-white/5 shadow-inner">{patient.name.charAt(0)}</div>
+                                                    <div>
+                                                        <div className="font-medium text-white">{patient.name}</div>
+                                                        <div className="text-xs text-white/40">{patient.email}</div>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="py-4 text-sm">
+                                                <span className="bg-white/5 border border-white/5 px-3 py-1.5 rounded-md text-white/80">{patient.activeTreatment}</span>
+                                            </TableCell>
+                                            <TableCell className="py-4">
+                                                {patient.approvalStatus === "APPROVED" && <Badge className="bg-[#8FA677]/10 text-[#8FA677] border-[#8FA677]/30 font-normal">Active / Approved</Badge>}
+                                                {patient.approvalStatus === "PENDING_SHIPMENT" && <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/30 font-normal">Pending Shipment</Badge>}
+                                                {patient.approvalStatus === "PENDING_PAYMENT" && <Badge className="bg-red-500/10 text-red-400 border-red-500/30 font-normal">Pending Payment</Badge>}
+                                                {patient.approvalStatus === "PENDING_APPROVAL" && <Badge className="bg-[#E8A838]/10 text-[#E8A838] border-[#E8A838]/30 font-normal">Pending MD Auth</Badge>}
+                                                {patient.approvalStatus === "PENDING_FORMS" && <Badge className="bg-white/5 text-white/50 border-white/10 font-normal">Incomplete Intake</Badge>}
+                                            </TableCell>
+                                            <TableCell className="py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-[#B8977E]" style={{ width: `${percentForms}%` }} />
+                                                    </div>
+                                                    <span className="text-xs text-white/50 w-8">{patient.completedForms.length}/{patient.requiredForms.length}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right pr-6 py-4">
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-[#B8977E] hover:text-[#B8977E] hover:bg-[#B8977E]/10">
+                                                    <ChevronRight className="w-5 h-5" />
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </>
             )}
 
         </div>

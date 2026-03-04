@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { useAppContext } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,25 @@ import { User, Mail, Phone, MapPin, Shield } from "lucide-react";
 
 export default function ProfilePage() {
     const { currentUser, patients } = useAppContext();
+    const [address, setAddress] = useState("123 Luxury Ave, Atlanta, GA 30305");
+    const addressInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (!addressInputRef.current || typeof window === "undefined") return;
+        const init = () => {
+            if (!window.google?.maps?.places) { setTimeout(init, 500); return; }
+            const ac = new window.google.maps.places.Autocomplete(addressInputRef.current!, {
+                types: ["address"],
+                componentRestrictions: { country: "us" },
+                fields: ["formatted_address"],
+            });
+            ac.addListener("place_changed", () => {
+                const place = ac.getPlace();
+                if (place?.formatted_address) setAddress(place.formatted_address);
+            });
+        };
+        init();
+    }, []);
 
     if (!currentUser) return null;
 
@@ -77,8 +97,15 @@ export default function ProfilePage() {
                                 <Input id="phone" defaultValue="(555) 123-4567" className="bg-white/5 border-white/10" />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="address" className="flex items-center gap-2"><MapPin className="w-3 h-3" /> Shipping Address</Label>
-                                <Input id="address" defaultValue="123 Luxury Ave, Atlanta, GA 30305" className="bg-white/5 border-white/10" />
+                                <Label htmlFor="address" className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Shipping Address</Label>
+                                <input
+                                    id="address"
+                                    ref={addressInputRef}
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    className="flex h-10 w-full rounded-md border text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 border-white/10 bg-white/5 text-white px-3"
+                                    placeholder="Search your real shipping address..."
+                                />
                             </div>
                             <Button className="mt-4 bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium">Save Changes</Button>
                         </CardContent>

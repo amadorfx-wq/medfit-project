@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LeadIntakeForm } from "@/components/LeadIntakeForm";
+import { tenant } from "@/lib/theme.config";
 
 export default function Home() {
   return (
@@ -17,7 +18,7 @@ export default function Home() {
               <div className="w-8 h-8 xl:w-10 xl:h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl xl:text-2xl">
                 M
               </div>
-              <span className="font-serif text-lg xl:text-2xl tracking-wide whitespace-nowrap">MedFit America</span>
+              <span className="font-serif text-lg xl:text-2xl tracking-wide whitespace-nowrap">{tenant.name}</span>
             </Link>
           </div>
 
@@ -37,8 +38,8 @@ export default function Home() {
             >
               Patient Portal
             </Link>
-            <a href="tel:4045550199" className="hidden xl:block text-sm font-medium text-[#B8977E] tracking-wider whitespace-nowrap ml-2">
-              404-555-0199
+            <a href={`tel:${tenant.phone}`} className="hidden xl:block text-sm font-medium text-[#B8977E] tracking-wider whitespace-nowrap ml-2">
+              {tenant.phone}
             </a>
             <Link href="/consultation" className="flex items-center">
               <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-xs xl:text-sm px-4 xl:px-8 h-9 xl:h-11 rounded-full transition-transform hover:scale-105 whitespace-nowrap">
@@ -160,14 +161,15 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
-                M
+                {tenant.logoInitial}
               </div>
-              <span className="font-serif text-xl tracking-wide">MedFit America</span>
+              <span className="font-serif text-xl tracking-wide">{tenant.name}</span>
             </div>
-            <div className="text-sm text-muted-foreground flex gap-6">
-              <span>© 2026 MedFit America. All rights reserved.</span>
-              <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
-              <Link href="#" className="hover:text-foreground">Terms</Link>
+            <div className="text-sm text-muted-foreground flex flex-wrap gap-6">
+              <span>{tenant.legal.copyright}</span>
+              <Link href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+              <Link href="/legal/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
+              <Link href="/legal/hipaa-notice" className="hover:text-foreground transition-colors">HIPAA Notice</Link>
             </div>
           </div>
         </div>

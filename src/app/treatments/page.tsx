@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ArrowRight, Dna, Activity, Pill, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { tenant } from "@/lib/theme.config";
 
 export default function PublicTreatmentsPage() {
     return (
@@ -11,8 +12,8 @@ export default function PublicTreatmentsPage() {
                 <div className="container mx-auto px-4 xl:px-8 h-20 xl:h-24 flex items-center justify-between gap-4">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 xl:gap-3 hover:opacity-80 transition-opacity">
-                        <div className="w-8 h-8 xl:w-10 xl:h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl xl:text-2xl">M</div>
-                        <span className="font-serif text-lg xl:text-2xl tracking-wide whitespace-nowrap">MedFit America</span>
+                        <div className="w-8 h-8 xl:w-10 xl:h-10 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl xl:text-2xl">{tenant.logoInitial}</div>
+                        <span className="font-serif text-lg xl:text-2xl tracking-wide whitespace-nowrap">{tenant.name}</span>
                     </Link>
 
                     {/* Actions */}
@@ -42,21 +43,23 @@ export default function PublicTreatmentsPage() {
                         { id: "testosterone-therapy", title: "Testosterone Replacement (TRT)", desc: "Restore optimal hormone levels, reignite vitality, and rebuild lean mass under strict medical supervision.", icon: <Dna className="w-6 h-6" />, link: "/treatments/trt" },
                         { id: "peptide-therapy", title: "Peptide Therapy", desc: "Advanced amino acid sequencing to accelerate recovery, boost anti-aging mechanisms, and enhance cognitive flow.", icon: <Pill className="w-6 h-6" />, link: "/treatments/peptides" }
                     ].map((tx, idx) => (
-                        <Card key={idx} className="bg-[#080808] border-border/50 hover:border-primary/50 transition-colors animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 group">
-                            <CardContent className="p-8 flex flex-col h-full">
-                                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6">
-                                    {tx.icon}
-                                </div>
-                                <h3 className="text-2xl font-serif mb-4">{tx.title}</h3>
-                                <p className="text-muted-foreground mb-8 flex-1">{tx.desc}</p>
+                        <Link href={tx.link} key={idx} className="block group">
+                            <Card className="bg-[#080808] border-border/50 hover:border-primary/50 transition-colors animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100 h-full">
+                                <CardContent className="p-8 flex flex-col h-full cursor-pointer relative">
+                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6">
+                                        {tx.icon}
+                                    </div>
+                                    <h3 className="text-2xl font-serif mb-4">{tx.title}</h3>
+                                    <p className="text-muted-foreground mb-8 flex-1">{tx.desc}</p>
 
-                                <Link href={tx.link} className="mt-auto">
-                                    <button className="w-full py-3 border border-white/10 hover:border-primary/50 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-all flex items-center justify-center gap-2 group-hover:text-primary">
-                                        Learn More <ArrowRight className="w-4 h-4" />
-                                    </button>
-                                </Link>
-                            </CardContent>
-                        </Card>
+                                    <div className="mt-auto">
+                                        <button className="w-full py-3 border border-white/10 group-hover:border-primary/50 bg-white/5 group-hover:bg-white/10 rounded-lg text-sm transition-all flex items-center justify-center gap-2 group-hover:text-primary">
+                                            Learn More <ArrowRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
                     ))}
                 </div>
 
