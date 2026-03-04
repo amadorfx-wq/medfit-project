@@ -101,6 +101,7 @@ export interface Staff {
 
 interface AppContextType {
     currentUser: { id: string; role: Role; name: string; ndaSignedAt?: string | null } | null;
+    isAuthLoading: boolean;
     login: (email: string, role: Role) => void;
     logout: () => void;
     patients: Patient[];
@@ -150,6 +151,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
     const [currentUser, setCurrentUser] = useState<AppContextType["currentUser"]>(null);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
     const [patients, setPatients] = useState<Patient[]>([]);
     const [charges, setCharges] = useState<Charge[]>([]);
     const [selectedGlobalPatientId, setSelectedGlobalPatientId] = useState<string | null>(null);
@@ -179,6 +181,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const fetchInitialData = async () => {
             const resolvedTid = tid || getTenantIdFromBrowser();
             if (resolvedTid) await initTenant(resolvedTid);
+
+            // Fetch Current Session Status FIRST to unblock routing
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (session?.user) {
+                // Determine base role
+                const baseRole = getRoleFromUserMetadata(session.user) as Role;
+                // Try to find staff member for enriched data
+                const { data: staffData } = await supabase.from('staff').select('*').eq('email', session.user.email).maybeSingle();
+
+                const role = staffData?.role || baseRole || 'ADMIN';
+                const name = staffData?.name || session.user.user_metadata?.name || session.user.email || 'Staff';
+                const ndaSignedAt = staffData?.nda_signed_at || null;
+
+                setCurrentUser({
+                    id: staffData?.id || session.user.id,
+                    role: role as Role,
+                    name,
+                    ndaSignedAt
+                });
+            }
+            setIsAuthLoading(false);
 
             // Fetch Patients from Supabase
             const { data: pData, error: pErr } = await supabase.from('patients').select('*');
@@ -909,7 +932,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     return (
         <AppContext.Provider value={{
-            currentUser, login, logout, loginWithCredentials, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, markAsShipped, enrollTreatment, addRequiredFormToPatient, selectedGlobalPatientId, setSelectedGlobalPatientId,
+            currentUser, isAuthLoading, login, logout, loginWithCredentials, patients, charges, addCharge, payCharge, registerAndLogin, submitForm, authorizeTreatment, markAsShipped, enrollTreatment, addRequiredFormToPatient, selectedGlobalPatientId, setSelectedGlobalPatientId,
             updatePatient, deletePatient,
             cart, addToCart, removeFromCart, clearCart, submitCartRequest,
             adminNotifications, sendAdminNotification, markNotificationRead,

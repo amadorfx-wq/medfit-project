@@ -33,7 +33,7 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { currentUser, logout, patients, setSelectedGlobalPatientId, adminNotifications, markNotificationRead } = useAppContext();
+    const { currentUser, isAuthLoading, logout, patients, setSelectedGlobalPatientId, adminNotifications, markNotificationRead } = useAppContext();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -49,6 +49,20 @@ export default function AdminLayout({
         p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.phone && p.phone.includes(searchQuery))
     ).slice(0, 5);
+
+    // Show loading state while confirming authentication
+    if (isAuthLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#0C1C30]">
+                <div className="animate-pulse flex flex-col items-center">
+                    <div className="w-16 h-16 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-3xl mx-auto mb-6">
+                        {tenant.logoInitial}
+                    </div>
+                    <div className="text-white/60">Verifying secure session...</div>
+                </div>
+            </div>
+        );
+    }
 
     // RBAC: Only clinical staff can access the admin portal
     const STAFF_ROLES = ["ADMIN", "SUPERADMIN", "DOCTOR", "RECEPTION"];
