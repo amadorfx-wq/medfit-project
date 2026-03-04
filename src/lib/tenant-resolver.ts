@@ -41,6 +41,19 @@ export function extractSubdomain(hostname: string): string | null {
         return null;
     }
 
+    // Handle Vercel default staging/production domains
+    if (host.endsWith('.vercel.app')) {
+        const parts = host.split('.');
+        // medfit-project.vercel.app -> root domain
+        if (parts.length === 3) {
+            return null;
+        }
+        // clinica-a.medfit-project.vercel.app -> 'clinica-a'
+        if (parts.length > 3) {
+            return parts[0];
+        }
+    }
+
     const parts = host.split('.');
     // Need at least 3 parts: subdomain.domain.tld
     if (parts.length >= 3) {
