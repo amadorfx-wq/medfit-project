@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 
 // Service-role client for webhook (bypasses RLS)
@@ -26,6 +26,7 @@ export async function POST(req: Request) {
 
     let event;
     try {
+        const stripe = getStripe();
         event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Webhook verification failed';

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 
 export async function POST(req: Request) {
     try {
@@ -10,6 +10,7 @@ export async function POST(req: Request) {
         }
 
         // Find Stripe Customer by email
+        const stripe = getStripe();
         const customers = await stripe.customers.list({
             email: customerEmail,
             limit: 1,
@@ -22,12 +23,12 @@ export async function POST(req: Request) {
         const customer = customers.data[0];
 
         // Create a Stripe Billing Portal session
-        const portalSession = await stripe.billingPortal.sessions.create({
+        const session = await stripe.billingPortal.sessions.create({
             customer: customer.id,
             return_url: `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/dashboard`,
         });
 
-        return NextResponse.json({ url: portalSession.url });
+        return NextResponse.json({ url: session.url });
     } catch (err: unknown) {
         console.error('[MedFit] Stripe Portal Error:', err);
         const message = err instanceof Error ? err.message : 'Internal Server Error';
