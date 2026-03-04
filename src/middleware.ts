@@ -102,6 +102,13 @@ export async function middleware(request: NextRequest) {
 
     // ── 5. Protected route — must have a session ──────────────────────────────
     if (!session) {
+        // [DEMO HOTFIX] Check for demo patient cookie
+        const demoCookie = request.cookies.get('demo_patient_session');
+        if (demoCookie && matchedRule.allowedRoles.includes('PATIENT')) {
+            // Bypass strict Supabase Auth for the PATIENT role demo
+            return response;
+        }
+
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);

@@ -455,6 +455,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 return;
             }
             setCurrentUser(userObj);
+            document.cookie = `demo_patient_session=${userObj.id}; path=/; max-age=86400; SameSite=Lax`;
             logEvent("PATIENT_LOGIN", `Patient Portal session started.`, "AUTH", "patient", userObj.id, userObj);
         }
     };
@@ -508,6 +509,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
         const userObj = { id: newPatient.id, role: "PATIENT" as Role, name: newPatient.name };
         setCurrentUser(userObj);
+        document.cookie = `demo_patient_session=${userObj.id}; path=/; max-age=86400; SameSite=Lax`;
         logEvent("PATIENT_REGISTERED", `New patient lead registered: ${email}`, "AUTH", "patient", newPatient.id, userObj);
     };
 
@@ -540,6 +542,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = () => {
+        document.cookie = 'demo_patient_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         logEvent("USER_LOGOUT", `Session ended`, "AUTH");
         setCurrentUser(null);
     };
