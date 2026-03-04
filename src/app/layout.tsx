@@ -64,11 +64,28 @@ const localBusinessSchema = {
   }
 };
 
-export default function RootLayout({
+import { cookies } from "next/headers";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+
+  // [SSR OPTIMIZATION] Predict user state to prevent hydration blinks on guarded layouts
+  let initialUser = null;
+  const demoCookie = cookieStore.get('demo_patient_session')?.value;
+
+  if (demoCookie) {
+    initialUser = { id: demoCookie, role: "PATIENT", name: "Loading..." };
+  } else {
+    const hasSupabaseCookie = cookieStore.getAll().some((c: any) => c.name.includes('-auth-token'));
+    if (hasSupabaseCookie) {
+      initialUser = { id: "ssr-shell", role: "ADMIN", name: "Loading..." };
+    }
+  }
+
   return (
     <html lang="en" className="dark">
       <head>
@@ -85,7 +102,7 @@ export default function RootLayout({
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           strategy="afterInteractive"
         />
-        <AppProvider>
+        <AppProvider initialUser={initialUser}>
           {children}
           <GlobalCart />
           <Toaster position="top-center" />

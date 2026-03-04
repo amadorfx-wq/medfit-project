@@ -149,9 +149,9 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: ReactNode }) {
-    const [currentUser, setCurrentUser] = useState<AppContextType["currentUser"]>(null);
-    const [isAuthLoading, setIsAuthLoading] = useState(true);
+export function AppProvider({ children, initialUser = null }: { children: ReactNode, initialUser?: any }) {
+    const [currentUser, setCurrentUser] = useState<AppContextType["currentUser"]>(initialUser);
+    const [isAuthLoading, setIsAuthLoading] = useState(!initialUser);
     const [patients, setPatients] = useState<Patient[]>([]);
     const [charges, setCharges] = useState<Charge[]>([]);
     const [selectedGlobalPatientId, setSelectedGlobalPatientId] = useState<string | null>(null);
@@ -182,7 +182,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             const resolvedTid = tid || getTenantIdFromBrowser();
             if (resolvedTid) await initTenant(resolvedTid);
 
-            // Fetch Current Session Status FIRST to unblock routing
+            // Fetch Current Session Status FIRST to unblock routing (if not already primed by SSR)
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             if (session?.user) {
                 // Determine base role
@@ -200,6 +200,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     name,
                     ndaSignedAt
                 });
+            } else if (!session?.user && document.cookie.includes('demo_patient_session')) {
+                // If the user has a demo session cookie, we don't clear it. Hydrate it fully below...
+            } else {
+                // Only clear if neither exists
+                if (currentUser?.id === "ssr-shell") setCurrentUser(null);
             }
             setIsAuthLoading(false);
 
