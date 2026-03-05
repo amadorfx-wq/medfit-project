@@ -1,12 +1,12 @@
 "use client";
 
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PlayCircle, FileText, ChevronRight, Lock } from "lucide-react";
 
 export default function AcademyPage() {
-    const { currentUser } = useAppContext();
+    const { currentUser } = useAuth();
 
     if (!currentUser) return null;
 

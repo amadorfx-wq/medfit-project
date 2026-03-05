@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
+import { useClinical } from "@/hooks/useClinical";
 import { CheckCircle2 } from "lucide-react";
 import {
     WellnessIntakeForm,
@@ -15,13 +17,41 @@ import {
 
 export default function IntakeFormsPage() {
     const router = useRouter();
-    const { currentUser, patients, submitForm, saveConsentForm } = useAppContext();
+    const { currentUser, isAuthLoading } = useAuth();
+    const { patients, isPatientsLoading } = usePatients();
+    const { submitForm, saveConsentForm } = useClinical();
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    if (isAuthLoading || isPatientsLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in duration-500">
+                <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+                <p className="text-muted-foreground">Loading medical records...</p>
+            </div>
+        );
+    }
 
     // Protection mapping
     if (!currentUser) return null;
 
-    const currentPatient = patients.find(p => p.id === currentUser.id);
+    let currentPatient = patients.find(p => p.id === currentUser.id);
+
+    // Fallback for demo logins that aren't in the DB
+    if (!currentPatient && currentUser.role === "PATIENT" && String(currentUser.id).includes("demo")) {
+        currentPatient = {
+            id: currentUser.id,
+            name: currentUser.name,
+            email: "demo@medfit.com",
+            phone: "", address: "", dob: "", tenantId: "",
+            activeTreatment: "Demo Treatment",
+            formsStatus: "PENDING",
+            approvalStatus: "PENDING_FORMS",
+            requiredForms: ["wellness-intake", "nfc-hipaa", "medical-weight-loss", "testosterone-therapy", "peptide-therapy"],
+            completedForms: [],
+            createdAt: new Date().toISOString()
+        };
+    }
+
     if (!currentPatient) return null;
 
     // Filter which forms are still pending
@@ -40,7 +70,7 @@ export default function IntakeFormsPage() {
             { fullName: currentUser.name, image: "", timestamp: new Date().toISOString() }
         );
 
-        submitForm(formId);
+        submitForm(currentUser.id, formId);
         setIsSubmitting(false);
     };
 

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { WellnessIntakeForm, MedicalWeightLossForm, SemaglutideInstructionsForm, TestosteroneTherapyForm, PeptideTherapyForm, NfcHipaaForm } from "@/app/dashboard/intake/forms";
+import { usePatients } from "@/hooks/usePatients";
 
 type FormTemp = { title: string; required: boolean; updated: string; id?: string };
 type TreatmentCategory = { id: string; name: string; icon: any; activePatients: number; forms: FormTemp[]; color: string };
@@ -22,6 +23,20 @@ export default function TreatmentsAndFormsPage() {
     const [selectedFormToMap, setSelectedFormToMap] = useState("");
     const [formSearchQuery, setFormSearchQuery] = useState("");
     const [isNavigating, setIsNavigating] = useState<string | null>(null);
+    const { patients } = usePatients();
+
+    const getActiveCount = (protocolId: string) => {
+        if (!patients) return 0;
+
+        return patients.filter(p => {
+            const t = (p.activeTreatment || "").toLowerCase();
+            if (protocolId === "weight-loss") return t.includes("weight") || t.includes("semaglutide") || t.includes("tirzepatide");
+            if (protocolId === "trt") return t.includes("testosterone") || t.includes("trt");
+            if (protocolId === "peptides") return t.includes("peptide");
+            if (protocolId === "nfc") return t.includes("nfc");
+            return false;
+        }).length;
+    };
 
     // Global click and hydration tracer
     useEffect(() => {
@@ -212,8 +227,8 @@ export default function TreatmentsAndFormsPage() {
                                         <treatment.icon className={`w - 5 h - 5 ${isSelected ? treatment.color : 'text-white/40'} `} />
                                     </div>
                                     <div>
-                                        <h4 className={`font - serif ${isSelected ? 'text-white text-lg' : 'text-white/70 text-base'} `}>{treatment.name}</h4>
-                                        <p className="text-xs text-white/40 mt-1">{treatment.activePatients} Enrolled Patients</p>
+                                        <h4 className={`font-serif ${isSelected ? 'text-white text-lg' : 'text-white/70 text-base'}`}>{treatment.name}</h4>
+                                        <p className="text-xs text-white/40 mt-1">{getActiveCount(treatment.id)} Enrolled Patients</p>
                                     </div>
                                 </div>
                                 <ChevronRight className={`w - 5 h - 5 transition - transform ${isSelected ? 'text-[#B8977E] translate-x-1' : 'text-white/20 group-hover:text-white/40'} `} />

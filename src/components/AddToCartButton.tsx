@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAppContext } from "@/lib/store";
+import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 import { ShoppingCart } from "lucide-react";
 
@@ -13,7 +13,7 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ item, className, variant = "default", label = "Add to Request" }: AddToCartButtonProps) {
-    const { addToCart } = useAppContext();
+    const { addToCart } = useCart();
 
     return (
         <Button

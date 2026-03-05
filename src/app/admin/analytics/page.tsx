@@ -24,24 +24,25 @@ const treatmentData = [
 
 const COLORS = ['#8FA677', '#B8977E', '#E8A838', '#4A5D4E'];
 
+// Custom Tooltip for dark mode
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-[#0C1420] border border-white/10 p-4 rounded-lg shadow-xl">
+                <p className="text-white font-serif mb-2">{label}</p>
+                {payload.map((entry: any, index: number) => (
+                    <p key={index} className="text-sm flex items-center gap-2" style={{ color: entry.color }}>
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                        {entry.name}: {entry.name === 'revenue' ? '$' : ''}{entry.value.toLocaleString()}
+                    </p>
+                ))}
+            </div>
+        );
+    }
+    return null;
+};
+
 export default function AnalyticsPage() {
-    // Custom Tooltip for dark mode
-    const CustomTooltip = ({ active, payload, label }: any) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-[#0C1420] border border-white/10 p-4 rounded-lg shadow-xl">
-                    <p className="text-white font-serif mb-2">{label}</p>
-                    {payload.map((entry: any, index: number) => (
-                        <p key={index} className="text-sm flex items-center gap-2" style={{ color: entry.color }}>
-                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                            {entry.name}: {entry.name === 'revenue' ? '$' : ''}{entry.value.toLocaleString()}
-                        </p>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
 
     return (
         <div className="animate-in fade-in duration-500 max-w-7xl mx-auto space-y-8">

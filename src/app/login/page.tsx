@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
 import { tenant } from "@/lib/theme.config";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,8 @@ import { DEV_CREDENTIALS } from "@/lib/auth";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { login, loginWithCredentials, registerAndLogin } = useAppContext();
+    const { loginWithCredentials, loginAsDemoPatient } = useAuth();
+    const { registerAndLogin, patients } = usePatients();
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [isAdminLogin, setIsAdminLogin] = useState(false);
@@ -26,16 +28,33 @@ export default function LoginPage() {
     const [staffError, setStaffError] = useState("");
     const [isStaffLoading, setIsStaffLoading] = useState(false);
 
+    const [isRegistering, setIsRegistering] = useState(false);
+
     const handlePatientLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        login(email || "sarah@example.com", "PATIENT");
+        const targetEmail = email || "sarah@example.com";
+        const existingPatient = patients.find(p => p.email.toLowerCase() === targetEmail.toLowerCase());
+
+        if (existingPatient) {
+            loginAsDemoPatient(existingPatient.id, existingPatient.name);
+        } else {
+            loginAsDemoPatient("demo_patient_fallback", targetEmail);
+        }
         router.push("/dashboard");
     };
 
-    const handlePatientRegister = (e: React.FormEvent) => {
+    const handlePatientRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        registerAndLogin(name || "New Patient", email || "new@example.com");
-        router.push("/dashboard/intake");
+        setIsRegistering(true);
+        try {
+            const res = await registerAndLogin(name || "New Patient", email || "new@example.com");
+            if (res?.success) {
+                // Hard reload to bypass aggressive Next.js App Router cache on first login
+                window.location.href = "/dashboard/intake";
+            }
+        } finally {
+            setIsRegistering(false);
+        }
     };
 
     const handleAdminLogin = async (e: React.FormEvent) => {
@@ -55,8 +74,9 @@ export default function LoginPage() {
                 // Fallback to demo mode if Supabase Auth is not set up
                 const devCred = DEV_CREDENTIALS.find(c => c.email === staffEmail);
                 if (devCred && staffPassword === devCred.password) {
-                    login(staffEmail, devCred.role);
-                    router.push("/admin");
+                    // Moveremos este bypass demo si es extrictamente necesario.
+                    // En el entorno enterprise, los Admins inician por DB puro.
+                    setStaffError("Database auth required for Admin. Demo mode deprecated.");
                 } else {
                     setStaffError(err.message || "Authentication failed. Please try again.");
                 }
@@ -185,8 +205,13 @@ export default function LoginPage() {
                                         </label>
                                     </div>
 
-                                    <Button type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md shadow-[0_0_15px_rgba(143,166,119,0.3)] mt-6">
-                                        Create Secure Account
+                                    <Button disabled={isRegistering} type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md shadow-[0_0_15px_rgba(143,166,119,0.3)] mt-6">
+                                        {isRegistering ? (
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                                                Creating Protocol...
+                                            </span>
+                                        ) : "Create Secure Account"}
                                     </Button>
 
                                     <div className="text-center mt-6">

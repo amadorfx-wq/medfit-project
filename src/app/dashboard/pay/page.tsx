@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
 import { tenant } from "@/lib/theme.config";
 import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,10 +14,13 @@ import { CheckCircle2, Building2, ShieldCheck, Truck } from "lucide-react";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "@/lib/stripe-client";
 import CheckoutForm from "@/components/CheckoutForm";
+import { useBilling } from "@/hooks/useBilling";
 
 export default function PaymentPage() {
     const router = useRouter();
-    const { currentUser, patients, charges, payCharge } = useAppContext();
+    const { currentUser } = useAuth();
+    const { patients } = usePatients();
+    const { charges, payCharge } = useBilling();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
 
     const currentPatient = currentUser ? patients.find(p => p.id === currentUser.id) : undefined;

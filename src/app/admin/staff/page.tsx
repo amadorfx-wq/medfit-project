@@ -12,7 +12,8 @@ import {
     FileText, Upload, X, Download, Phone, MapPin, BadgeCheck, StickyNote,
     Eye, Lock, ChevronLeft
 } from "lucide-react";
-import { useAppContext, Role, Staff, StaffDocument } from "@/lib/store";
+import { Role, Staff, StaffDocument } from "@/types/staff";
+import { useStaff } from "@/hooks/useStaff";
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
@@ -35,7 +36,7 @@ const INITIAL_FORM: StaffFormData = {
 };
 
 export default function StaffManagementPage() {
-    const { staff, addStaff, updateStaff, deleteStaff, uploadStaffDocument, deleteStaffDocument } = useAppContext();
+    const { staff, addStaff, updateStaff, deleteStaff, uploadStaffDocument, deleteStaffDocument } = useStaff();
     const [searchTerm, setSearchTerm] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useAppContext, AuditCategory } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { useAudit } from "@/hooks/useAudit";
+import { AuditCategory, AuditLog } from "@/types/audit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +29,8 @@ const CATEGORY_CONFIG: Record<AuditCategory, { label: string; color: string; bg:
 const ALL_CATEGORIES: AuditCategory[] = ["AUTH", "PHI_ACCESS", "CLINICAL", "BILLING", "ADMIN", "SYSTEM", "GENERAL", "COMPLIANCE"];
 
 export default function SecurityAuditPage() {
-    const { auditLogs, currentUser } = useAppContext();
+    const { currentUser } = useAuth();
+    const { auditLogs } = useAudit();
     const [searchTerm, setSearchTerm] = useState("");
     const [activeCategory, setActiveCategory] = useState<AuditCategory | "ALL">("ALL");
     const [timeRange, setTimeRange] = useState<"1h" | "24h" | "7d" | "ALL">("ALL");
@@ -35,10 +38,10 @@ export default function SecurityAuditPage() {
     // ─── Stats ────────────────────────────────────────────────────────────────
     const stats = useMemo(() => {
         const now = Date.now();
-        const last24h = auditLogs.filter(l => now - new Date(l.timestamp).getTime() < 86400000);
-        const authEvents = auditLogs.filter(l => l.category === "AUTH").length;
-        const phiEvents = auditLogs.filter(l => l.category === "PHI_ACCESS").length;
-        const uniqueUsers = new Set(auditLogs.map(l => l.userId)).size;
+        const last24h = auditLogs.filter((l: AuditLog) => now - new Date(l.timestamp).getTime() < 86400000);
+        const authEvents = auditLogs.filter((l: AuditLog) => l.category === "AUTH").length;
+        const phiEvents = auditLogs.filter((l: AuditLog) => l.category === "PHI_ACCESS").length;
+        const uniqueUsers = new Set(auditLogs.map((l: AuditLog) => l.userId)).size;
         return { total: auditLogs.length, last24h: last24h.length, authEvents, phiEvents, uniqueUsers };
     }, [auditLogs]);
 
@@ -47,7 +50,7 @@ export default function SecurityAuditPage() {
         const now = Date.now();
         const rangeMs: Record<string, number> = { "1h": 3600000, "24h": 86400000, "7d": 604800000 };
 
-        return auditLogs.filter(log => {
+        return auditLogs.filter((log: AuditLog) => {
             const matchesSearch =
                 log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 log.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -206,8 +209,8 @@ export default function SecurityAuditPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredLogs.map((log) => {
-                                    const cfg = CATEGORY_CONFIG[log.category ?? "GENERAL"];
+                                filteredLogs.map((log: AuditLog) => {
+                                    const cfg = CATEGORY_CONFIG[(log.category as AuditCategory) ?? "GENERAL"];
                                     return (
                                         <tr key={log.id} className="hover:bg-white/[0.02] transition-colors group">
                                             <td className="p-4 align-top">

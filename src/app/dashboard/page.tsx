@@ -5,14 +5,20 @@ import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
+import { useCart } from "@/hooks/useCart";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Clock, AlertCircle, FileSignature, ArrowRight, MessageSquare, ShoppingBag, PhoneCall, CheckCircle2, Check, Stethoscope, ShieldCheck, Truck, Pill, Sparkles } from "lucide-react";
+import { useBilling } from "@/hooks/useBilling";
 
 export default function DashboardPage() {
-    const { currentUser, charges, patients, addToCart } = useAppContext();
+    const { currentUser } = useAuth();
+    const { patients } = usePatients();
+    const { addToCart } = useCart();
+    const { charges } = useBilling();
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [isShopModalOpen, setIsShopModalOpen] = useState(false);
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);

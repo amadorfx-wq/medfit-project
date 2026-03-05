@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
+import { useNotifications } from "@/hooks/useNotifications";
 import { tenant } from "@/lib/theme.config";
 import { signOut as supabaseSignOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -33,7 +35,9 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { currentUser, isAuthLoading, logout, patients, setSelectedGlobalPatientId, adminNotifications, markNotificationRead } = useAppContext();
+    const { currentUser, isAuthLoading, logout } = useAuth();
+    const { patients, setSelectedGlobalPatientId } = usePatients();
+    const { notifications: adminNotifications, markNotificationRead } = useNotifications();
     const pathname = usePathname();
     const router = useRouter();
 

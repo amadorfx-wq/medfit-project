@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +11,14 @@ import { toast } from "sonner";
 import { Users, CreditCard, DollarSign, ChevronRight, AlertCircle, Mail, Activity, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useBilling } from "@/hooks/useBilling";
+import { useClinical } from "@/hooks/useClinical";
 
 export default function AdminDashboardPage() {
-    const { currentUser, patients, charges, addCharge, authorizeTreatment, setSelectedGlobalPatientId } = useAppContext();
+    const { currentUser } = useAuth();
+    const { patients, setSelectedGlobalPatientId } = usePatients();
+    const { authorizeTreatment } = useClinical();
+    const { charges, addCharge } = useBilling();
     const router = useRouter();
 
     // Form state

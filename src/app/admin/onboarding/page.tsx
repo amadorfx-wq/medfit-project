@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
 import { tenant } from "@/lib/theme.config";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, FileSignature, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function StaffOnboardingPage() {
-    const { currentUser, signNDA } = useAppContext();
+    const { currentUser, signNDA } = useAuth();
     const [hasRead, setHasRead] = useState(false);
     const [isSigning, setIsSigning] = useState(false);
     const [signed, setSigned] = useState(false);
@@ -18,10 +18,9 @@ export default function StaffOnboardingPage() {
         setSigned(true);
         setIsSigning(false);
 
-        // Redirect to admin dashboard after brief confirmation
-        setTimeout(() => {
-            window.location.href = "/admin";
-        }, 1500);
+        // Let the layout's inline rendering handle the transition automatically 
+        // once the AuthContext updates `currentUser.ndaSignedAt`.
+        // Remove forced window.location override to prevent loop.
     };
 
     return (

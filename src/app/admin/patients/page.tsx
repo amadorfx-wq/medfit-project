@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAppContext } from "@/lib/store";
+import { usePatients } from "@/hooks/usePatients";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,17 @@ import { Search, Users, Activity, FileText, ChevronRight, FileCheck2, DollarSign
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useAdminPatients } from "@/hooks/useAdminPatients";
+import { useBilling } from "@/hooks/useBilling";
+import { useClinical } from "@/hooks/useClinical";
+import { useAudit } from "@/hooks/useAudit";
 
 export default function PatientsManagementPage() {
-    const { patients, charges, selectedGlobalPatientId, setSelectedGlobalPatientId, addRequiredFormToPatient, updatePatient, deletePatient, logEvent } = useAppContext();
+    const { selectedGlobalPatientId, setSelectedGlobalPatientId, updatePatient, deletePatient } = usePatients();
+    const { logEvent } = useAudit();
+    const { addRequiredFormToPatient } = useClinical();
+    const { charges } = useBilling();
+    const { patients, isLoading, error, mutate, setPatients } = useAdminPatients();
     const [searchTerm, setSearchTerm] = useState("");
 
     // Document Management States
@@ -32,6 +40,8 @@ export default function PatientsManagementPage() {
     const handleSaveEdit = async () => {
         if (!activePatient) return;
         await updatePatient(activePatient.id, editForm);
+        // Enterprise UI: Optimistic local state update to prevent flashing.
+        setPatients(prev => prev.map(p => p.id === activePatient.id ? { ...p, ...editForm } as any : p));
         setIsEditModalOpen(false);
         toast.success("Patient profile updated successfully");
     };
@@ -48,7 +58,11 @@ export default function PatientsManagementPage() {
         // Close modals first to prevent UI referencing a deleted/null patient
         setIsDeleteModalOpen(false);
         setIsEditModalOpen(false);
-        // Now run the delete (this will clear activePatient from global state)
+
+        // Optimistic UI cache burst 
+        setPatients(prev => prev.filter(p => p.id !== patientIdToDelete));
+
+        // Now run the delete
         await deletePatient(patientIdToDelete);
         toast.success(`Patient record and active subscriptions for ${patientNameToDelete} have been permanently deleted.`);
     };
@@ -120,6 +134,31 @@ export default function PatientsManagementPage() {
             error: 'Failed to access encrypted filesystem.',
         });
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-32 h-[60vh] animate-in fade-in duration-500">
+                <div className="w-12 h-12 border-4 border-[#B8977E]/20 border-t-[#B8977E] rounded-full animate-spin mb-6" />
+                <h3 className="font-serif text-xl text-white mb-2">Decrypting Patient Records</h3>
+                <p className="text-white/40 text-sm">Establishing secure connection to healthcare pipeline...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center p-32 h-[60vh] animate-in fade-in duration-500">
+                <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-6">
+                    <AlertTriangle className="w-8 h-8 text-red-500" />
+                </div>
+                <h3 className="font-serif text-2xl text-white mb-2">Database Connection Failed</h3>
+                <p className="text-white/50 text-sm max-w-md text-center mb-8">{error.message}</p>
+                <Button onClick={mutate} className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50">
+                    Retry Connection
+                </Button>
+            </div>
+        );
+    }
 
     return (
         <div className="animate-in fade-in duration-500">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CreditCard, Stethoscope, BookOpen, User, LogOut, Receipt } from "lucide-react";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
 import { tenant } from "@/lib/theme.config";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -13,7 +13,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const { currentUser, logout } = useAppContext();
+    const { currentUser, logout } = useAuth();
 
     const navItems = [
         { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },

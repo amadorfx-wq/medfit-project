@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAppContext } from "@/lib/store";
+import { usePatients } from "@/hooks/usePatients";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,9 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { DollarSign, Search, CreditCard, Mail, CheckCircle2, Receipt, ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { getPaymentPreview } from "@/lib/payment-nomenclature";
+import { useBilling } from "@/hooks/useBilling";
+import { useClinical } from "@/hooks/useClinical";
 
 export default function BillingInvoicesPage() {
-    const { patients, charges, addCharge, authorizeTreatment } = useAppContext();
+    const { patients } = usePatients();
+    const { authorizeTreatment } = useClinical();
+    const { charges, addCharge } = useBilling();
 
     const [selectedPatientId, setSelectedPatientId] = useState<string>("p1");
     const [amount, setAmount] = useState<string>("");

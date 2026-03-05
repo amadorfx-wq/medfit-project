@@ -1,13 +1,17 @@
 "use client";
 
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
+import { useClinical } from "@/hooks/useClinical";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Droplet, Pill, Info, ArrowRight, Zap, Target, ArrowUpRight, Microscope, Database } from "lucide-react";
 
 export default function TreatmentsPage() {
-    const { currentUser, patients, enrollTreatment } = useAppContext();
+    const { currentUser } = useAuth();
+    const { patients } = usePatients();
+    const { enrollTreatment } = useClinical();
     const router = useRouter();
 
     if (!currentUser) return null;

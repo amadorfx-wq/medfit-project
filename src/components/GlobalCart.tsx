@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { ShoppingCart, ShieldCheck, X } from "lucide-react";
-import { useAppContext } from "@/lib/store";
+import { useCart } from "@/hooks/useCart";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 
 export function GlobalCart() {
-    const { cart, removeFromCart, submitCartRequest } = useAppContext();
+    const { cart, removeFromCart, submitCartRequest } = useCart();
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const pathname = usePathname();

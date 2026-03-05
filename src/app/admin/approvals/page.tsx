@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAppContext } from "@/lib/store";
+import { usePatients } from "@/hooks/usePatients";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { User, ClipboardCheck, ArrowRight, Mail, AlertCircle, CheckCircle2, FileText, ShieldCheck, Truck, Package } from "lucide-react";
 import { WellnessIntakeForm, MedicalWeightLossForm, SemaglutideInstructionsForm, TestosteroneTherapyForm, PeptideTherapyForm, NfcHipaaForm } from "@/app/dashboard/intake/forms";
+import { useClinical } from "@/hooks/useClinical";
 
 export default function PendingApprovalsPage() {
-    const { patients, authorizeTreatment, markAsShipped } = useAppContext();
+    const { patients } = usePatients();
+    const { authorizeTreatment, markAsShipped } = useClinical();
     const pendingApprovals = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL");
     const pendingShipments = patients.filter(p => p.approvalStatus === "PENDING_SHIPMENT");
 

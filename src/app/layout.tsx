@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { AppProvider } from "@/lib/store";
+// store.tsx ha sido erradicado
+import { AuthProvider } from "@/hooks/useAuth";
+import { BillingProvider } from "@/hooks/useBilling";
+import { PatientsProvider } from "@/hooks/usePatients";
+import { StaffProvider } from "@/hooks/useStaff";
+import { CartProvider } from "@/hooks/useCart";
 import { Toaster } from "@/components/ui/sonner";
 import { GlobalCart } from "@/components/GlobalCart";
 
@@ -96,17 +101,28 @@ export default async function RootLayout({
       </head>
       <body
         className={`${inter.variable} ${playfair.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
-        <Script
-          id="google-maps"
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-          strategy="afterInteractive"
-        />
-        <AppProvider initialUser={initialUser}>
-          {children}
-          <GlobalCart />
-          <Toaster position="top-center" />
-        </AppProvider>
+        {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+          <Script
+            id="google-maps"
+            src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+            strategy="beforeInteractive"
+          />
+        )}
+        <AuthProvider>
+          <PatientsProvider>
+            <StaffProvider>
+              <CartProvider>
+                <BillingProvider>
+                  {children}
+                  <GlobalCart />
+                  <Toaster position="top-center" />
+                </BillingProvider>
+              </CartProvider>
+            </StaffProvider>
+          </PatientsProvider>
+        </AuthProvider>
       </body>
     </html>
   );

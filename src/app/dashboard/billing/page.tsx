@@ -1,6 +1,7 @@
 "use client";
 
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Calendar, ShieldCheck, Settings, AlertCircle, ArrowRight, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
 export default function BillingSubscriptionPage() {
-    const { currentUser, patients } = useAppContext();
+    const { currentUser } = useAuth();
+    const { patients } = usePatients();
     const patient = patients.find(p => p.id === currentUser?.id);
     const [subStatus, setSubStatus] = useState<"ACTIVE" | "PAUSED">("ACTIVE");
 

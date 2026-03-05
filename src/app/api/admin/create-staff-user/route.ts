@@ -13,7 +13,8 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { email, password, metadata } = body;
 
-        if (!email || !password || !metadata?.name || !metadata?.role) {
+        // In Enterprise Multi-Tenant mode, tenantId (tenant_id) is mandatory for Staff
+        if (!email || !password || !metadata?.name || !metadata?.role || !metadata?.tenantId) {
             return NextResponse.json(
                 { error: "Missing required fields: email, password, name, role" },
                 { status: 400 }
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
                 role: metadata.role,
                 department: metadata.department,
                 staff_id: metadata.staffId,
+                tenant_id: metadata.tenantId, // ENTERPRISE: Cryptographic isolation boundary
             },
         });
 

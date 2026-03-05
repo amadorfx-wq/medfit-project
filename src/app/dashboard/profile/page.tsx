@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useAppContext } from "@/lib/store";
+import { useAuth } from "@/hooks/useAuth";
+import { usePatients } from "@/hooks/usePatients";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User, Mail, Phone, MapPin, Shield } from "lucide-react";
 
 export default function ProfilePage() {
-    const { currentUser, patients } = useAppContext();
+    const { currentUser } = useAuth();
+    const { patients } = usePatients();
     const [address, setAddress] = useState("123 Luxury Ave, Atlanta, GA 30305");
     const addressInputRef = useRef<HTMLInputElement>(null);
 
