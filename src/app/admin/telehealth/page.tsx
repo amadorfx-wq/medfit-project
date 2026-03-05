@@ -12,7 +12,7 @@ export default function TelehealthHDPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-20">
                 <div>
                     <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                        <Video className="w-8 h-8 text-[#B8977E]" />
+                        <Video className="w-8 h-8 text-[#a10c22]" />
                         Virtual Consultations (Telehealth HD)
                     </h1>
                     <p className="text-white/50">Conduct instant HIPAA-compliant video calls and secure real-time payments.</p>
@@ -20,7 +20,7 @@ export default function TelehealthHDPage() {
             </div>
 
             {/* Paywall Container */}
-            <div className="relative w-full rounded-2xl border border-[#B8977E]/20 bg-[#0C1420] overflow-hidden mt-8 shadow-2xl">
+            <div className="relative w-full rounded-2xl border border-[#a10c22]/20 bg-[#0C1420] overflow-hidden mt-8 shadow-2xl">
 
                 {/* Background "Tease" Image / Mock UI (Blurred) */}
                 <div className="absolute inset-0 pointer-events-none opacity-40 blur-[8px] flex items-center justify-center select-none">
@@ -36,8 +36,8 @@ export default function TelehealthHDPage() {
                                 <div className="h-2 w-3/4 bg-white/5 rounded" />
                                 <div className="h-2 w-full bg-white/5 rounded" />
                             </div>
-                            <div className="h-48 bg-[#B8977E]/10 rounded-xl border border-[#B8977E]/20 p-4 flex flex-col justify-end">
-                                <div className="h-10 w-full bg-[#B8977E]/30 rounded" />
+                            <div className="h-48 bg-[#a10c22]/10 rounded-xl border border-[#a10c22]/20 p-4 flex flex-col justify-end">
+                                <div className="h-10 w-full bg-[#a10c22]/30 rounded" />
                             </div>
                         </div>
                     </div>
@@ -49,16 +49,16 @@ export default function TelehealthHDPage() {
                 {/* Paywall Content */}
                 <div className="relative z-20 p-8 md:p-16 flex flex-col items-center justify-center text-center max-w-3xl mx-auto min-h-[600px] space-y-8">
 
-                    <div className="w-20 h-20 bg-gradient-to-br from-[#B8977E]/20 to-black rounded-2xl flex items-center justify-center border border-[#B8977E]/30 shadow-2xl shadow-[#B8977E]/10 mb-2">
-                        <Lock className="w-10 h-10 text-[#B8977E]" />
+                    <div className="w-20 h-20 bg-gradient-to-br from-[#a10c22]/20 to-black rounded-2xl flex items-center justify-center border border-[#a10c22]/30 shadow-2xl shadow-[#a10c22]/10 mb-2">
+                        <Lock className="w-10 h-10 text-[#a10c22]" />
                     </div>
 
                     <div className="space-y-4">
-                        <Badge variant="outline" className="border-[#B8977E]/30 text-[#B8977E] bg-[#B8977E]/10 text-xs uppercase font-bold tracking-widest px-4 py-1">
+                        <Badge variant="outline" className="border-[#a10c22]/30 text-[#a10c22] bg-[#a10c22]/10 text-xs uppercase font-bold tracking-widest px-4 py-1">
                             Enterprise Feature
                         </Badge>
                         <h2 className="text-4xl md:text-5xl font-serif text-white leading-tight">
-                            The <span className="text-[#B8977E] italic">Virtual Closing Room.</span>
+                            The <span className="text-[#a10c22] italic">Virtual Closing Room.</span>
                         </h2>
                         <p className="text-white/60 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
                             Stop losing 30% of patients who abandon checkout after an audio call. Secure a 100% close rate with an integrated video-to-payment pipeline.
@@ -67,20 +67,20 @@ export default function TelehealthHDPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left mt-8">
                         <Card className="bg-white/5 border-white/10 p-5 backdrop-blur-sm">
-                            <ShieldCheck className="w-6 h-6 text-[#B8977E] mb-3" />
+                            <ShieldCheck className="w-6 h-6 text-[#a10c22] mb-3" />
                             <h3 className="text-white font-medium mb-1">HIPAA Verified</h3>
                             <p className="text-white/40 text-sm">Military-grade encrypted P2P video calls, guaranteeing legal compliance and BAA data protection.</p>
                         </Card>
                         <Card className="bg-white/5 border-white/10 p-5 backdrop-blur-sm">
-                            <Activity className="w-6 h-6 text-[#B8977E] mb-3" />
+                            <Activity className="w-6 h-6 text-[#a10c22] mb-3" />
                             <h3 className="text-white font-medium mb-1">Split-Screen CRM</h3>
                             <p className="text-white/40 text-sm">Review medical histories and adjust dosages in real-time without ever taking your eyes off the patient.</p>
                         </Card>
-                        <Card className="bg-[#B8977E]/10 border-[#B8977E]/20 p-5 backdrop-blur-sm relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-16 bg-[#B8977E]/20 blur-[50px] rounded-full" />
-                            <CreditCard className="w-6 h-6 text-[#B8977E] mb-3 relative z-10" />
-                            <h3 className="text-[#B8977E] font-medium mb-1 relative z-10">Stripe Injection</h3>
-                            <p className="text-[#B8977E]/70 text-sm relative z-10">Push the payment checkout directly to the patient&apos;s screen during the video call to capture the sale instantly.</p>
+                        <Card className="bg-[#a10c22]/10 border-[#a10c22]/20 p-5 backdrop-blur-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-16 bg-[#a10c22]/20 blur-[50px] rounded-full" />
+                            <CreditCard className="w-6 h-6 text-[#a10c22] mb-3 relative z-10" />
+                            <h3 className="text-[#a10c22] font-medium mb-1 relative z-10">Stripe Injection</h3>
+                            <p className="text-[#a10c22]/70 text-sm relative z-10">Push the payment checkout directly to the patient&apos;s screen during the video call to capture the sale instantly.</p>
                         </Card>
                     </div>
 
@@ -90,7 +90,7 @@ export default function TelehealthHDPage() {
                             onClick={() => {
                                 toast.message("Enterprise Upgrade Required", {
                                     description: "Contact your Account Manager to enable MedFit Telehealth HD ($299/mo).",
-                                    icon: <Lock className="w-4 h-4 text-[#B8977E]" />,
+                                    icon: <Lock className="w-4 h-4 text-[#a10c22]" />,
                                     duration: 5000,
                                 })
                             }}

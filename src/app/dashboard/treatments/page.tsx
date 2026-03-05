@@ -27,7 +27,7 @@ export default function TreatmentsPage() {
         {
             name: "Medical Weight Loss",
             icon: Target,
-            accentColor: "#8FA677",
+            accentColor: "#a10c22",
             description: "Advanced metabolic reset using GLP-1/GIP receptor agonists (Semaglutide/Tirzepatide). Clinically proven to reduce cravings, improve insulin sensitivity, and drive sustainable fat loss.",
             features: [
                 { icon: Droplet, label: "Subcutaneous Administration" },
@@ -37,7 +37,7 @@ export default function TreatmentsPage() {
         {
             name: "Peptide Protocol",
             icon: Pill,
-            accentColor: "#B8977E",
+            accentColor: "#a10c22",
             description: "Targeted amino acid sequencing designed to accelerate recovery, enhance cognitive function, boost natural growth hormone, and optimize cellular longevity (e.g. BPC-157, CJC-1295).",
             features: [
                 { icon: Activity, label: "Recovery & Healing" },
@@ -47,7 +47,7 @@ export default function TreatmentsPage() {
         {
             name: "Testosterone Therapy",
             icon: Zap,
-            accentColor: "#E8A838",
+            accentColor: "#a10c22",
             description: "Comprehensive Testosterone Replacement Therapy. Restore vitality, increase lean muscle mass, improve libido, and overcome the symptoms of andropause under strict medical supervision.",
             features: [
                 { icon: Activity, label: "Blood Panel Required" },
@@ -75,13 +75,13 @@ export default function TreatmentsPage() {
 
             {/* Active Protocol */}
             <div className="mb-16">
-                <Card className="bg-gradient-to-br from-[#B8977E]/10 to-transparent border-[#B8977E]/20">
+                <Card className="bg-gradient-to-br from-[#a10c22]/10 to-transparent border-[#a10c22]/20">
                     <CardHeader>
                         <div className="flex items-center justify-between mb-2">
-                            <Badge variant="outline" className="text-[#B8977E] border-[#B8977E]/50 bg-[#B8977E]/10 tracking-widest uppercase">
+                            <Badge variant="outline" className="text-[#a10c22] border-[#a10c22]/50 bg-[#a10c22]/10 tracking-widest uppercase">
                                 Active Protocol
                             </Badge>
-                            <Activity className="w-5 h-5 text-[#B8977E]" />
+                            <Activity className="w-5 h-5 text-[#a10c22]" />
                         </div>
                         <CardTitle className="font-serif text-3xl">{patientData?.activeTreatment || "Pending Evaluation"}</CardTitle>
                         <CardDescription className="text-base mt-2 max-w-2xl">

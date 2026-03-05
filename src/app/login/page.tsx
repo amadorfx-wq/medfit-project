@@ -89,7 +89,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex bg-background">
             {/* Left Panel: Branding (Hidden on mobile) */}
-            <div className="hidden lg:flex flex-1 bg-[#080808] border-r border-border/50 flex-col justify-between p-16">
+            <div className="hidden lg:flex flex-1 bg-[white] border-r border-border/50 flex-col justify-between p-16">
                 <div>
                     <Link href="/" className="flex items-center gap-3 mb-16 hover:opacity-80 transition-opacity">
                         <div className="w-10 h-10 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-2xl">
@@ -100,7 +100,7 @@ export default function LoginPage() {
                     <h1 className="text-5xl font-serif leading-tight mb-8">
                         Your <span className="text-primary italic">Health.</span><br />
                         Your <span className="text-primary italic">Protocol.</span><br />
-                        Your <span className="text-[#B8977E] italic">Results.</span>
+                        Your <span className="text-[#a10c22] italic">Results.</span>
                     </h1>
                     <p className="text-lg text-muted-foreground max-w-md">
                         The secure portal to manage your personalized wellness journey, track your treatments, and handle your balances effortlessly.
@@ -109,15 +109,15 @@ export default function LoginPage() {
 
                 <div className="space-y-6">
                     <div className="flex items-center gap-4 text-sm text-foreground">
-                        <ShieldCheck className="w-6 h-6 text-[#B8977E]" strokeWidth={1.5} />
+                        <ShieldCheck className="w-6 h-6 text-[#a10c22]" strokeWidth={1.5} />
                         <span>100% HIPAA-Compliant & Secure</span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-foreground">
-                        <HeartPulse className="w-6 h-6 text-[#B8977E]" strokeWidth={1.5} />
+                        <HeartPulse className="w-6 h-6 text-[#a10c22]" strokeWidth={1.5} />
                         <span>Medically Supervised Protocols</span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-foreground">
-                        <UserCircle2 className="w-6 h-6 text-[#B8977E]" strokeWidth={1.5} />
+                        <UserCircle2 className="w-6 h-6 text-[#a10c22]" strokeWidth={1.5} />
                         <span>Concierge Patient Experience</span>
                     </div>
                 </div>
@@ -148,7 +148,7 @@ export default function LoginPage() {
                             <TabsTrigger value="patient" className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                                 Patient
                             </TabsTrigger>
-                            <TabsTrigger value="admin" className="rounded-full data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-[#B8977E]">
+                            <TabsTrigger value="admin" className="rounded-full data-[state=active]:bg-[#102A52] data-[state=active]:text-[#a10c22]">
                                 Clinical Staff
                             </TabsTrigger>
                         </TabsList>
@@ -195,7 +195,7 @@ export default function LoginPage() {
                                             type="checkbox"
                                             id="agree-terms"
                                             required
-                                            className="mt-1 accent-[#8FA677] w-4 h-4 rounded"
+                                            className="mt-1 accent-[#a10c22] w-4 h-4 rounded"
                                         />
                                         <label htmlFor="agree-terms" className="text-xs text-muted-foreground leading-relaxed">
                                             I agree to the{" "}
@@ -205,13 +205,13 @@ export default function LoginPage() {
                                         </label>
                                     </div>
 
-                                    <Button disabled={isRegistering} type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md shadow-[0_0_15px_rgba(143,166,119,0.3)] mt-6">
+                                    <Button disabled={isRegistering} type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md shadow-[0_0_15px_rgba(184,151,126,0.3)] transition-all duration-300 mt-6 font-medium tracking-wide">
                                         {isRegistering ? (
                                             <span className="flex items-center gap-2">
                                                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                                                 Creating Protocol...
                                             </span>
-                                        ) : "Create Secure Account"}
+                                        ) : "Begin Secure Intake"}
                                     </Button>
 
                                     <div className="text-center mt-6">
@@ -252,8 +252,8 @@ export default function LoginPage() {
                                     <div className="flex justify-end">
                                         <span className="text-sm text-primary hover:underline cursor-pointer">Forgot password?</span>
                                     </div>
-                                    <Button type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md mt-4">
-                                        Sign In To Your Portal
+                                    <Button type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md mt-4 shadow-[0_0_15px_rgba(184,151,126,0.3)] transition-all duration-300 font-medium tracking-wide">
+                                        Access Secure Portal
                                     </Button>
 
                                     <div className="text-center mt-6">
@@ -284,7 +284,7 @@ export default function LoginPage() {
                                         placeholder="admin@medfit.com"
                                         value={staffEmail}
                                         onChange={(e) => setStaffEmail(e.target.value)}
-                                        className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-[#B8977E] text-lg h-12"
+                                        className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-[#a10c22] text-lg h-12"
                                         required
                                     />
                                 </div>
@@ -296,7 +296,7 @@ export default function LoginPage() {
                                         placeholder="••••••••"
                                         value={staffPassword}
                                         onChange={(e) => setStaffPassword(e.target.value)}
-                                        className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-[#B8977E] text-lg h-12"
+                                        className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-[#a10c22] text-lg h-12"
                                         required
                                     />
                                 </div>
@@ -312,9 +312,9 @@ export default function LoginPage() {
                                 <Button
                                     type="submit"
                                     disabled={isStaffLoading}
-                                    className="w-full rounded-full h-14 bg-card border border-border hover:bg-white/5 text-foreground text-md mt-8 disabled:opacity-60"
+                                    className="w-full rounded-full h-14 bg-card border border-[#a10c22]/30 hover:bg-[#a10c22]/10 hover:border-[#a10c22]/60 text-[#a10c22] text-md mt-8 disabled:opacity-60 transition-all duration-300 font-medium tracking-wide"
                                 >
-                                    {isStaffLoading ? "Authenticating..." : "Access Admin Console"}
+                                    {isStaffLoading ? "Authenticating..." : "Access Clinical Console"}
                                 </Button>
 
                                 <p className="text-xs text-center text-white/30 pt-2">

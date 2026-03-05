@@ -39,8 +39,8 @@ export function LeadIntakeForm() {
         return (
             <Card className="bg-card border-border/50 text-center p-8 md:p-12 animate-in fade-in zoom-in-95 duration-500">
                 <CardContent className="space-y-4 flex flex-col items-center p-0">
-                    <div className="w-20 h-20 rounded-full bg-[#8FA677]/20 flex items-center justify-center mb-4">
-                        <CheckCircle2 className="w-10 h-10 text-[#8FA677]" />
+                    <div className="w-20 h-20 rounded-full bg-[#a10c22]/20 flex items-center justify-center mb-4">
+                        <CheckCircle2 className="w-10 h-10 text-[#a10c22]" />
                     </div>
                     <h3 className="font-serif text-3xl mb-2">Request Received</h3>
                     <p className="text-muted-foreground text-lg max-w-md mx-auto">
@@ -188,7 +188,7 @@ export function LeadIntakeForm() {
                             </div>
 
                             <div className="pt-4">
-                                <Button type="submit" disabled={isSubmitting || !formData.name || !formData.email} className="w-full rounded-xl h-14 text-lg bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] flex justify-center items-center">
+                                <Button type="submit" disabled={isSubmitting || !formData.name || !formData.email} className="w-full rounded-xl h-14 text-lg bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] flex justify-center items-center">
                                     {isSubmitting ? "Encrypting & Sending..." : "Request Clinical Evaluation"}
                                 </Button>
                                 <p className="text-xs text-center text-muted-foreground mt-4 flex items-center justify-center gap-1.5 opacity-70">

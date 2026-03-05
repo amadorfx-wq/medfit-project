@@ -18,8 +18,8 @@ import { useState, useMemo } from "react";
 const CATEGORY_CONFIG: Record<AuditCategory, { label: string; color: string; bg: string; icon: React.ElementType }> = {
     AUTH: { label: "Auth", color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20", icon: LogIn },
     PHI_ACCESS: { label: "PHI Access", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20", icon: Users },
-    CLINICAL: { label: "Clinical", color: "text-[#8FA677]", bg: "bg-[#8FA677]/10 border-[#8FA677]/20", icon: Stethoscope },
-    BILLING: { label: "Billing", color: "text-[#E8A838]", bg: "bg-[#E8A838]/10 border-[#E8A838]/20", icon: CreditCard },
+    CLINICAL: { label: "Clinical", color: "text-[#a10c22]", bg: "bg-[#a10c22]/10 border-[#a10c22]/20", icon: Stethoscope },
+    BILLING: { label: "Billing", color: "text-[#a10c22]", bg: "bg-[#a10c22]/10 border-[#a10c22]/20", icon: CreditCard },
     ADMIN: { label: "Admin", color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20", icon: UserCog },
     SYSTEM: { label: "System", color: "text-white/50", bg: "bg-white/5 border-white/10", icon: Server },
     GENERAL: { label: "General", color: "text-white/40", bg: "bg-white/5 border-white/5", icon: Activity },
@@ -81,7 +81,7 @@ export default function SecurityAuditPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                        <ShieldCheck className="w-8 h-8 text-[#8FA677]" />
+                        <ShieldCheck className="w-8 h-8 text-[#a10c22]" />
                         Security & Audit Logs
                     </h1>
                     <p className="text-white/50 text-sm">Immutable HIPAA-compliant event trail. Every action is permanently recorded.</p>
@@ -114,7 +114,7 @@ export default function SecurityAuditPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                     { label: "Total Events", value: stats.total, icon: Activity, color: "text-white" },
-                    { label: "Last 24 Hours", value: stats.last24h, icon: Clock, color: "text-[#8FA677]" },
+                    { label: "Last 24 Hours", value: stats.last24h, icon: Clock, color: "text-[#a10c22]" },
                     { label: "Auth Events", value: stats.authEvents, icon: LogIn, color: "text-blue-400" },
                     { label: "PHI Access Events", value: stats.phiEvents, icon: Users, color: "text-red-400" },
                 ].map(stat => (
@@ -138,7 +138,7 @@ export default function SecurityAuditPage() {
                             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                             <Input
                                 placeholder="Search events by user, action, or details..."
-                                className="bg-[#0C1420] border-white/10 text-white pl-9 h-10 rounded-lg focus-visible:ring-1 focus-visible:ring-[#8FA677]/50"
+                                className="bg-[#0C1420] border-white/10 text-white pl-9 h-10 rounded-lg focus-visible:ring-1 focus-visible:ring-[#a10c22]/50"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -237,7 +237,7 @@ export default function SecurityAuditPage() {
                                             </td>
                                             <td className="p-4 align-top">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-medium text-white group-hover:text-[#B8977E] transition-colors">{log.userName}</span>
+                                                    <span className="text-sm font-medium text-white group-hover:text-[#a10c22] transition-colors">{log.userName}</span>
                                                     <span className="text-[10px] text-white/40">{log.userRole}</span>
                                                 </div>
                                             </td>

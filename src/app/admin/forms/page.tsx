@@ -60,7 +60,7 @@ export default function TreatmentsAndFormsPage() {
                 { title: "Medical Weight Loss Consent", required: true, updated: "2026-01-20" },
                 { title: "Semaglutide Protocol Instructions", required: true, updated: "2026-02-10" }
             ],
-            color: "text-[#B8977E]"
+            color: "text-[#a10c22]"
         },
         {
             id: "trt",
@@ -71,7 +71,7 @@ export default function TreatmentsAndFormsPage() {
                 { title: "Wellness Intake Form", required: true, updated: "2025-10-15" },
                 { title: "Testosterone Therapy Consent", required: true, updated: "2026-01-05" }
             ],
-            color: "text-[#8FA677]"
+            color: "text-[#a10c22]"
         },
         {
             id: "peptides",
@@ -82,7 +82,7 @@ export default function TreatmentsAndFormsPage() {
                 { title: "Wellness Intake Form", required: true, updated: "2025-10-15" },
                 { title: "Peptide Therapy Consent", required: true, updated: "2025-11-20" }
             ],
-            color: "text-[#E8A838]"
+            color: "text-[#a10c22]"
         },
         {
             id: "nfc",
@@ -203,7 +203,7 @@ export default function TreatmentsAndFormsPage() {
         <div className="animate-in fade-in duration-500 max-w-6xl mx-auto">
             <div className="mb-8">
                 <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                    <FileText className="w-8 h-8 text-[#B8977E]" />
+                    <FileText className="w-8 h-8 text-[#a10c22]" />
                     Treatments & Forms Center
                 </h1>
                 <p className="text-white/50">Manage clinical offerings and the required compliance intake mapped to each protocol.</p>
@@ -220,7 +220,7 @@ export default function TreatmentsAndFormsPage() {
                             <button
                                 key={treatment.id}
                                 onClick={() => setSelectedTreatment(treatment.name)}
-                                className={`w - full text - left p - 5 rounded - xl border transition - all duration - 300 flex items - center justify - between group ${isSelected ? 'bg-[#1A2332] border-[#B8977E]/30 shadow-[0_0_20px_rgba(184,151,126,0.1)]' : 'bg-[#0A0F17] hover:bg-[#0C1420] border-white/5'} `}
+                                className={`w - full text - left p - 5 rounded - xl border transition - all duration - 300 flex items - center justify - between group ${isSelected ? 'bg-[#1A2332] border-[#a10c22]/30 shadow-[0_0_20px_rgba(184,151,126,0.1)]' : 'bg-[#0A0F17] hover:bg-[#0C1420] border-white/5'} `}
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={`w - 10 h - 10 rounded - full flex items - center justify - center shrink - 0 ${isSelected ? 'bg-black/40 shadow-inner' : 'bg-white/5'} `}>
@@ -231,7 +231,7 @@ export default function TreatmentsAndFormsPage() {
                                         <p className="text-xs text-white/40 mt-1">{getActiveCount(treatment.id)} Enrolled Patients</p>
                                     </div>
                                 </div>
-                                <ChevronRight className={`w - 5 h - 5 transition - transform ${isSelected ? 'text-[#B8977E] translate-x-1' : 'text-white/20 group-hover:text-white/40'} `} />
+                                <ChevronRight className={`w - 5 h - 5 transition - transform ${isSelected ? 'text-[#a10c22] translate-x-1' : 'text-white/20 group-hover:text-white/40'} `} />
                             </button>
                         );
                     })}
@@ -250,7 +250,7 @@ export default function TreatmentsAndFormsPage() {
                                             </div>
                                             <div>
                                                 <h2 className="text-2xl font-serif text-white">{activeDetails.name}</h2>
-                                                <Badge variant="outline" className="mt-2 border-[#8FA677]/30 text-[#8FA677] bg-[#8FA677]/10 font-normal">Active System-Wide</Badge>
+                                                <Badge variant="outline" className="mt-2 border-[#a10c22]/30 text-[#a10c22] bg-[#a10c22]/10 font-normal">Active System-Wide</Badge>
                                             </div>
                                         </div>
                                         <Button variant="outline" className="border-white/10 text-white hover:bg-white/10">
@@ -266,10 +266,10 @@ export default function TreatmentsAndFormsPage() {
 
                                         <div className="space-y-4">
                                             {activeDetails.forms.map((form: FormTemp, idx: number) => (
-                                                <div key={idx} className="flex p-5 rounded-xl border border-white/5 bg-[#080D15] justify-between items-center group hover:border-[#B8977E]/20 transition-colors">
+                                                <div key={idx} className="flex p-5 rounded-xl border border-white/5 bg-[#080D15] justify-between items-center group hover:border-[#a10c22]/20 transition-colors">
                                                     <div className="flex items-center gap-5">
                                                         <div className="w-12 h-12 rounded-lg bg-black/50 border border-white/5 flex items-center justify-center">
-                                                            <FileText className="w-6 h-6 text-white/50 group-hover:text-[#B8977E] transition-colors" />
+                                                            <FileText className="w-6 h-6 text-white/50 group-hover:text-[#a10c22] transition-colors" />
                                                         </div>
                                                         <div>
                                                             <h4 className="text-base font-medium text-white">{form.title}</h4>
@@ -315,7 +315,7 @@ export default function TreatmentsAndFormsPage() {
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            className="h-9 px-4 rounded-md text-sm font-medium bg-[#1A2332] text-white hover:bg-[#B8977E] hover:text-black border border-white/10 transition-colors pointer-events-auto cursor-pointer min-w-[120px] flex items-center justify-center relative z-20"
+                                                            className="h-9 px-4 rounded-md text-sm font-medium bg-[#1A2332] text-white hover:bg-[#a10c22] hover:text-black border border-white/10 transition-colors pointer-events-auto cursor-pointer min-w-[120px] flex items-center justify-center relative z-20"
                                                             onClick={(e) => { handleGoToBuilder(e, form.title); }}
                                                         >
                                                             {isNavigating === form.title ? <Loader2 className="w-4 h-4 animate-spin mx-auto" strokeWidth={3} /> : "Builder Editor"}
@@ -347,7 +347,7 @@ export default function TreatmentsAndFormsPage() {
                 <DialogContent className="bg-[#0A0F17] border-white/10 text-white sm:max-w-3xl">
                     <DialogHeader>
                         <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-                            <FileCheck2 className="w-6 h-6 text-[#8FA677]" />
+                            <FileCheck2 className="w-6 h-6 text-[#a10c22]" />
                             Template Pre-Viewer
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
@@ -418,17 +418,17 @@ export default function TreatmentsAndFormsPage() {
                                         <div
                                             key={templateName}
                                             onClick={() => setSelectedFormToMap(templateName)}
-                                            className={`p-3 text-sm rounded-lg border cursor-pointer transition-colors flex items-center justify-between ${selectedFormToMap === templateName ? 'bg-[#1A2332] border-[#B8977E]/50 text-white shadow-inner' : 'border-white/5 hover:bg-white/5 text-white/60'}`}
+                                            className={`p-3 text-sm rounded-lg border cursor-pointer transition-colors flex items-center justify-between ${selectedFormToMap === templateName ? 'bg-[#1A2332] border-[#a10c22]/50 text-white shadow-inner' : 'border-white/5 hover:bg-white/5 text-white/60'}`}
                                         >
                                             <span>{templateName}</span>
-                                            {selectedFormToMap === templateName && <CheckCircle2 className="w-4 h-4 text-[#B8977E]" />}
+                                            {selectedFormToMap === templateName && <CheckCircle2 className="w-4 h-4 text-[#a10c22]" />}
                                         </div>
                                     ))}
                             </div>
                         </div>
                         <Button
                             type="button"
-                            className="w-full bg-[#B8977E] text-black hover:bg-[#B8977E]/90 h-12 cursor-pointer"
+                            className="w-full bg-[#a10c22] text-black hover:bg-[#a10c22]/90 h-12 cursor-pointer"
                             disabled={!selectedFormToMap}
                             onClick={handleMapNewForm}
                         >

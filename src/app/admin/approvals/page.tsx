@@ -52,7 +52,7 @@ export default function PendingApprovalsPage() {
         <div className="animate-in fade-in duration-500 max-w-5xl">
             <div className="mb-8">
                 <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                    <ClipboardCheck className="w-8 h-8 text-[#B8977E]" />
+                    <ClipboardCheck className="w-8 h-8 text-[#a10c22]" />
                     Pending Approvals
                 </h1>
                 <p className="text-white/50">Review clinical intakes, verify consent forms, and issue secure payment links.</p>
@@ -61,13 +61,13 @@ export default function PendingApprovalsPage() {
             {/* --- MEDICAL REVIEW SECTION --- */}
             <div className="mb-10">
                 <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#E8A838]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#a10c22]" />
                     Medical Review Phase
                 </h2>
 
                 {pendingApprovals.length === 0 ? (
                     <div className="text-center py-20 bg-[#0C1420] border border-border/50 rounded-xl mb-8">
-                        <CheckCircle2 className="w-12 h-12 text-[#8FA677] mx-auto mb-4 opacity-50" />
+                        <CheckCircle2 className="w-12 h-12 text-[#a10c22] mx-auto mb-4 opacity-50" />
                         <h3 className="text-xl font-serif text-white mb-2">All Caught Up</h3>
                         <p className="text-white/50">There are no pending patient intakes waiting for medical review.</p>
                     </div>
@@ -88,7 +88,7 @@ export default function PendingApprovalsPage() {
                                                     <p className="text-sm text-white/50">{patient.email}</p>
                                                 </div>
                                             </div>
-                                            <Badge className="bg-[#E8A838]/10 text-[#E8A838] border-[#E8A838]/30 hover:bg-[#E8A838]/20">
+                                            <Badge className="bg-[#a10c22]/10 text-[#a10c22] border-[#a10c22]/30 hover:bg-[#a10c22]/20">
                                                 Action Required
                                             </Badge>
                                         </div>
@@ -103,7 +103,7 @@ export default function PendingApprovalsPage() {
 
                                             <div>
                                                 <p className="text-xs text-white/40 uppercase tracking-wider mb-3 flex items-center gap-2">
-                                                    Completed Forms Log <CheckCircle2 className="w-3 h-3 text-[#8FA677]" />
+                                                    Completed Forms Log <CheckCircle2 className="w-3 h-3 text-[#a10c22]" />
                                                 </p>
                                                 <div className="space-y-2">
                                                     {patient.completedForms.map((formSlug, idx) => (
@@ -112,7 +112,7 @@ export default function PendingApprovalsPage() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                className="h-7 text-xs text-[#B8977E] hover:text-white hover:bg-white/5"
+                                                                className="h-7 text-xs text-[#a10c22] hover:text-white hover:bg-white/5"
                                                                 onClick={() => setPreviewDoc(formSlug)}
                                                             >
                                                                 View PDF
@@ -160,7 +160,7 @@ export default function PendingApprovalsPage() {
                                                             />
                                                         </div>
                                                     </div>
-                                                    <Button type="submit" className="w-full bg-[#B8977E] hover:bg-[#B8977E]/90 text-black font-semibold mt-2 h-11">
+                                                    <Button type="submit" className="w-full bg-[#a10c22] hover:bg-[#a10c22]/90 text-black font-semibold mt-2 h-11">
                                                         Send Payment Link
                                                         <ArrowRight className="w-4 h-4 ml-2" />
                                                     </Button>
@@ -171,8 +171,8 @@ export default function PendingApprovalsPage() {
                                             </div>
                                         ) : (
                                             <div className="text-center space-y-6">
-                                                <div className="w-16 h-16 rounded-full bg-[#E8A838]/10 flex items-center justify-center mx-auto mb-4 border border-[#E8A838]/20">
-                                                    <AlertCircle className="w-8 h-8 text-[#E8A838]" />
+                                                <div className="w-16 h-16 rounded-full bg-[#a10c22]/10 flex items-center justify-center mx-auto mb-4 border border-[#a10c22]/20">
+                                                    <AlertCircle className="w-8 h-8 text-[#a10c22]" />
                                                 </div>
                                                 <div>
                                                     <h4 className="text-lg font-medium text-white mb-2">Ready for Review</h4>
@@ -200,7 +200,7 @@ export default function PendingApprovalsPage() {
             {/* --- PHARMACY FULFILLMENT SECTION --- */}
             <div>
                 <h2 className="text-xl font-serif text-white mb-6 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#8FA677]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#a10c22]" />
                     Pharmacy Fulfillment Phase
                 </h2>
 
@@ -214,16 +214,16 @@ export default function PendingApprovalsPage() {
                     <div className="space-y-6">
                         {pendingShipments.map(patient => (
                             <Card key={patient.id} className="bg-[#0C1420] border-border/50 overflow-hidden relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#8FA677]/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[#a10c22]/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
                                 <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="flex items-center gap-6 w-full md:w-auto">
-                                        <div className="w-14 h-14 rounded-full bg-[#8FA677]/10 flex items-center justify-center border border-[#8FA677]/20 shrink-0">
-                                            <Package className="w-6 h-6 text-[#8FA677]" />
+                                        <div className="w-14 h-14 rounded-full bg-[#a10c22]/10 flex items-center justify-center border border-[#a10c22]/20 shrink-0">
+                                            <Package className="w-6 h-6 text-[#a10c22]" />
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-3 mb-1">
                                                 <h3 className="text-xl font-medium text-white">{patient.name}</h3>
-                                                <Badge className="bg-[#8FA677]/10 text-[#8FA677] border-[#8FA677]/30">Paid & Ready</Badge>
+                                                <Badge className="bg-[#a10c22]/10 text-[#a10c22] border-[#a10c22]/30">Paid & Ready</Badge>
                                             </div>
                                             <p className="text-sm text-white/50 mb-2">Shipment details needed for: <strong className="text-white/80">{patient.activeTreatment}</strong></p>
                                             <p className="text-xs text-white/40 flex items-center gap-2">
@@ -235,7 +235,7 @@ export default function PendingApprovalsPage() {
                                     <div className="w-full md:w-auto shrink-0 flex flex-col gap-3">
                                         <Button
                                             onClick={() => markAsShipped(patient.id)}
-                                            className="w-full md:w-48 bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-semibold h-11"
+                                            className="w-full md:w-48 bg-[#a10c22] hover:bg-[#a10c22]/90 text-black font-semibold h-11"
                                         >
                                             <Truck className="w-4 h-4 mr-2" /> Mark as Shipped
                                         </Button>
@@ -259,7 +259,7 @@ export default function PendingApprovalsPage() {
                                 </DialogDescription>
                             </div>
                             <div className="flex gap-3">
-                                <Badge variant="outline" className="text-[#8FA677] border-[#8FA677]/30 bg-[#8FA677]/10">
+                                <Badge variant="outline" className="text-[#a10c22] border-[#a10c22]/30 bg-[#a10c22]/10">
                                     <ShieldCheck className="w-3 h-3 mr-1" /> Verified Signature
                                 </Badge>
                             </div>

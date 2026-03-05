@@ -41,7 +41,7 @@ export default function StaffOnboardingPage() {
                 {/* Contract Document */}
                 <div className="bg-[#0C1420] border border-white/10 rounded-2xl p-6 md:p-8 mb-8">
                     <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
-                        <FileSignature className="w-5 h-5 text-[#B8977E]" />
+                        <FileSignature className="w-5 h-5 text-[#a10c22]" />
                         <h2 className="font-serif text-white">Non-Disclosure & Data Handling Agreement</h2>
                     </div>
 
@@ -117,7 +117,7 @@ export default function StaffOnboardingPage() {
                                 type="checkbox"
                                 checked={hasRead}
                                 onChange={(e) => setHasRead(e.target.checked)}
-                                className="mt-1 w-5 h-5 accent-[#8FA677] rounded"
+                                className="mt-1 w-5 h-5 accent-[#a10c22] rounded"
                             />
                             <span className="text-sm text-white/70 group-hover:text-white/90 transition-colors">
                                 I, <strong className="text-white">{currentUser?.name || "Staff Member"}</strong>,

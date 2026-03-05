@@ -8,6 +8,7 @@ import { usePatients } from "@/hooks/usePatients";
 import { useNotifications } from "@/hooks/useNotifications";
 import { tenant } from "@/lib/theme.config";
 import { signOut as supabaseSignOut } from "@/lib/auth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -79,7 +80,7 @@ export default function AdminLayout({
                     </div>
                     <h1 className="text-2xl font-serif text-white">Access Denied</h1>
                     <p className="text-white/60">This area is restricted to {tenant.name} Clinical Staff only.</p>
-                    <Link href="/login" className="text-[#B8977E] hover:underline block mt-4">Return to Login</Link>
+                    <Link href="/login" className="text-[#a10c22] hover:underline block mt-4">Return to Login</Link>
                 </div>
             </div>
         );
@@ -99,10 +100,10 @@ export default function AdminLayout({
     const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL" || p.approvalStatus === "PENDING_SHIPMENT").length;
 
     const allNavItems = [
-        { name: "Dashboard Overview", href: "/admin", icon: LayoutDashboard, roles: ["SUPERADMIN", "ADMIN", "DOCTOR", "RECEPTION"] },
-        { name: "Approvals & Shipments", href: "/admin/approvals", icon: ClipboardCheck, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"], badge: pendingAuthorizations },
+        { name: "Command Center", href: "/admin", icon: LayoutDashboard, roles: ["SUPERADMIN", "ADMIN", "DOCTOR", "RECEPTION"] },
+        { name: "Authorizations & Logistics", href: "/admin/approvals", icon: ClipboardCheck, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"], badge: pendingAuthorizations },
         { name: "Patient Management", href: "/admin/patients", icon: Users, roles: ["SUPERADMIN", "ADMIN", "DOCTOR", "RECEPTION"] },
-        { name: "Billing & Invoices", href: "/admin/billing", icon: DollarSign, roles: ["SUPERADMIN", "ADMIN", "RECEPTION"] },
+        { name: "National Accounts", href: "/admin/billing", icon: DollarSign, roles: ["SUPERADMIN", "ADMIN", "RECEPTION"] },
         { name: "Treatments & Forms", href: "/admin/forms", icon: FileText, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"] },
         { name: "Analytics", href: "/admin/analytics", icon: BarChart3, roles: ["SUPERADMIN", "ADMIN"] },
         { name: "Telehealth HD", href: "/admin/telehealth", icon: Video, roles: ["SUPERADMIN", "ADMIN", "DOCTOR"], badge: "Locked" },
@@ -125,7 +126,7 @@ export default function AdminLayout({
                         </div>
                         <div className="flex flex-col">
                             <span className="font-serif text-base tracking-wide leading-none">{tenant.name}</span>
-                            <span className="text-[10px] text-[#B8977E] uppercase tracking-widest mt-1">Clinical Hub</span>
+                            <span className="text-[10px] text-[#a10c22] uppercase tracking-widest mt-1">Operations Hub</span>
                         </div>
                     </div>
                 </div>
@@ -140,9 +141,9 @@ export default function AdminLayout({
                                     className={`w-full justify-start gap-3 h-11 px-3 ${isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
                                 >
                                     <item.icon className="w-4 h-4" />
-                                    <span className="font-medium text-sm">{item.name}</span>
+                                    <span className="font-serif text-sm px-1">{item.name}</span>
                                     {item.badge && (typeof item.badge === "number" ? item.badge > 0 : true) ? (
-                                        <Badge className="ml-auto bg-[#E8A838] hover:bg-[#E8A838] text-black text-xs px-1.5 min-w-[20px] justify-center">
+                                        <Badge className="ml-auto bg-[#a10c22] hover:bg-[#a10c22] text-black text-xs px-1.5 min-w-[20px] justify-center">
                                             {item.badge}
                                         </Badge>
                                     ) : null}
@@ -158,9 +159,13 @@ export default function AdminLayout({
                             {currentUser.name.charAt(0)}
                         </div>
                         <div>
-                            <p className="text-sm font-medium">{currentUser.name}</p>
-                            <p className="text-xs text-white/50 capitalize">{currentUser.role?.toLowerCase().replace('_', ' ')}</p>
+                            <p className="text-sm font-serif">{currentUser.name}</p>
+                            <p className="text-[10px] text-white/50 capitalize tracking-wider font-semibold">{currentUser.role?.toLowerCase().replace('_', ' ')}</p>
                         </div>
+                    </div>
+                    <div className="flex items-center justify-between px-2 mb-4">
+                        <span className="text-[10px] text-white/50 uppercase tracking-widest font-serif">Theme</span>
+                        <ThemeToggle />
                     </div>
                     <Button
                         variant="ghost"
@@ -169,7 +174,7 @@ export default function AdminLayout({
                             try { await supabaseSignOut(); } catch (_) { }
                             window.location.href = '/login';
                         }}
-                        className="w-full justify-start gap-3 text-white/50 hover:text-white hover:bg-white/5"
+                        className="w-full justify-start gap-3 text-white/50 hover:text-white hover:bg-white/5 font-serif"
                     >
                         <LogOut className="w-4 h-4" />
                         Log Out
@@ -191,7 +196,7 @@ export default function AdminLayout({
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                         <Input
                             placeholder="Global Search: Patient Name, Email, or Phone..."
-                            className="w-full bg-[#111A27] border-white/10 text-white pl-10 h-10 rounded-full focus-visible:ring-1 focus-visible:ring-[#B8977E]/50 focus-visible:bg-[#0C1420] transition-colors"
+                            className="w-full bg-[#111A27] border-white/10 text-white pl-10 h-10 rounded-full focus-visible:ring-1 focus-visible:ring-[#a10c22]/50 focus-visible:bg-[#0C1420] transition-colors"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
@@ -219,11 +224,11 @@ export default function AdminLayout({
                                                 }}
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white group-hover:bg-[#B8977E]/20 group-hover:text-[#B8977E] transition-colors">
+                                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white group-hover:bg-[#a10c22]/20 group-hover:text-[#a10c22] transition-colors">
                                                         {patient.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <div className="text-sm font-medium text-white group-hover:text-[#B8977E] transition-colors">{patient.name}</div>
+                                                        <div className="text-sm font-medium text-white group-hover:text-[#a10c22] transition-colors">{patient.name}</div>
                                                         <div className="text-[10px] text-white/50">{patient.email} {patient.phone ? `• ${patient.phone}` : ''}</div>
                                                     </div>
                                                 </div>
@@ -256,11 +261,11 @@ export default function AdminLayout({
                             <div className="absolute top-12 right-0 w-80 sm:w-96 bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-50">
                                 <div className="p-4 border-b border-white/5 flex items-center justify-between">
                                     <h3 className="font-serif text-white flex items-center gap-2">
-                                        <Bell className="w-4 h-4 text-[#B8977E]" />
+                                        <Bell className="w-4 h-4 text-[#a10c22]" />
                                         Notifications
                                     </h3>
                                     {unreadCount > 0 && (
-                                        <Badge className="bg-[#B8977E] text-black hover:bg-[#B8977E] px-2">
+                                        <Badge className="bg-[#a10c22] text-black hover:bg-[#a10c22] px-2">
                                             {unreadCount} New
                                         </Badge>
                                     )}
@@ -294,9 +299,9 @@ export default function AdminLayout({
                                                     }}
                                                 >
                                                     <div className="flex items-start gap-3">
-                                                        <div className={`mt-1 p-2 rounded-full ${notif.type === 'CART_REQUEST' ? 'bg-[#8FA677]/20 text-[#8FA677]' :
+                                                        <div className={`mt-1 p-2 rounded-full ${notif.type === 'CART_REQUEST' ? 'bg-[#a10c22]/20 text-[#a10c22]' :
                                                             notif.type === 'SYSTEM_ALERT' ? 'bg-red-500/20 text-red-400' :
-                                                                'bg-[#E8A838]/20 text-[#E8A838]'
+                                                                'bg-[#a10c22]/20 text-[#a10c22]'
                                                             }`}>
                                                             {notif.type === 'CART_REQUEST' ? <ShoppingCart className="w-4 h-4" /> :
                                                                 notif.type === 'SYSTEM_ALERT' ? <AlertTriangle className="w-4 h-4" /> :

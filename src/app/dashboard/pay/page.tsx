@@ -76,52 +76,52 @@ export default function PaymentPage() {
             </header>
 
             {currentPatient?.approvalStatus === "PENDING_FORMS" ? (
-                <Card className="bg-card border-border/50 text-center py-16">
+                <Card className="bg-[#F9F7F2] border-[#E5E5E5]/50 shadow-sm rounded-3xl text-center py-16">
                     <CardContent className="space-y-4 flex flex-col items-center">
-                        <div className="w-16 h-16 rounded-full bg-[#E8A838]/20 flex items-center justify-center">
-                            <ShieldCheck className="w-8 h-8 text-[#E8A838]" />
+                        <div className="w-16 h-16 rounded-full bg-[#a10c22]/20 flex items-center justify-center">
+                            <ShieldCheck className="w-8 h-8 text-[#a10c22]" />
                         </div>
                         <CardTitle className="font-serif text-2xl">Action Required</CardTitle>
                         <CardDescription className="text-base max-w-sm mx-auto">
                             Please complete your required clinical intake forms and medical questionnaires before proceeding to checkout.
                         </CardDescription>
-                        <Button variant="outline" onClick={() => router.push("/dashboard/intake")} className="mt-4 rounded-xl border-[#E8A838]/50 text-[#E8A838] hover:bg-[#E8A838]/10">
+                        <Button variant="outline" onClick={() => router.push("/dashboard/intake")} className="mt-6 rounded-full h-12 px-8 border-[#a10c22]/50 text-[#a10c22] hover:bg-[#a10c22]/10 font-medium tracking-wide transition-all duration-300">
                             Go to Security Forms
                         </Button>
                     </CardContent>
                 </Card>
             ) : currentPatient?.approvalStatus === "PENDING_APPROVAL" ? (
-                <Card className="bg-card border-border/50 text-center py-16">
+                <Card className="bg-[#F9F7F2] border-[#E5E5E5]/50 shadow-sm rounded-3xl text-center py-16">
                     <CardContent className="space-y-4 flex flex-col items-center">
-                        <div className="w-16 h-16 rounded-full bg-[#B8977E]/20 flex items-center justify-center animate-pulse">
-                            <Building2 className="w-8 h-8 text-[#B8977E]" />
+                        <div className="w-16 h-16 rounded-full bg-[#a10c22]/20 flex items-center justify-center animate-pulse">
+                            <Building2 className="w-8 h-8 text-[#a10c22]" />
                         </div>
                         <CardTitle className="font-serif text-2xl">Pending Medical Authorization</CardTitle>
                         <CardDescription className="text-base max-w-md mx-auto">
                             Your requested treatment plan is currently under review by our clinical team. Once authorized, you will receive an email to complete your checkout securely.
                         </CardDescription>
-                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">
+                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-6 rounded-full h-12 px-8 border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A] font-medium tracking-wide transition-all duration-300">
                             Return to Dashboard
                         </Button>
                     </CardContent>
                 </Card>
             ) : currentPatient?.approvalStatus === "PENDING_SHIPMENT" && pendingBalance === 0 ? (
-                <Card className="bg-card border-border/50 text-center py-16 animate-in slide-in-from-bottom-4">
+                <Card className="bg-[#F9F7F2] border-[#E5E5E5]/50 shadow-sm rounded-3xl text-center py-16 animate-in slide-in-from-bottom-4">
                     <CardContent className="space-y-4 flex flex-col items-center">
-                        <div className="w-16 h-16 rounded-full bg-[#8FA677]/20 flex items-center justify-center animate-pulse">
-                            <Truck className="w-8 h-8 text-[#8FA677]" />
+                        <div className="w-16 h-16 rounded-full bg-[#a10c22]/20 flex items-center justify-center animate-pulse">
+                            <Truck className="w-8 h-8 text-[#a10c22]" />
                         </div>
                         <CardTitle className="font-serif text-2xl">Processing Shipment</CardTitle>
                         <CardDescription className="text-base max-w-sm mx-auto">
                             Your payment was successful. The pharmacy is now preparing your protocol for shipping. You will receive tracking information soon.
                         </CardDescription>
-                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">
+                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-6 rounded-full h-12 px-8 border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A] font-medium tracking-wide transition-all duration-300">
                             Return to Dashboard
                         </Button>
                     </CardContent>
                 </Card>
             ) : pendingBalance === 0 ? (
-                <Card className="bg-card border-border/50 text-center py-16">
+                <Card className="bg-[#F9F7F2] border-[#E5E5E5]/50 shadow-sm rounded-3xl text-center py-16">
                     <CardContent className="space-y-4 flex flex-col items-center">
                         <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
                             <CheckCircle2 className="w-8 h-8 text-primary" />
@@ -130,7 +130,7 @@ export default function PaymentPage() {
                         <CardDescription className="text-base max-w-sm mx-auto">
                             You have no pending charges. Thank you for your continued trust in {tenant.name}.
                         </CardDescription>
-                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-4 rounded-xl">
+                        <Button variant="outline" onClick={() => router.push("/dashboard")} className="mt-6 rounded-full h-12 px-8 border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A] font-medium tracking-wide transition-all duration-300">
                             Return to Dashboard
                         </Button>
                     </CardContent>
@@ -146,16 +146,17 @@ export default function PaymentPage() {
                         </h3>
                         <div className="space-y-4">
                             {userCharges.map(charge => (
-                                <Card key={charge.id} className="bg-white/5 border-border/50">
-                                    <CardContent className="p-4 flex items-start justify-between">
+                                <Card key={charge.id} className="bg-white border-[#E5E5E5]/50 shadow-sm rounded-2xl overflow-hidden group hover:border-[#a10c22]/30 transition-colors">
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#a10c22] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <CardContent className="p-5 flex items-start justify-between relative">
                                         <div>
-                                            <p className="font-medium">{charge.description}</p>
-                                            <p className="text-sm text-muted-foreground">Charge ID: #{charge.id}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">Added: {charge.date}</p>
+                                            <p className="font-medium text-[#1A1A1A] text-lg">{charge.description}</p>
+                                            <p className="text-sm text-[#2D2D2D]/60 mt-1">Invoice #{charge.id.substring(0, 8)}</p>
+                                            <p className="text-xs text-[#2D2D2D]/40 mt-1 uppercase tracking-wider">{charge.date}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="font-serif text-lg">${charge.amount.toFixed(2)}</p>
-                                            <Badge variant="outline" className="mt-1 border-primary/50 text-primary bg-primary/10">Action Required</Badge>
+                                        <div className="text-right flex flex-col items-end">
+                                            <p className="font-serif text-2xl text-[#1A1A1A] mb-2">${charge.amount.toFixed(2)}</p>
+                                            <Badge variant="outline" className="border-[#a10c22]/50 text-[#a10c22] bg-[#a10c22]/5 rounded-full px-3 py-1 text-[10px] tracking-widest uppercase">Required</Badge>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -174,10 +175,16 @@ export default function PaymentPage() {
                     </div>
 
                     {/* Right Col: Secure Payment Terminal */}
-                    <div className="bg-[#050505] -m-6 p-6 md:-m-12 md:p-12 md:border-l border-border/50 min-h-full">
-                        <h3 className="text-lg font-serif mb-6 text-foreground">Secure Checkout</h3>
+                    <div className="bg-[#0C1420] -m-6 p-6 md:-m-12 md:p-12 md:rounded-r-3xl md:border-l border-[#E5E5E5]/20 min-h-full relative overflow-hidden">
+                        {/* Subtle luxury glow in dark mode terminal */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#a10c22]/10 rounded-full blur-[100px] -mr-20 -mt-20 pointer-events-none" />
 
-                        <div className="bg-black/20 p-6 rounded-xl border border-white/5 shadow-inner">
+                        <h3 className="text-lg font-serif mb-6 text-white flex items-center gap-2">
+                            <ShieldCheck className="w-5 h-5 text-[#a10c22]" />
+                            Secure Checkout
+                        </h3>
+
+                        <div className="bg-[#151D29] p-6 lg:p-8 rounded-3xl border border-white/5 shadow-2xl relative z-10">
                             {clientSecret ? (
                                 <Elements
                                     stripe={getStripe()}
@@ -186,11 +193,13 @@ export default function PaymentPage() {
                                         appearance: {
                                             theme: 'night',
                                             variables: {
-                                                colorPrimary: '#8FA677',
-                                                colorBackground: '#1A1A1A',
+                                                colorPrimary: '#a10c22',
+                                                colorBackground: '#1A2332',
                                                 colorText: '#F9F7F2',
                                                 colorDanger: '#ef4444',
-                                                fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                                                fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                                                borderRadius: '16px',
+                                                spacingGridRow: '20px'
                                             }
                                         }
                                     }}
@@ -198,9 +207,11 @@ export default function PaymentPage() {
                                     <CheckoutForm amount={pendingBalance} onSuccess={handleSuccess} />
                                 </Elements>
                             ) : (
-                                <div className="h-48 flex flex-col items-center justify-center text-muted-foreground animate-pulse gap-3">
-                                    <ShieldCheck className="w-8 h-8 opacity-50" />
-                                    <span>Initializing 256-bit encrypted terminal...</span>
+                                <div className="h-64 flex flex-col items-center justify-center text-white/50 animate-pulse gap-4">
+                                    <div className="w-16 h-16 rounded-2xl bg-[#a10c22]/10 flex items-center justify-center border border-[#a10c22]/20">
+                                        <ShieldCheck className="w-8 h-8 text-[#a10c22]" />
+                                    </div>
+                                    <span className="text-sm tracking-wide">Initializing 256-bit encrypted terminal...</span>
                                 </div>
                             )}
                         </div>

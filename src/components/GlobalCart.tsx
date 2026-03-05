@@ -25,7 +25,7 @@ export function GlobalCart() {
             {cart.length > 0 && (
                 <button
                     onClick={() => setIsCartOpen(true)}
-                    className="fixed bottom-24 md:bottom-8 right-6 md:right-8 bg-[#B8977E] text-black w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform z-50 animate-in fade-in zoom-in"
+                    className="fixed bottom-24 md:bottom-8 right-6 md:right-8 bg-[#a10c22] text-black w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform z-50 animate-in fade-in zoom-in"
                 >
                     <ShoppingCart className="w-6 h-6" />
                     <span className="absolute -top-1 -right-1 bg-white text-black text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border border-black">
@@ -39,7 +39,7 @@ export function GlobalCart() {
                 <DialogContent className="bg-[#0C1420] border-white/10 text-white sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-                            <ShieldCheck className="w-5 h-5 text-[#B8977E]" />
+                            <ShieldCheck className="w-5 h-5 text-[#a10c22]" />
                             Review Order Request
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
@@ -59,7 +59,7 @@ export function GlobalCart() {
                                     <div key={idx} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
                                         <div className="flex-1 pr-4">
                                             <p className="font-medium text-sm text-white">{item.name}</p>
-                                            <p className="font-serif text-[#B8977E] text-xs mt-1">{item.price}</p>
+                                            <p className="font-serif text-[#a10c22] text-xs mt-1">{item.price}</p>
                                         </div>
                                         <button
                                             onClick={() => removeFromCart(item.id)}
@@ -73,7 +73,7 @@ export function GlobalCart() {
 
                             <div className="pt-4 border-t border-white/10">
                                 <Button
-                                    className="w-full bg-[#B8977E] text-black hover:bg-[#B8977E]/90 h-12 text-base font-medium transition-all"
+                                    className="w-full bg-[#a10c22] text-black hover:bg-[#a10c22]/90 h-12 text-base font-medium transition-all"
                                     disabled={isSubmitting}
                                     onClick={async () => {
                                         setIsSubmitting(true);

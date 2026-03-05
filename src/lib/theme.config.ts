@@ -17,8 +17,8 @@ export const tenant = {
     // ─── Brand Identity ──────────────────────────────────────────────────────
     name: "MedFit America",
     shortName: "MedFit",
-    legalEntity: "Medfit Of Georgia LLC",
-    tagline: "Exceptional Care, Discreetly Provided.",
+    legalEntity: "MedFit America LLC",
+    tagline: "Excellence in Medical Longevity.",
     logoInitial: "M", // Single letter shown in compact logo mark
     academyName: "MedFit Academy",
 
@@ -48,35 +48,35 @@ export const tenant = {
     // ─── Color Palette ───────────────────────────────────────────────────────
     // Change these to re-brand the entire app for a new clinic.
     colors: {
-        // Primary brand color → used for buttons, accents, progress bars
-        primary: "#8FA677",
-        primaryHover: "#7D9365",
-        primaryLight: "rgba(143, 166, 119, 0.1)",   // bg-primary/10
-        primaryGlow: "rgba(143, 166, 119, 0.3)",     // shadow glow 
+        // Primary brand color (Midnight Navy)
+        primary: "#0A2342",
+        primaryHover: "#081D36",
+        primaryLight: "rgba(10, 35, 66, 0.1)",
+        primaryGlow: "rgba(10, 35, 66, 0.3)",
 
-        // Secondary accent → used for billing, gold tones
-        accent: "#B8977E",
-        accentHover: "#A6856C",
+        // Secondary accent (Ruby Red)
+        accent: "#8B0000",
+        accentHover: "#6B0000",
 
-        // Alert/warning → used for pending items
-        warning: "#E8A838",
+        // Alert/warning
+        warning: "#a10c22",
 
         // Backgrounds
-        pageBg: "#F9F7F2",            // light/patient pages
-        adminBg: "#080D15",           // dark admin panel
-        adminCard: "#0C1420",         // dark cards
+        pageBg: "#F8F9FA",            // light cream
+        adminBg: "#0C1420",           // dark navy command center
+        adminCard: "#111A27",
         adminBorder: "rgba(255,255,255,0.05)",
 
         // Text
-        textDark: "#1A1A1A",
-        textMuted: "#2D2D2D",
+        textDark: "#111827",
+        textMuted: "#6B7280",
         textLight: "rgba(255,255,255,0.7)",
         textLighter: "rgba(255,255,255,0.4)",
 
-        // Form surfaces (patient light theme)
-        formBg: "#F9F7F2",
-        formBorder: "#E5E5E5",
-        formInputBg: "white",
+        // Form surfaces
+        formBg: "#FFFFFF",
+        formBorder: "#E5E7EB",
+        formInputBg: "#FFFFFF",
     },
 
     // ─── Payment Configuration ───────────────────────────────────────────────

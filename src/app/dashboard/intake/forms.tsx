@@ -65,12 +65,12 @@ function AddressAutocompleteSection({
 
     return (
         <div className="md:col-span-2 bg-white/50 p-6 rounded-2xl border border-[#E5E5E5]/60 shadow-sm">
-            <Label className="text-xs font-semibold text-[#8FA677] uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Label className="text-xs font-semibold text-[#a10c22] uppercase tracking-wider mb-4 flex items-center gap-2">
                 <MapPin className="w-4 h-4" /> Intelligent Address Search
             </Label>
             <input
                 ref={inputCallbackRef}
-                className="w-full h-12 px-4 rounded-xl border border-[#E5E5E5] bg-white text-[#1A1A1A] focus:outline-none focus:border-[#8FA677] focus:ring-1 focus:ring-[#8FA677] transition-all mb-4 placeholder:text-[#2D2D2D]/40"
+                className="w-full h-12 px-4 rounded-xl border border-[#E5E5E5] bg-white text-[#1A1A1A] focus:outline-none focus:border-[#a10c22] focus:ring-1 focus:ring-[#a10c22] transition-all mb-4 placeholder:text-[#2D2D2D]/40"
                 placeholder="Start typing your home address..."
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -113,27 +113,24 @@ interface FormLayoutProps {
     icon?: React.ElementType;
 }
 const FormLayout = ({ title, subtitle, step, totalSteps, children }: FormLayoutProps) => (
-    <div className="bg-[#F9F7F2] text-[#2D2D2D] p-6 md:p-12 rounded-3xl shadow-sm border border-[#E5E5E5] w-full max-w-3xl mx-auto animate-in fade-in zoom-in-95 duration-500">
-        <header className="mb-8 border-b border-[#E5E5E5] pb-6">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-[#8FA677]">
-                    <ShieldCheck className="w-5 h-5" />
-                    <span className="text-xs font-semibold tracking-widest uppercase">Secure Form</span>
-                </div>
-                {totalSteps > 0 && (
-                    <div className="text-xs font-medium text-[#2D2D2D]/60 tracking-wider">
-                        STEP {step} OF {totalSteps}
-                    </div>
-                )}
+    <div className="bg-[#F9F7F2] text-[#2D2D2D] p-6 md:p-12 rounded-[2rem] shadow-sm border border-[#E5E5E5]/50 w-full max-w-3xl mx-auto animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden">
+        {/* Subtle premium accent glow */}
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#a10c22]/50 to-transparent opacity-50"></div>
+
+        <header className="mb-10 text-center">
+            <div className="flex items-center justify-center gap-2 text-[#a10c22] mb-6">
+                <ShieldCheck className="w-5 h-5" />
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase">Secure Clinical Form</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-serif text-[#1A1A1A] mb-2">{title}</h1>
-            <p className="text-[#2D2D2D]/70 text-sm">{subtitle}</p>
+
+            <h1 className="text-3xl md:text-4xl font-serif text-[#1A1A1A] mb-3 leading-tight">{title}</h1>
+            <p className="text-[#2D2D2D]/70 text-sm md:text-base max-w-lg mx-auto leading-relaxed">{subtitle}</p>
         </header>
 
         {totalSteps > 1 && (
-            <div className="flex gap-2 mb-8">
+            <div className="flex gap-2 mb-10 px-4 md:px-12">
                 {Array.from({ length: totalSteps }).map((_, i) => (
-                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < step ? 'bg-[#8FA677]' : 'bg-[#E5E5E5]'}`} />
+                    <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-700 ${i < step ? 'bg-[#a10c22] shadow-[0_0_10px_rgba(143,166,119,0.3)]' : 'bg-[#E5E5E5]'}`} />
                 ))}
             </div>
         )}
@@ -159,9 +156,9 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
     };
 
 
-    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
+    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#a10c22] px-0 h-10 text-[#1A1A1A]";
     const labelClasses = "text-xs font-semibold text-[#2D2D2D]/60 uppercase tracking-wider mb-2 block";
-    const textareaClasses = "w-full min-h-[60px] p-3 rounded-xl bg-white border border-[#E5E5E5] text-sm focus:outline-none focus:border-[#8FA677] resize-none text-[#1A1A1A]";
+    const textareaClasses = "w-full min-h-[60px] p-3 rounded-xl bg-white border border-[#E5E5E5] text-sm focus:outline-none focus:border-[#a10c22] resize-none text-[#1A1A1A]";
 
     if (step === 1) {
         return (
@@ -192,7 +189,7 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                         <div><Label className={labelClasses}>What makes these symptoms better or worse?</Label><textarea required className={textareaClasses} /></div>
                     </div>
 
-                    <Button type="submit" className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                    <Button type="submit" className="w-full h-14 rounded-2xl bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-md">
                         Continue to Medical History
                     </Button>
                 </form>
@@ -227,7 +224,7 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-sm text-[#2D2D2D]">
                                 {["Cancer of any kind", "Thyroid Disease", "HIV/AIDS", "Hepatitis/Liver Disease", "Heart Disease/Heart Attack/Myocardial Infarction", "High/Low Blood Pressure", "Hysterectomy", "Severe Headaches", "Hx of Depression/Anxiety", "Hx of Suicidality"].map(condition => (
                                     <label key={condition} className="flex items-center gap-2 cursor-pointer group">
-                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#8FA677] focus:ring-[#8FA677]" />
+                                        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#a10c22] focus:ring-[#a10c22]" />
                                         <span className="group-hover:text-[#1A1A1A]">{condition}</span>
                                     </label>
                                 ))}
@@ -252,9 +249,9 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                         </div>
                     </div>
 
-                    <div className="flex gap-4">
-                        <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 h-14 rounded-2xl border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A]">Back</Button>
-                        <Button type="submit" className="flex-[2] h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">Continue to Lifestyle</Button>
+                    <div className="flex gap-4 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setStep(1)} className="flex-1 h-14 rounded-full border border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A] font-medium tracking-wide transition-all">Back</Button>
+                        <Button type="submit" className="flex-[2] h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">Continue to Lifestyle</Button>
                     </div>
                 </form>
             </FormLayout>
@@ -301,7 +298,7 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                     </div>
                 </div>
 
-                <div className="text-sm text-[#2D2D2D]/80 leading-relaxed bg-[#8FA677]/10 p-6 rounded-2xl">
+                <div className="text-sm text-[#2D2D2D]/80 leading-relaxed bg-[#a10c22]/10 p-6 rounded-2xl">
                     <p>I have read and fully completed this questionnaire truthfully. I agree that this constitutes full disclosure, and that it supersedes any previous verbal or written disclosures. I authorize the healthcare provider, nurse, medical assistants, and any other deemed medical staff to administer treatments and medications as they deem necessary and advisable including recommending/ordering laboratory and other diagnostic tests as indicated for my medical concerns. I understand that by identifying my health risk factors, Medfit of Georgia will then recommend targeted lifestyle support that, if acted upon, can help me reduce my risk of disease and increase my ability to be healthier. I understand I have the right to refuse any treatment recommendation. I understand your office does not replace my primary care provider.</p>
                     <p className="mt-2">While all treatments are recommended to achieve the best possible results, I do understand that not all treatments will have the same results on every client, therefore no guarantee can be given. I also understand that any recommendations made are up to me to choose to accept and engage in for optimal results to occur.</p>
                     <p className="mt-2">I understand that if I withhold information or provide misinformation, incomplete results or recommendations can occur from treatments received. I am aware that it is my responsibility to inform you of my current medical or health conditions and to update this history. The treatments I receive here are voluntary and I release Medfit of Georgia from liability and assume full responsibility thereof.</p>
@@ -313,9 +310,9 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
                     signed={signatureData}
                 />
 
-                <div className="flex gap-4">
-                    <Button type="button" variant="outline" onClick={() => setStep(2)} className="flex-1 h-14 rounded-2xl border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A]">Back</Button>
-                    <Button type="submit" disabled={isSubmitting || !signatureData} className="flex-[2] h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
+                <div className="flex gap-4 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setStep(2)} className="flex-1 h-14 rounded-full border border-[#E5E5E5] text-[#2D2D2D] hover:bg-white hover:text-[#1A1A1A] font-medium tracking-wide transition-all">Back</Button>
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="flex-[2] h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">
                         {isSubmitting ? "Finalizing..." : "Accept & Complete"}
                     </Button>
                 </div>
@@ -327,7 +324,7 @@ export function WellnessIntakeForm({ onSubmit, isSubmitting }: FormProps) {
 // Form 2: NFC HIPAA
 export function NfcHipaaForm({ onSubmit, isSubmitting }: FormProps) {
     const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
-    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
+    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#a10c22] px-0 h-10 text-[#1A1A1A]";
 
     return (
         <FormLayout title="HEALTH CARE AUTHORIZATION FORM" subtitle="Notice of Privacy Practices for NFC Lab Services." step={1} totalSteps={1}>
@@ -359,9 +356,11 @@ export function NfcHipaaForm({ onSubmit, isSubmitting }: FormProps) {
                     signed={signatureData}
                 />
 
-                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
-                    {isSubmitting ? "Authorizing..." : "I Agree & Authorize"}
-                </Button>
+                <div className="pt-4">
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">
+                        {isSubmitting ? "Authorizing..." : "I Agree & Authorize"}
+                    </Button>
+                </div>
             </form>
         </FormLayout>
     );
@@ -370,7 +369,7 @@ export function NfcHipaaForm({ onSubmit, isSubmitting }: FormProps) {
 // Form 3: Medical Weight Loss
 export function MedicalWeightLossForm({ onSubmit, isSubmitting }: FormProps) {
     const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
-    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
+    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#a10c22] px-0 h-10 text-[#1A1A1A]";
 
     return (
         <FormLayout title="Semaglutide/Tirzepatide: Medical Weight Loss Program Consent Form" subtitle="" step={1} totalSteps={1}>
@@ -387,9 +386,11 @@ export function MedicalWeightLossForm({ onSubmit, isSubmitting }: FormProps) {
                     onSign={(data) => setSignatureData(data)}
                     signed={signatureData}
                 />
-                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
-                    {isSubmitting ? "Processing..." : "Sign Consent"}
-                </Button>
+                <div className="pt-4">
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">
+                        {isSubmitting ? "Processing..." : "Sign Consent"}
+                    </Button>
+                </div>
             </form>
         </FormLayout>
     );
@@ -398,7 +399,7 @@ export function MedicalWeightLossForm({ onSubmit, isSubmitting }: FormProps) {
 // Form 4: Testosterone Therapy
 export function TestosteroneTherapyForm({ onSubmit, isSubmitting }: FormProps) {
     const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
-    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
+    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#a10c22] px-0 h-10 text-[#1A1A1A]";
 
     return (
         <FormLayout title="Informed Consent for Testosterone Replacement Therapy" subtitle="" step={1} totalSteps={1}>
@@ -427,9 +428,11 @@ export function TestosteroneTherapyForm({ onSubmit, isSubmitting }: FormProps) {
                     onSign={(data) => setSignatureData(data)}
                     signed={signatureData}
                 />
-                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
-                    {isSubmitting ? "Processing..." : "I Acknowledge & Consent"}
-                </Button>
+                <div className="pt-4">
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">
+                        {isSubmitting ? "Processing..." : "I Acknowledge & Consent"}
+                    </Button>
+                </div>
             </form>
         </FormLayout>
     );
@@ -438,7 +441,7 @@ export function TestosteroneTherapyForm({ onSubmit, isSubmitting }: FormProps) {
 // Form 5: Peptide Therapy
 export function PeptideTherapyForm({ onSubmit, isSubmitting }: FormProps) {
     const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
-    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
+    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#a10c22] px-0 h-10 text-[#1A1A1A]";
 
     return (
         <FormLayout title="Peptide Therapy Consent Form" subtitle="" step={1} totalSteps={1}>
@@ -519,9 +522,11 @@ export function PeptideTherapyForm({ onSubmit, isSubmitting }: FormProps) {
                     onSign={(data) => setSignatureData(data)}
                     signed={signatureData}
                 />
-                <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
-                    {isSubmitting ? "Processing..." : "Sign Consent"}
-                </Button>
+                <div className="pt-4">
+                    <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">
+                        {isSubmitting ? "Processing..." : "Sign Consent"}
+                    </Button>
+                </div>
             </form>
         </FormLayout>
     );
@@ -530,7 +535,7 @@ export function PeptideTherapyForm({ onSubmit, isSubmitting }: FormProps) {
 // Form 6: Semaglutide
 export function SemaglutideInstructionsForm({ onSubmit, isSubmitting }: FormProps) {
     const [signatureData, setSignatureData] = useState<SignatureData | null>(null);
-    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#8FA677] px-0 h-10 text-[#1A1A1A]";
+    const inputClasses = "border-0 border-b border-[#E5E5E5] bg-transparent rounded-none focus-visible:ring-0 focus-visible:border-[#a10c22] px-0 h-10 text-[#1A1A1A]";
 
     return (
         <FormLayout title="Semaglutide/Tirzepatide Weekly Self Administration Instructions" subtitle="Self-Administration Guidelines & Acknowledgement" step={1} totalSteps={1}>
@@ -563,8 +568,8 @@ export function SemaglutideInstructionsForm({ onSubmit, isSubmitting }: FormProp
                     </ol>
                 </div>
                 <div className="space-y-4 pt-4">
-                    <div className="bg-[#8FA677]/10 p-5 rounded-2xl flex gap-4">
-                        <AlertCircle className="w-5 h-5 text-[#8FA677] shrink-0 mt-0.5" />
+                    <div className="bg-[#a10c22]/10 p-5 rounded-2xl flex gap-4">
+                        <AlertCircle className="w-5 h-5 text-[#a10c22] shrink-0 mt-0.5" />
                         <div className="text-sm text-[#2D2D2D]/80 leading-relaxed">
                             <p className="font-medium text-[#1A1A1A] mb-1">Acknowledgement Statement</p>
                             By signing below, I confirm that I have read and understand the self-administration instructions provided.
@@ -575,9 +580,11 @@ export function SemaglutideInstructionsForm({ onSubmit, isSubmitting }: FormProp
                         onSign={(data) => setSignatureData(data)}
                         signed={signatureData}
                     />
-                    <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-2xl bg-[#8FA677] hover:bg-[#7D9365] text-white font-medium shadow-md">
-                        {isSubmitting ? "Finalizing..." : "I Acknowledge & Sign"}
-                    </Button>
+                    <div className="pt-2">
+                        <Button type="submit" disabled={isSubmitting || !signatureData} className="w-full h-14 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white font-medium shadow-[0_0_15px_rgba(143,166,119,0.3)] transition-all duration-300 tracking-wide">
+                            {isSubmitting ? "Finalizing..." : "I Acknowledge & Sign"}
+                        </Button>
+                    </div>
                 </div>
             </form>
         </FormLayout>

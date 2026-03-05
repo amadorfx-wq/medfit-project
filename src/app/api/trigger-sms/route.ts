@@ -41,13 +41,13 @@ export async function POST(req: Request) {
                 subject: 'Action Required: Complete your MedFit Profile',
                 html: `
                     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background-color: #080808; color: #ffffff; padding: 40px; border-radius: 8px;">
-                        <h2 style="color: #B8977E; text-align: center;">MedFit America</h2>
+                        <h2 style="color: #a10c22; text-align: center;">MedFit America</h2>
                         <h3 style="color: #ffffff; text-align: center; font-weight: normal;">Hello ${patientName},</h3>
                         <p style="color: #a0a0a0; font-size: 16px; line-height: 1.5; text-align: center;">
                             We noticed you haven't completed your intake forms or clinical review yet. To proceed with your personalized treatment protocol, please complete your profile.
                         </p>
                         <div style="text-align: center; margin-top: 30px;">
-                            <a href="${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/login" style="background-color: #B8977E; color: #000000; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
+                            <a href="${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/login" style="background-color: #a10c22; color: #000000; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
                                 Resume Onboarding
                             </a>
                         </div>

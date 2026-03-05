@@ -18,7 +18,7 @@ export function AddToCartButton({ item, className, variant = "default", label = 
     return (
         <Button
             variant={variant}
-            className={className || "bg-[#1A1A1A] hover:bg-[#2D2D2D] text-white font-medium shadow-xl transition-all hover:scale-105"}
+            className={className || "bg-[#102A52] hover:bg-[#102A52] text-white font-medium shadow-xl transition-all hover:scale-105"}
             onClick={() => {
                 addToCart(item);
                 toast.success(`${item.name} added to your request list!`);

@@ -91,12 +91,12 @@ export default function DashboardPage() {
                 </div>
                 <Link href="/dashboard/treatments" className="shrink-0 relative group">
                     {/* Premium Glow Effect */}
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#B8977E]/40 via-[#B8977E]/20 to-[#B8977E]/40 rounded-xl blur-md opacity-75 group-hover:opacity-100 transition duration-500 animate-pulse-slow"></div>
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#a10c22]/40 via-[#a10c22]/20 to-[#a10c22]/40 rounded-xl blur-md opacity-75 group-hover:opacity-100 transition duration-500 animate-pulse-slow"></div>
 
-                    <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl border border-[#B8977E]/50 bg-[#0A0F17] hover:bg-[#B8977E]/10 transition-all duration-300 cursor-pointer shadow-[0_0_20px_rgba(184,151,126,0.15)] group-hover:shadow-[0_0_30px_rgba(184,151,126,0.3)]">
-                        <Sparkles className="w-4 h-4 text-[#B8977E]" />
-                        <span className="text-sm font-medium text-[#B8977E] tracking-wide">Our Protocols</span>
-                        <ArrowRight className="w-4 h-4 text-[#B8977E] group-hover:translate-x-1 transition-transform" />
+                    <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl border border-[#a10c22]/50 bg-[#0A0F17] hover:bg-[#a10c22]/10 transition-all duration-300 cursor-pointer shadow-[0_0_20px_rgba(184,151,126,0.15)] group-hover:shadow-[0_0_30px_rgba(184,151,126,0.3)]">
+                        <Sparkles className="w-4 h-4 text-[#a10c22]" />
+                        <span className="text-sm font-medium text-[#a10c22] tracking-wide">Our Protocols</span>
+                        <ArrowRight className="w-4 h-4 text-[#a10c22] group-hover:translate-x-1 transition-transform" />
                     </div>
                 </Link>
             </header>
@@ -121,10 +121,10 @@ export default function DashboardPage() {
 
             {/* Clinical Progress Tracker */}
             <div className="mb-10 bg-[#080D15] border border-white/5 p-6 md:p-8 rounded-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#B8977E]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#a10c22]/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
 
                 <h3 className="text-lg font-serif mb-6 flex items-center gap-2 text-white">
-                    <Activity className="w-5 h-5 text-[#B8977E]" />
+                    <Activity className="w-5 h-5 text-[#a10c22]" />
                     Live Clinical Status
                 </h3>
 
@@ -134,7 +134,7 @@ export default function DashboardPage() {
 
                     {/* Active Track */}
                     <div
-                        className="absolute top-5 left-8 h-0.5 bg-[#B8977E] z-0 hidden md:block transition-all duration-1000 ease-in-out"
+                        className="absolute top-5 left-8 h-0.5 bg-[#a10c22] z-0 hidden md:block transition-all duration-1000 ease-in-out"
                         style={{ width: `min(100%, calc(${currentStep * 33.33}% + 2rem))` }}
                     />
 
@@ -147,7 +147,7 @@ export default function DashboardPage() {
                             return (
                                 <div key={idx} className="flex flex-row md:flex-col items-center md:items-start md:text-center text-left gap-4 md:gap-3 group">
                                     <div className="relative">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isCompleted ? 'bg-[#B8977E] border-[#B8977E] text-[#0A0F17]' : isActive ? 'bg-[#1A2332] border-[#B8977E] text-[#B8977E] shadow-[0_0_15px_rgba(184,151,126,0.3)] animate-pulse' : 'bg-[#0A0F17] border-white/10 text-white/30'}`}>
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isCompleted ? 'bg-[#a10c22] border-[#a10c22] text-[#0A0F17]' : isActive ? 'bg-[#1A2332] border-[#a10c22] text-[#a10c22] shadow-[0_0_15px_rgba(184,151,126,0.3)] animate-pulse' : 'bg-[#0A0F17] border-white/10 text-white/30'}`}>
                                             {isCompleted ? <Check className="w-5 h-5" /> : <step.icon className="w-4 h-4" />}
                                         </div>
                                     </div>
@@ -193,17 +193,28 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Active Treatment Card */}
-                <Card className="border border-border/50 bg-card backdrop-blur-sm">
+                <Card className="border border-border/50 bg-card backdrop-blur-sm relative overflow-hidden">
+                    {!userDetails?.activeTreatment && (
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#a10c22]/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                    )}
                     <CardContent className="p-6 flex flex-col justify-between h-full space-y-4">
-                        <span className="text-sm font-medium text-muted-foreground">Active Program</span>
+                        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Active Program</span>
                         <div>
-                            <h3 className="text-xl font-medium leading-tight mb-2">{userDetails?.activeTreatment || "None"}</h3>
+                            {userDetails?.activeTreatment ? (
+                                <h3 className="text-xl font-medium leading-tight mb-2">{userDetails.activeTreatment}</h3>
+                            ) : (
+                                <h3 className="text-xl font-serif text-[#a10c22] leading-tight mb-2">Begin Your Journey</h3>
+                            )}
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground mb-4">You are currently enrolled and active in this protocol.</p>
-                            <Button asChild variant="outline" className="w-full rounded-xl border-border hover:bg-white/5 h-12 text-sm font-medium">
+                            {userDetails?.activeTreatment ? (
+                                <p className="text-sm text-muted-foreground mb-4">You are currently enrolled and active in this protocol.</p>
+                            ) : (
+                                <p className="text-sm text-foreground/80 mb-4">Discover medically supervised protocols tailored for you.</p>
+                            )}
+                            <Button asChild variant={userDetails?.activeTreatment ? "outline" : "default"} className={`w-full rounded-xl h-12 text-sm font-medium ${!userDetails?.activeTreatment ? 'bg-[#a10c22] hover:bg-[#a10c22]/90 text-black shadow-[0_0_15px_rgba(184,151,126,0.3)]' : 'border-border hover:bg-white/5'}`}>
                                 <Link href="/dashboard/treatments">
-                                    View Protocol Details
+                                    {userDetails?.activeTreatment ? "View Protocol Details" : "Explore Men's Protocols"}
                                 </Link>
                             </Button>
                         </div>
@@ -232,10 +243,10 @@ export default function DashboardPage() {
                         <div className="flex flex-col sm:flex-row items-stretch">
                             <div className="flex-1 p-6 space-y-2">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <div className="w-7 h-7 rounded-full bg-[#B8977E]/10 flex items-center justify-center">
-                                        <Sparkles className="w-3.5 h-3.5 text-[#B8977E]" />
+                                    <div className="w-7 h-7 rounded-full bg-[#a10c22]/10 flex items-center justify-center">
+                                        <Sparkles className="w-3.5 h-3.5 text-[#a10c22]" />
                                     </div>
-                                    <span className="text-xs uppercase tracking-wider text-[#B8977E] font-medium">Active Subscription</span>
+                                    <span className="text-xs uppercase tracking-wider text-[#a10c22] font-medium">Active Subscription</span>
                                 </div>
                                 <h3 className="text-lg font-serif">{userDetails.activeTreatment}</h3>
                                 <p className="text-sm text-muted-foreground">Your monthly protocol is active. Manage your payment methods, view invoices, or update your subscription below.</p>
@@ -243,7 +254,7 @@ export default function DashboardPage() {
                             <div className="sm:border-l border-t sm:border-t-0 border-border/50 p-6 flex flex-col items-center justify-center bg-white/[0.02]">
                                 <Button
                                     variant="outline"
-                                    className="rounded-xl border-[#B8977E]/30 text-[#B8977E] hover:bg-[#B8977E]/10 h-12 px-6 w-full"
+                                    className="rounded-xl border-[#a10c22]/30 text-[#a10c22] hover:bg-[#a10c22]/10 h-12 px-6 w-full"
                                     onClick={async () => {
                                         const patient = patients.find(p => p.id === currentUser.id);
                                         if (!patient?.email) {
@@ -309,15 +320,18 @@ export default function DashboardPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-10 text-center bg-white/[0.02] border border-border/50 rounded-xl">
-                                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                                    <Pill className="w-6 h-6 text-muted-foreground/40" />
+                            <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-gradient-to-b from-[#1A2332]/50 to-transparent border border-[#a10c22]/20 rounded-2xl relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-[#a10c22]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                                <div className="w-16 h-16 rounded-2xl bg-[#a10c22]/10 flex items-center justify-center mb-6 border border-[#a10c22]/20">
+                                    <Sparkles className="w-8 h-8 text-[#a10c22]" />
                                 </div>
-                                <p className="text-sm font-medium text-muted-foreground">No Active Medications</p>
-                                <p className="text-xs text-muted-foreground/60 mt-1 max-w-[200px]">Enroll in a treatment protocol to see your prescribed medications here.</p>
-                                <Link href="/dashboard/treatments">
-                                    <Button variant="outline" size="sm" className="mt-4 h-8 text-xs border-primary/30 text-primary hover:bg-primary/10">
-                                        View Protocols <ArrowRight className="w-3 h-3 ml-1" />
+                                <h4 className="text-xl font-serif text-white mb-2">Optimize Your Biology</h4>
+                                <p className="text-sm text-white/60 mb-8 max-w-sm mx-auto leading-relaxed">
+                                    From medical weight loss to hormone optimization. Enroll in a protocol to track your prescriptions and progress here.
+                                </p>
+                                <Link href="/dashboard/treatments" className="w-full sm:w-auto">
+                                    <Button className="h-12 px-8 rounded-full bg-[#a10c22] hover:bg-[#a10c22]/90 text-black font-medium tracking-wide shadow-[0_0_20px_rgba(184,151,126,0.2)] hover:shadow-[0_0_30px_rgba(184,151,126,0.4)] transition-all duration-300 w-full">
+                                        View Clinical Protocols <ArrowRight className="w-4 h-4 ml-2" />
                                     </Button>
                                 </Link>
                             </div>
@@ -379,7 +393,7 @@ export default function DashboardPage() {
                 <DialogContent className="bg-[#0C1420] border-white/10 text-white sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-                            <MessageSquare className="w-5 h-5 text-[#B8977E]" />
+                            <MessageSquare className="w-5 h-5 text-[#a10c22]" />
                             Secure Concierge
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
@@ -388,13 +402,13 @@ export default function DashboardPage() {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <textarea
-                            className="w-full bg-black/20 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 min-h-[120px] focus:outline-none focus:border-[#B8977E]/50 resize-none transition-colors"
+                            className="w-full bg-black/20 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 min-h-[120px] focus:outline-none focus:border-[#a10c22]/50 resize-none transition-colors"
                             placeholder="Type your message here..."
                             value={messageText}
                             onChange={(e) => setMessageText(e.target.value)}
                         />
                         <Button
-                            className="w-full bg-[#B8977E] text-black hover:bg-[#B8977E]/90 h-12"
+                            className="w-full bg-[#a10c22] text-black hover:bg-[#a10c22]/90 h-12"
                             onClick={() => {
                                 if (!messageText.trim()) return toast.error("Please enter a message");
                                 toast.success("Secure message sent to clinical team.");
@@ -413,7 +427,7 @@ export default function DashboardPage() {
                 <DialogContent className="bg-[#0C1420] border-white/10 text-white sm:max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-                            <ShoppingBag className="w-5 h-5 text-[#B8977E]" />
+                            <ShoppingBag className="w-5 h-5 text-[#a10c22]" />
                             Supplement Shop & Add-ons
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
@@ -426,7 +440,7 @@ export default function DashboardPage() {
                             placeholder="Search supplements..."
                             value={shopSearchQuery}
                             onChange={(e) => setShopSearchQuery(e.target.value)}
-                            className="bg-black/20 border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 focus-visible:ring-[#B8977E]/50"
+                            className="bg-black/20 border-white/10 text-white placeholder:text-white/30 rounded-xl h-11 focus-visible:ring-[#a10c22]/50"
                         />
                     </div>
 
@@ -438,16 +452,16 @@ export default function DashboardPage() {
                             { name: "B12 (Methylcobalamin)", desc: "Essential nerve function and energy. 10ml vial.", price: "$85.00" },
                             { name: "D3/K2 Oral Supplements", desc: "Bone health and immune support. 60 capsules.", price: "$45.00" }
                         ].filter(s => s.name.toLowerCase().includes(shopSearchQuery.toLowerCase()) || s.desc.toLowerCase().includes(shopSearchQuery.toLowerCase())).map((supp, idx) => (
-                            <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:border-[#B8977E]/30 transition-colors gap-4">
+                            <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:border-[#a10c22]/30 transition-colors gap-4">
                                 <div>
                                     <h4 className="font-medium text-white">{supp.name}</h4>
                                     <p className="text-sm text-white/50 mt-1">{supp.desc}</p>
                                 </div>
                                 <div className="flex items-center gap-4 shrink-0 justify-between sm:justify-end">
-                                    <span className="font-serif text-[#B8977E]">{supp.price}</span>
+                                    <span className="font-serif text-[#a10c22]">{supp.price}</span>
                                     <Button
                                         size="sm"
-                                        className="bg-white/10 text-white hover:bg-[#B8977E] hover:text-black border-none transition-colors"
+                                        className="bg-white/10 text-white hover:bg-[#a10c22] hover:text-black border-none transition-colors"
                                         onClick={() => {
                                             addToCart({ name: supp.name, price: supp.price });
                                             toast.success(`${supp.name} added to cart!`);
@@ -479,7 +493,7 @@ export default function DashboardPage() {
                 <DialogContent className="bg-[#0C1420] border-white/10 text-white sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-                            <Clock className="w-5 h-5 text-[#B8977E]" />
+                            <Clock className="w-5 h-5 text-[#a10c22]" />
                             Request Appointment
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
@@ -488,13 +502,13 @@ export default function DashboardPage() {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <textarea
-                            className="w-full bg-black/20 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 min-h-[120px] focus:outline-none focus:border-[#B8977E]/50 resize-none transition-colors"
+                            className="w-full bg-black/20 border border-white/10 rounded-xl p-4 text-white placeholder:text-white/30 min-h-[120px] focus:outline-none focus:border-[#a10c22]/50 resize-none transition-colors"
                             placeholder="E.g., I would like to be seen next Tuesday afternoon, or any morning next week."
                             value={bookingNote}
                             onChange={(e) => setBookingNote(e.target.value)}
                         />
                         <Button
-                            className="w-full bg-[#B8977E] text-black hover:bg-[#B8977E]/90 h-12"
+                            className="w-full bg-[#a10c22] text-black hover:bg-[#a10c22]/90 h-12"
                             onClick={() => {
                                 if (!bookingNote.trim()) return toast.error("Please provide your preferred availability.");
                                 toast.success("Appointment request sent to the clinic.");

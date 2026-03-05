@@ -22,7 +22,7 @@ export default function BlogPostPage() {
                         <span className="font-serif text-xl tracking-wide text-black">MedFit America</span>
                     </Link>
                     <Link href="/consultation">
-                        <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-white font-medium text-sm rounded-full px-6 shadow-sm">
+                        <Button className="bg-[#a10c22] hover:bg-[#a10c22]/90 text-white font-medium text-sm rounded-full px-6 shadow-sm">
                             Request a Consultation
                         </Button>
                     </Link>
@@ -30,15 +30,15 @@ export default function BlogPostPage() {
             </header>
 
             <main className="pt-32 pb-32 container mx-auto px-6 max-w-3xl">
-                <Link href="/academy" className="inline-flex items-center gap-2 text-sm text-[#8FA677] font-medium hover:opacity-80 transition-opacity mb-12">
+                <Link href="/academy" className="inline-flex items-center gap-2 text-sm text-[#a10c22] font-medium hover:opacity-80 transition-opacity mb-12">
                     <ArrowLeft className="w-4 h-4" /> Back to Academy
                 </Link>
 
                 <article className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <header className="mb-14 border-b border-black/10 pb-10">
-                        <div className="flex items-center gap-4 text-xs font-bold tracking-widest text-[#B8977E] uppercase mb-6">
+                        <div className="flex items-center gap-4 text-xs font-bold tracking-widest text-[#a10c22] uppercase mb-6">
                             <span>{post.category}</span>
-                            <span className="w-1 h-1 bg-[#B8977E] rounded-full" />
+                            <span className="w-1 h-1 bg-[#a10c22] rounded-full" />
                             <span>{post.readTime}</span>
                         </div>
                         <h1 className="text-4xl md:text-6xl font-serif text-black leading-[1.1] mb-6">
@@ -49,7 +49,7 @@ export default function BlogPostPage() {
                     <div className="prose prose-lg md:prose-xl prose-stone max-w-none 
                         prose-headings:font-serif prose-headings:text-black prose-headings:font-normal
                         prose-p:font-sans prose-p:text-stone-800 prose-p:leading-relaxed
-                        prose-li:text-stone-800 marker:text-[#8FA677]
+                        prose-li:text-stone-800 marker:text-[#a10c22]
                         prose-strong:text-black prose-strong:font-semibold">
                         {post.content}
                     </div>
@@ -60,7 +60,7 @@ export default function BlogPostPage() {
                             The true elegance begins with inner health. Step forward with clinically-proven strategies under physician guidance.
                         </p>
                         <Link href="/consultation">
-                            <Button className="h-14 px-10 rounded-full bg-[#8FA677] hover:bg-[#7D9365] text-white text-lg font-medium shadow-md hover:shadow-lg transition-all">
+                            <Button className="h-14 px-10 rounded-full bg-[#a10c22] hover:bg-[#7D9365] text-white text-lg font-medium shadow-md hover:shadow-lg transition-all">
                                 Request a Consultation
                             </Button>
                         </Link>

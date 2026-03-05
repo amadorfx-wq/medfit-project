@@ -64,7 +64,7 @@ export default function BillingSubscriptionPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Active Subscription Card */}
                     <Card className="md:col-span-2 border-[#E5E5E5] shadow-sm bg-white overflow-hidden">
-                        <div className="h-2 w-full bg-[#B8977E]" />
+                        <div className="h-2 w-full bg-[#a10c22]" />
                         <CardHeader className="pb-4">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -72,7 +72,7 @@ export default function BillingSubscriptionPage() {
                                         <CardTitle className="text-xl font-serif text-[#1A1A1A]">
                                             {patient.activeTreatment}
                                         </CardTitle>
-                                        <Badge className={`border-none ${subStatus === 'ACTIVE' ? 'bg-[#8FA677] text-white hover:bg-[#A3B88A]' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'} transition-colors`}>
+                                        <Badge className={`border-none ${subStatus === 'ACTIVE' ? 'bg-[#a10c22] text-white hover:bg-[#A3B88A]' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'} transition-colors`}>
                                             {subStatus}
                                         </Badge>
                                     </div>
@@ -86,14 +86,14 @@ export default function BillingSubscriptionPage() {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="flex items-center gap-4 p-4 bg-[#F9F7F2] rounded-lg border border-[#E5E5E5]">
-                                <Calendar className="w-5 h-5 text-[#8FA677]" />
+                                <Calendar className="w-5 h-5 text-[#a10c22]" />
                                 <div className="flex-1">
                                     <p className="text-sm font-medium text-[#1A1A1A]">Next Billing Date</p>
                                     <p className="text-sm text-[#666666]">{nextBillingDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                 </div>
                                 <Button
                                     variant="outline"
-                                    className="border-[#B8977E] text-[#B8977E] hover:bg-[#B8977E] hover:text-white"
+                                    className="border-[#a10c22] text-[#a10c22] hover:bg-[#a10c22] hover:text-white"
                                     onClick={() => {
                                         if (subStatus === "ACTIVE") {
                                             setTriageStep("REASON");
@@ -120,7 +120,7 @@ export default function BillingSubscriptionPage() {
                                             <p className="text-xs text-[#666666]">Expires 12/28</p>
                                         </div>
                                     </div>
-                                    <Button variant="ghost" size="sm" className="text-[#8FA677]">Update</Button>
+                                    <Button variant="ghost" size="sm" className="text-[#a10c22]">Update</Button>
                                 </div>
                             </div>
                         </CardContent>
@@ -131,7 +131,7 @@ export default function BillingSubscriptionPage() {
                         <Card className="border-[#E5E5E5] shadow-sm bg-[#F9F7F2]">
                             <CardHeader>
                                 <CardTitle className="text-sm font-medium flex items-center gap-2 text-[#1A1A1A]">
-                                    <ShieldCheck className="w-4 h-4 text-[#8FA677]" />
+                                    <ShieldCheck className="w-4 h-4 text-[#a10c22]" />
                                     Secure Billing
                                 </CardTitle>
                             </CardHeader>
@@ -148,7 +148,7 @@ export default function BillingSubscriptionPage() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-start gap-3">
-                                    <AlertCircle className="w-4 h-4 text-[#B8977E] shrink-0 mt-0.5" />
+                                    <AlertCircle className="w-4 h-4 text-[#a10c22] shrink-0 mt-0.5" />
                                     <p className="text-xs text-[#666666]">
                                         Modifying your subscription may affect your clinical progress. Please consult your physician before pausing.
                                     </p>
@@ -190,19 +190,19 @@ export default function BillingSubscriptionPage() {
                             <div className="py-6">
                                 <RadioGroup value={selectedReason} onValueChange={setSelectedReason} className="space-y-4">
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("nausea")}>
-                                        <RadioGroupItem value="nausea" id="r1" className="text-[#8FA677] border-gray-300" />
+                                        <RadioGroupItem value="nausea" id="r1" className="text-[#a10c22] border-gray-300" />
                                         <Label htmlFor="r1" className="cursor-pointer font-medium">I&apos;m experiencing side effects (e.g., Nausea)</Label>
                                     </div>
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("price")}>
-                                        <RadioGroupItem value="price" id="r2" className="text-[#8FA677] border-gray-300" />
+                                        <RadioGroupItem value="price" id="r2" className="text-[#a10c22] border-gray-300" />
                                         <Label htmlFor="r2" className="cursor-pointer font-medium">It&apos;s too expensive right now</Label>
                                     </div>
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("results")}>
-                                        <RadioGroupItem value="results" id="r3" className="text-[#8FA677] border-gray-300" />
+                                        <RadioGroupItem value="results" id="r3" className="text-[#a10c22] border-gray-300" />
                                         <Label htmlFor="r3" className="cursor-pointer font-medium">I&apos;m not seeing the desired results</Label>
                                     </div>
                                     <div className="flex items-center space-x-3 border border-[#E5E5E5] p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => setSelectedReason("other")}>
-                                        <RadioGroupItem value="other" id="r4" className="text-[#8FA677] border-gray-300" />
+                                        <RadioGroupItem value="other" id="r4" className="text-[#a10c22] border-gray-300" />
                                         <Label htmlFor="r4" className="cursor-pointer font-medium">Other reason</Label>
                                     </div>
                                 </RadioGroup>
@@ -230,8 +230,8 @@ export default function BillingSubscriptionPage() {
 
                     {triageStep === "OFFER_NAUSEA" && (
                         <div className="py-4 text-center pb-2">
-                            <div className="w-16 h-16 bg-[#8FA677]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <AlertCircle className="w-8 h-8 text-[#8FA677]" />
+                            <div className="w-16 h-16 bg-[#a10c22]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <AlertCircle className="w-8 h-8 text-[#a10c22]" />
                             </div>
                             <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Don&apos;t let side effects stop your progress.</h3>
                             <p className="text-[#666666] mb-8">
@@ -239,7 +239,7 @@ export default function BillingSubscriptionPage() {
                             </p>
                             <div className="flex flex-col gap-3">
                                 <Button
-                                    className="w-full bg-[#8FA677] hover:bg-[#A3B88A] text-white font-medium h-12 text-lg shadow-lg shadow-[#8FA677]/20"
+                                    className="w-full bg-[#a10c22] hover:bg-[#A3B88A] text-white font-medium h-12 text-lg shadow-lg shadow-[#a10c22]/20"
                                     onClick={() => {
                                         toast.success("Care Package Activated", { description: "Zofran Rx requested and billing paused for 14 days." });
                                         setIsCancelModalOpen(false);
@@ -256,12 +256,12 @@ export default function BillingSubscriptionPage() {
 
                     {triageStep === "OFFER_PRICE" && (
                         <div className="py-4 text-center pb-2">
-                            <div className="w-16 h-16 bg-[#B8977E]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <DollarSign className="w-8 h-8 text-[#B8977E]" />
+                            <div className="w-16 h-16 bg-[#a10c22]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <DollarSign className="w-8 h-8 text-[#a10c22]" />
                             </div>
                             <h3 className="text-2xl font-serif text-[#1A1A1A] mb-3">Switch to the Maintenance Protocol.</h3>
                             <p className="text-[#666666] mb-8">
-                                Instead of losing all your momentum, we can step you down to our &apos;Maintenance Protocol&apos;. You retain access to your doctor and receive a perfectly adjusted micro-dose at <strong className="text-[#B8977E]">50% off the standard monthly price</strong>.
+                                Instead of losing all your momentum, we can step you down to our &apos;Maintenance Protocol&apos;. You retain access to your doctor and receive a perfectly adjusted micro-dose at <strong className="text-[#a10c22]">50% off the standard monthly price</strong>.
                             </p>
                             <div className="flex flex-col gap-3">
                                 <Button

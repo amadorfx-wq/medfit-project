@@ -176,7 +176,7 @@ export default function StaffManagementPage() {
                 onChange={handleFormChange}
                 placeholder={placeholder}
                 disabled={!editMode && expedientOpen}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus-visible:ring-[#8FA677]/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus-visible:ring-[#a10c22]/50 disabled:opacity-60 disabled:cursor-not-allowed"
             />
         </div>
     );
@@ -187,12 +187,12 @@ export default function StaffManagementPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                        <Shield className="w-8 h-8 text-[#8FA677]" />
+                        <Shield className="w-8 h-8 text-[#a10c22]" />
                         Staff & Roles
                     </h1>
                     <p className="text-white/50">Manage clinical team access, RBAC permissions, and staff expedients.</p>
                 </div>
-                <Button onClick={() => { setFormData(INITIAL_FORM); setIsAddOpen(true); }} className="bg-[#8FA677] hover:bg-[#A3B88A] text-[#0C1420] font-medium gap-2">
+                <Button onClick={() => { setFormData(INITIAL_FORM); setIsAddOpen(true); }} className="bg-[#a10c22] hover:bg-[#A3B88A] text-[#0C1420] font-medium gap-2">
                     <UserPlus className="w-4 h-4" />
                     Invite Staff Member
                 </Button>
@@ -205,7 +205,7 @@ export default function StaffManagementPage() {
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                         <Input
                             placeholder="Search staff by name, email, or role..."
-                            className="bg-[#0C1420] border-white/10 text-white pl-9 h-10 rounded-lg focus-visible:ring-1 focus-visible:ring-[#8FA677]/50"
+                            className="bg-[#0C1420] border-white/10 text-white pl-9 h-10 rounded-lg focus-visible:ring-1 focus-visible:ring-[#a10c22]/50"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -270,7 +270,7 @@ export default function StaffManagementPage() {
                     <DialogHeader className="pb-4 border-b border-white/10">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 rounded-full bg-[#8FA677]/20 flex items-center justify-center text-xl font-serif text-[#8FA677]">
+                                <div className="w-12 h-12 rounded-full bg-[#a10c22]/20 flex items-center justify-center text-xl font-serif text-[#a10c22]">
                                     {selectedStaff?.name.charAt(0)}
                                 </div>
                                 <div>
@@ -289,7 +289,7 @@ export default function StaffManagementPage() {
                                 ) : (
                                     <div className="flex gap-2">
                                         <Button size="sm" variant="outline" className="border-white/10 text-white h-8" onClick={() => setEditMode(false)}>Cancel</Button>
-                                        <Button size="sm" className="bg-[#8FA677] text-black hover:bg-[#A3B88A] h-8" onClick={handleSaveEdit} disabled={isSubmitting}>
+                                        <Button size="sm" className="bg-[#a10c22] text-black hover:bg-[#A3B88A] h-8" onClick={handleSaveEdit} disabled={isSubmitting}>
                                             {isSubmitting ? "Saving..." : "Save"}
                                         </Button>
                                     </div>
@@ -325,7 +325,7 @@ export default function StaffManagementPage() {
                                     onChange={handleFormChange}
                                     placeholder="123 Medical Center Dr, Atlanta, GA"
                                     disabled={!editMode}
-                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus-visible:ring-[#8FA677]/50 disabled:opacity-60"
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-white/20 focus-visible:ring-[#a10c22]/50 disabled:opacity-60"
                                 />
                             </div>
 
@@ -341,7 +341,7 @@ export default function StaffManagementPage() {
                                         value={String(formData.role ?? "RECEPTION")}
                                         onChange={handleFormChange}
                                         disabled={!editMode}
-                                        className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white px-3 text-sm disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-1 focus:ring-[#8FA677]/50"
+                                        className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white px-3 text-sm disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-1 focus:ring-[#a10c22]/50"
                                     >
                                         <option value="RECEPTION">Reception</option>
                                         <option value="DOCTOR">Doctor / NP</option>
@@ -374,16 +374,16 @@ export default function StaffManagementPage() {
                         <TabsContent value="documents" className="space-y-4 animate-in fade-in duration-300">
                             {/* Upload Area */}
                             <div
-                                className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-[#8FA677]/40 hover:bg-[#8FA677]/5 transition-all cursor-pointer group"
+                                className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:border-[#a10c22]/40 hover:bg-[#a10c22]/5 transition-all cursor-pointer group"
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                <Upload className="w-8 h-8 text-white/30 group-hover:text-[#8FA677] mx-auto mb-3 transition-colors" />
+                                <Upload className="w-8 h-8 text-white/30 group-hover:text-[#a10c22] mx-auto mb-3 transition-colors" />
                                 <p className="text-sm text-white/60 group-hover:text-white/80">Click to upload, or drag & drop</p>
                                 <p className="text-xs text-white/30 mt-1">PDF, JPG, PNG, DOCX — up to 10MB</p>
                                 <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png,.docx" onChange={handleFileUpload} />
                             </div>
                             {isUploading && (
-                                <div className="text-center text-sm text-[#8FA677] animate-pulse">Uploading to Supabase Storage...</div>
+                                <div className="text-center text-sm text-[#a10c22] animate-pulse">Uploading to Supabase Storage...</div>
                             )}
 
                             {/* Documents List */}
@@ -397,8 +397,8 @@ export default function StaffManagementPage() {
                                     {currentDocs.map((doc: StaffDocument, i: number) => (
                                         <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors group/doc">
                                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                <div className="w-8 h-8 rounded-lg bg-[#8FA677]/10 flex items-center justify-center shrink-0">
-                                                    <FileText className="w-4 h-4 text-[#8FA677]" />
+                                                <div className="w-8 h-8 rounded-lg bg-[#a10c22]/10 flex items-center justify-center shrink-0">
+                                                    <FileText className="w-4 h-4 text-[#a10c22]" />
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="text-sm text-white truncate">{doc.name}</p>
@@ -429,7 +429,7 @@ export default function StaffManagementPage() {
                 <DialogContent className="bg-[#0C1420] border-white/10 text-white sm:max-w-xl">
                     <DialogHeader>
                         <DialogTitle className="font-serif text-2xl flex items-center gap-2">
-                            <UserPlus className="w-5 h-5 text-[#8FA677]" />
+                            <UserPlus className="w-5 h-5 text-[#a10c22]" />
                             Invite Staff Member
                         </DialogTitle>
                         <DialogDescription className="text-white/50">
@@ -454,7 +454,7 @@ export default function StaffManagementPage() {
                             </div>
                             <div className="space-y-1.5">
                                 <Label className="text-xs uppercase tracking-wider text-white/50">System Role *</Label>
-                                <select name="role" value={formData.role ?? ""} onChange={handleFormChange} className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8FA677]/50">
+                                <select name="role" value={formData.role ?? ""} onChange={handleFormChange} className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#a10c22]/50">
                                     <option value="RECEPTION">Reception</option>
                                     <option value="DOCTOR">Doctor / NP</option>
                                     <option value="ADMIN">Admin</option>
@@ -481,7 +481,7 @@ export default function StaffManagementPage() {
                         </div>
                         <DialogFooter className="pt-2">
                             <Button type="button" variant="ghost" onClick={() => setIsAddOpen(false)} className="text-white/50">Cancel</Button>
-                            <Button type="submit" disabled={isSubmitting} className="bg-[#8FA677] text-black hover:bg-[#A3B88A]">
+                            <Button type="submit" disabled={isSubmitting} className="bg-[#a10c22] text-black hover:bg-[#A3B88A]">
                                 {isSubmitting ? "Creating..." : "Create Staff Member"}
                             </Button>
                         </DialogFooter>

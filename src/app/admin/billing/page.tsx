@@ -71,7 +71,7 @@ export default function BillingInvoicesPage() {
         <div className="animate-in fade-in duration-500 max-w-6xl mx-auto">
             <div className="mb-8">
                 <h1 className="text-3xl font-serif text-white mb-2 flex items-center gap-3">
-                    <DollarSign className="w-8 h-8 text-[#B8977E]" />
+                    <DollarSign className="w-8 h-8 text-[#a10c22]" />
                     Billing & Invoices
                 </h1>
                 <p className="text-white/50">Manage patient balances, issue new charges, and track revenue.</p>
@@ -82,7 +82,7 @@ export default function BillingInvoicesPage() {
                 <Card className="bg-[#0C1420] border-border/50 col-span-1 shadow-2xl h-fit">
                     <CardHeader className="border-b border-border/50 pb-6">
                         <CardTitle className="text-xl font-serif text-white flex items-center gap-2">
-                            <Receipt className="w-5 h-5 text-[#B8977E]" />
+                            <Receipt className="w-5 h-5 text-[#a10c22]" />
                             Issue New Invoice
                         </CardTitle>
                     </CardHeader>
@@ -116,10 +116,10 @@ export default function BillingInvoicesPage() {
 
                             {/* Nomenclature Preview */}
                             {description.length > 2 && (
-                                <div className="bg-[#8FA677]/10 border border-[#8FA677]/20 rounded-xl p-3 space-y-2 animate-in fade-in duration-300">
+                                <div className="bg-[#a10c22]/10 border border-[#a10c22]/20 rounded-xl p-3 space-y-2 animate-in fade-in duration-300">
                                     <div className="flex items-center gap-2">
-                                        <ShieldCheck className="w-3.5 h-3.5 text-[#8FA677]" />
-                                        <span className="text-[10px] font-semibold text-[#8FA677] uppercase tracking-wider">Payment Processor Shield</span>
+                                        <ShieldCheck className="w-3.5 h-3.5 text-[#a10c22]" />
+                                        <span className="text-[10px] font-semibold text-[#a10c22] uppercase tracking-wider">Payment Processor Shield</span>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3 text-xs">
                                         <div>
@@ -128,7 +128,7 @@ export default function BillingInvoicesPage() {
                                         </div>
                                         <div>
                                             <p className="text-white/40 text-[10px] mb-0.5 flex items-center gap-1"><EyeOff className="w-2.5 h-2.5" /> Stripe sees</p>
-                                            <p className="text-[#8FA677] font-medium font-mono text-[11px]">{getPaymentPreview(description).stripeLabel}</p>
+                                            <p className="text-[#a10c22] font-medium font-mono text-[11px]">{getPaymentPreview(description).stripeLabel}</p>
                                         </div>
                                     </div>
                                     <p className="text-white/20 text-[9px]">Bank statement: MEDFIT WELLNESS</p>
@@ -159,10 +159,10 @@ export default function BillingInvoicesPage() {
                                     <Label className="text-sm font-medium text-white">Send Payment Link</Label>
                                     <p className="text-xs text-white/50">Alerts patient via email & SMS</p>
                                 </div>
-                                <Switch defaultChecked className="data-[state=checked]:bg-[#B8977E]" />
+                                <Switch defaultChecked className="data-[state=checked]:bg-[#a10c22]" />
                             </div>
 
-                            <Button type="submit" className="w-full h-12 bg-[#B8977E] hover:bg-[#B8977E]/90 text-black font-semibold mt-4">
+                            <Button type="submit" className="w-full h-12 bg-[#a10c22] hover:bg-[#a10c22]/90 text-black font-semibold mt-4">
                                 <CreditCard className="w-4 h-4 mr-2" />
                                 Process Invoice to Account
                             </Button>
@@ -212,7 +212,7 @@ export default function BillingInvoicesPage() {
                                                     <TableCell className="text-white/70 text-sm py-4">{charge.description}</TableCell>
                                                     <TableCell className="text-white/50 text-xs py-4">{charge.date}</TableCell>
                                                     <TableCell className="text-right pr-6 py-4">
-                                                        <span className="text-[#E8A838] font-serif font-medium">${charge.amount.toFixed(2)}</span>
+                                                        <span className="text-[#a10c22] font-serif font-medium">${charge.amount.toFixed(2)}</span>
                                                     </TableCell>
                                                 </TableRow>
                                             )
@@ -241,7 +241,7 @@ export default function BillingInvoicesPage() {
                                             return (
                                                 <TableRow key={charge.id} className="border-border/50 hover:bg-white/5">
                                                     <TableCell className="pl-6 py-3 w-10">
-                                                        <CheckCircle2 className="w-4 h-4 text-[#8FA677]" />
+                                                        <CheckCircle2 className="w-4 h-4 text-[#a10c22]" />
                                                     </TableCell>
                                                     <TableCell className="py-3">
                                                         <div className="font-medium text-white text-sm">{p?.name || 'Unknown'}</div>
@@ -249,7 +249,7 @@ export default function BillingInvoicesPage() {
                                                     </TableCell>
                                                     <TableCell className="text-white/50 text-xs py-3">{charge.date}</TableCell>
                                                     <TableCell className="text-right pr-6 py-3">
-                                                        <span className="text-[#8FA677] font-serif font-medium">+${charge.amount.toFixed(2)}</span>
+                                                        <span className="text-[#a10c22] font-serif font-medium">+${charge.amount.toFixed(2)}</span>
                                                     </TableCell>
                                                 </TableRow>
                                             )

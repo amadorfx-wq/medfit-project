@@ -13,7 +13,7 @@ export default function AboutPage() {
                         <span className="font-serif text-xl tracking-wide">{tenant.name}</span>
                     </Link>
                     <Link href="/consultation">
-                        <Button className="bg-[#8FA677] hover:bg-[#8FA677]/90 text-black font-medium text-sm rounded-full px-6">
+                        <Button className="bg-[#a10c22] hover:bg-[#a10c22]/90 text-black font-medium text-sm rounded-full px-6">
                             Start Clinical Intake
                         </Button>
                     </Link>

@@ -10,6 +10,7 @@ import { StaffProvider } from "@/hooks/useStaff";
 import { CartProvider } from "@/hooks/useCart";
 import { Toaster } from "@/components/ui/sonner";
 import { GlobalCart } from "@/components/GlobalCart";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -92,7 +93,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -107,22 +108,29 @@ export default async function RootLayout({
           <Script
             id="google-maps"
             src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-            strategy="beforeInteractive"
+            strategy="lazyOnload"
           />
         )}
-        <AuthProvider>
-          <PatientsProvider>
-            <StaffProvider>
-              <CartProvider>
-                <BillingProvider>
-                  {children}
-                  <GlobalCart />
-                  <Toaster position="top-center" />
-                </BillingProvider>
-              </CartProvider>
-            </StaffProvider>
-          </PatientsProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={true}
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <PatientsProvider>
+              <StaffProvider>
+                <CartProvider>
+                  <BillingProvider>
+                    {children}
+                    <GlobalCart />
+                    <Toaster position="top-center" />
+                  </BillingProvider>
+                </CartProvider>
+              </StaffProvider>
+            </PatientsProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

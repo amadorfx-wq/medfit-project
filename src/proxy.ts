@@ -15,7 +15,7 @@ const ROUTE_PERMISSIONS: { path: string; allowedRoles: string[] }[] = [
     { path: '/dashboard', allowedRoles: ['PATIENT'] },
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     let response = NextResponse.next({
         request: { headers: request.headers },
     });
