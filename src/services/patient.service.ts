@@ -58,6 +58,11 @@ export class PatientService {
             }));
 
         } catch (err: any) {
+            if (err?.message?.includes('AbortError') || err?.name === 'AbortError') {
+                console.warn('[PatientService] Caught Supabase AbortError (Lock contention), retrying...');
+                await new Promise(r => setTimeout(r, 600)); // Delay to let the lock free
+                return PatientService.getPatients(); // Retry
+            }
             console.error('[PatientService] Fatal error in getPatients:', err);
             throw err; // Burbujear error hacia el puente del Estado React.
         }

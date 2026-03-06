@@ -59,12 +59,12 @@ export default function AdminLayout({
     // Show loading state while confirming authentication
     if (isAuthLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0C1C30]">
+            <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="animate-pulse flex flex-col items-center">
                     <div className="w-16 h-16 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-3xl mx-auto mb-6">
                         {tenant.logoInitial}
                     </div>
-                    <div className="text-white/60">Verifying secure session...</div>
+                    <div className="text-muted-foreground">Verifying secure session...</div>
                 </div>
             </div>
         );
@@ -74,13 +74,13 @@ export default function AdminLayout({
     const STAFF_ROLES = ["ADMIN", "SUPERADMIN", "DOCTOR", "RECEPTION"];
     if (!currentUser || !STAFF_ROLES.includes(currentUser.role ?? "")) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0C1C30]">
-                <div className="text-center space-y-4 max-w-sm">
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-primaryenter space-y-4 max-w-sm">
                     <div className="w-16 h-16 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-3xl mx-auto mb-6">
                         {tenant.logoInitial}
                     </div>
-                    <h1 className="text-2xl font-serif text-white">Access Denied</h1>
-                    <p className="text-white/60">This area is restricted to {tenant.name} Clinical Staff only.</p>
+                    <h1 className="text-primaryxl font-serif text-foreground">Access Denied</h1>
+                    <p className="text-muted-foreground">This area is restricted to {tenant.name} Clinical Staff only.</p>
                     <Link href="/login" className="text-[#a10c22] hover:underline block mt-4">Return to Login</Link>
                 </div>
             </div>
@@ -115,11 +115,11 @@ export default function AdminLayout({
     const navItems = allNavItems.filter(item => item.roles.includes(currentUser.role ?? ""));
 
     return (
-        <div className="min-h-screen flex bg-[#0A0F17] text-white">
+        <div className="min-h-screen flex bg-background text-foreground">
 
             {/* Sidebar */}
-            <aside className="w-64 border-r border-border/50 bg-[#0C1420] flex flex-col hidden lg:flex">
-                <div className="h-20 flex items-center px-6 border-b border-border/50">
+            <aside className="w-64 border-r border-border bg-card text-primaryard-foreground flex flex-col hidden lg:flex">
+                <div className="h-20 flex items-center px-6 border-b border-border">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
                             {tenant.logoInitial}
@@ -138,12 +138,12 @@ export default function AdminLayout({
                             <Link key={item.name} href={item.href} className="block">
                                 <Button
                                     variant="ghost"
-                                    className={`w-full justify-start gap-3 h-11 px-3 ${isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
+                                    className={`w-full justify-start gap-3 h-11 px-3 ${isActive ? 'bg-accent text-accent-foreground text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50 text-accent-foreground'}`}
                                 >
                                     <item.icon className="w-4 h-4" />
                                     <span className="font-serif text-sm px-1">{item.name}</span>
                                     {item.badge && (typeof item.badge === "number" ? item.badge > 0 : true) ? (
-                                        <Badge className="ml-auto bg-[#a10c22] hover:bg-[#a10c22] text-black text-xs px-1.5 min-w-[20px] justify-center">
+                                        <Badge className="ml-auto bg-[#a10c22] hover:bg-[#a10c22] text-primary-foreground text-xs px-1.5 min-w-[20px] justify-center">
                                             {item.badge}
                                         </Badge>
                                     ) : null}
@@ -153,18 +153,18 @@ export default function AdminLayout({
                     })}
                 </div>
 
-                <div className="p-4 border-t border-border/50">
+                <div className="p-4 border-t border-border">
                     <div className="flex items-center gap-3 mb-4 px-2">
-                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif">
+                        <div className="w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-xs font-serif">
                             {currentUser.name.charAt(0)}
                         </div>
                         <div>
                             <p className="text-sm font-serif">{currentUser.name}</p>
-                            <p className="text-[10px] text-white/50 capitalize tracking-wider font-semibold">{currentUser.role?.toLowerCase().replace('_', ' ')}</p>
+                            <p className="text-[10px] text-muted-foreground capitalize tracking-wider font-semibold">{currentUser.role?.toLowerCase().replace('_', ' ')}</p>
                         </div>
                     </div>
                     <div className="flex items-center justify-between px-2 mb-4">
-                        <span className="text-[10px] text-white/50 uppercase tracking-widest font-serif">Theme</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-serif">Theme</span>
                         <ThemeToggle />
                     </div>
                     <Button
@@ -174,7 +174,7 @@ export default function AdminLayout({
                             try { await supabaseSignOut(); } catch (_) { }
                             window.location.href = '/login';
                         }}
-                        className="w-full justify-start gap-3 text-white/50 hover:text-white hover:bg-white/5 font-serif"
+                        className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground hover:bg-accent/50 text-accent-foreground font-serif"
                     >
                         <LogOut className="w-4 h-4" />
                         Log Out
@@ -186,17 +186,17 @@ export default function AdminLayout({
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
 
                 {/* Topbar (Mobile menu toggle & Search) */}
-                <header className="h-20 border-b border-border/50 bg-[#0C1420] flex items-center justify-between px-6 lg:px-10 shrink-0 relative z-[100]">
+                <header className="h-20 border-b border-border bg-card text-primaryard-foreground flex items-center justify-between px-6 lg:px-10 shrink-0 relative z-[100]">
                     <div className="flex items-center gap-4 lg:hidden">
                         {/* Mobile Logo placeholder */}
                         <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">M</div>
                     </div>
 
                     <div className="flex-1 max-w-xl relative">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70" />
                         <Input
                             placeholder="Global Search: Patient Name, Email, or Phone..."
-                            className="w-full bg-[#111A27] border-white/10 text-white pl-10 h-10 rounded-full focus-visible:ring-1 focus-visible:ring-[#a10c22]/50 focus-visible:bg-[#0C1420] transition-colors"
+                            className="w-full bg-muted text-muted-foreground border-border text-foreground pl-10 h-10 rounded-full focus-visible:ring-1 focus-visible:ring-[#a10c22]/50 focus-visible:bg-card text-primaryard-foreground transition-colors"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => setIsSearchFocused(true)}
@@ -205,13 +205,13 @@ export default function AdminLayout({
 
                         {/* Dropdown de Resultados */}
                         {isSearchFocused && searchQuery.length > 1 && (
-                            <div className="absolute top-12 left-0 w-full bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-[100]">
+                            <div className="absolute top-12 left-0 w-full bg-card text-primaryard-foreground border border-border shadow-2xl rounded-2xl overflow-hidden z-[100]">
                                 {searchResults.length > 0 ? (
                                     <ul className="py-2">
                                         {searchResults.map(patient => (
                                             <li
                                                 key={patient.id}
-                                                className="px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center justify-between group transition-colors"
+                                                className="px-4 py-3 hover:bg-accent/50 text-accent-foreground cursor-pointer flex items-center justify-between group transition-colors"
                                                 onMouseDown={(e) => {
                                                     // use onMouseDown instead of onClick to fire before the input's onBlur hides the dropdown
                                                     e.preventDefault();
@@ -224,20 +224,20 @@ export default function AdminLayout({
                                                 }}
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-serif text-white group-hover:bg-[#a10c22]/20 group-hover:text-[#a10c22] transition-colors">
+                                                    <div className="w-8 h-8 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-xs font-serif text-foreground group-hover:bg-[#a10c22]/20 group-hover:text-[#a10c22] transition-colors">
                                                         {patient.name.charAt(0)}
                                                     </div>
                                                     <div>
-                                                        <div className="text-sm font-medium text-white group-hover:text-[#a10c22] transition-colors">{patient.name}</div>
-                                                        <div className="text-[10px] text-white/50">{patient.email} {patient.phone ? `• ${patient.phone}` : ''}</div>
+                                                        <div className="text-sm font-medium text-foreground group-hover:text-[#a10c22] transition-colors">{patient.name}</div>
+                                                        <div className="text-[10px] text-muted-foreground">{patient.email} {patient.phone ? `• ${patient.phone}` : ''}</div>
                                                     </div>
                                                 </div>
-                                                <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/60 transition-colors" />
+                                                <ChevronRight className="w-4 h-4 text-foreground/20 group-hover:text-muted-foreground transition-colors" />
                                             </li>
                                         ))}
                                     </ul>
                                 ) : (
-                                    <div className="p-4 text-center text-sm text-white/50 bg-[#0C1420]">
+                                    <div className="p-4 text-primaryenter text-sm text-muted-foreground bg-card text-primaryard-foreground">
                                         No matching patients found for &quot;{searchQuery}&quot;
                                     </div>
                                 )}
@@ -248,9 +248,9 @@ export default function AdminLayout({
                     <div className="flex items-center gap-4 ml-6 relative">
                         <button
                             onClick={() => setIsNotifOpen(!isNotifOpen)}
-                            className="relative w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                            className="relative w-10 h-10 rounded-full bg-accent/50 text-accent-foreground hover:bg-accent text-accent-foreground flex items-center justify-center transition-colors"
                         >
-                            <Bell className="w-5 h-5 text-white/70" />
+                            <Bell className="w-5 h-5 text-muted-foreground" />
                             {unreadCount > 0 && (
                                 <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#0C1420]" />
                             )}
@@ -258,21 +258,21 @@ export default function AdminLayout({
 
                         {/* Notification Dropdown */}
                         {isNotifOpen && (
-                            <div className="absolute top-12 right-0 w-80 sm:w-96 bg-[#0C1420] border border-border/50 shadow-2xl rounded-2xl overflow-hidden z-50">
-                                <div className="p-4 border-b border-white/5 flex items-center justify-between">
-                                    <h3 className="font-serif text-white flex items-center gap-2">
+                            <div className="absolute top-12 right-0 w-80 sm:w-96 bg-card text-primaryard-foreground border border-border shadow-2xl rounded-2xl overflow-hidden z-50">
+                                <div className="p-4 border-b border-border flex items-center justify-between">
+                                    <h3 className="font-serif text-foreground flex items-center gap-2">
                                         <Bell className="w-4 h-4 text-[#a10c22]" />
                                         Notifications
                                     </h3>
                                     {unreadCount > 0 && (
-                                        <Badge className="bg-[#a10c22] text-black hover:bg-[#a10c22] px-2">
+                                        <Badge className="bg-[#a10c22] text-primary-foreground hover:bg-[#a10c22] px-2">
                                             {unreadCount} New
                                         </Badge>
                                     )}
                                 </div>
                                 <div className="max-h-[300px] overflow-y-auto">
                                     {!adminNotifications || adminNotifications.length === 0 ? (
-                                        <div className="p-8 text-center text-white/40">
+                                        <div className="p-8 text-primaryenter text-muted-foreground/70">
                                             <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                             <p className="text-sm">No new notifications</p>
                                         </div>
@@ -281,7 +281,7 @@ export default function AdminLayout({
                                             {adminNotifications.map((notif) => (
                                                 <li
                                                     key={notif.id}
-                                                    className={`p-4 transition-colors hover:bg-white/5 cursor-pointer ${notif.read ? 'opacity-60' : 'bg-white/5'}`}
+                                                    className={`p-4 transition-colors hover:bg-accent/50 text-accent-foreground cursor-pointer ${notif.read ? 'opacity-60' : 'bg-accent/50 text-accent-foreground'}`}
                                                     onClick={() => {
                                                         markNotificationRead(notif.id);
                                                         setIsNotifOpen(false);
@@ -309,12 +309,12 @@ export default function AdminLayout({
                                                         </div>
                                                         <div className="flex-1">
                                                             <div className="flex items-center justify-between mb-1">
-                                                                <p className="text-sm font-medium text-white">{notif.patientName}</p>
-                                                                <span className="text-[10px] text-white/40">
+                                                                <p className="text-sm font-medium text-foreground">{notif.patientName}</p>
+                                                                <span className="text-[10px] text-muted-foreground/70">
                                                                     {new Date(notif.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                                 </span>
                                                             </div>
-                                                            <p className="text-xs text-white/60 line-clamp-2">{notif.content}</p>
+                                                            <p className="text-xs text-muted-foreground line-clamp-2">{notif.content}</p>
                                                         </div>
                                                     </div>
                                                 </li>
