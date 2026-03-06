@@ -4,7 +4,7 @@
  * Passwords are NEVER stored in plaintext — Supabase uses bcrypt internally.
  */
 import { supabase } from "@/lib/supabase";
-import type { Role } from "@/lib/store";
+import type { Role } from "@/types/staff";
 
 // ─── Dev Credentials (for bootstrapping / never expose in production) ──────────
 export const DEV_CREDENTIALS = [

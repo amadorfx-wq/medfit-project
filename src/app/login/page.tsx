@@ -61,27 +61,28 @@ export default function LoginPage() {
         e.preventDefault();
         setStaffError("");
         setIsStaffLoading(true);
+
+        // Safety timeout: if auth hangs for 15s, reset the button and show an error.
+        const safetyTimeout = setTimeout(() => {
+            setIsStaffLoading(false);
+            setStaffError("Connection timed out. Please check your internet connection and try again.");
+        }, 15000);
+
         try {
+            // loginWithCredentials now handles navigation internally via window.location.href
             await loginWithCredentials(staffEmail, staffPassword);
-            router.push("/admin");
+            // If we reach here, the page is about to do a full navigation.
+            // Keep the loading state active — the page will reload.
+            clearTimeout(safetyTimeout);
         } catch (err: any) {
-            // Graceful fallback: if Supabase Auth is not configured, use demo mode
+            clearTimeout(safetyTimeout);
             if (err.message?.includes("Invalid login") || err.message?.includes("invalid_credentials")) {
                 setStaffError("Invalid email or password. Check your credentials and try again.");
             } else if (err.message?.includes("Email not confirmed") || err.message?.includes("not confirmed")) {
                 setStaffError("Email not confirmed. Please contact your administrator.");
             } else {
-                // Fallback to demo mode if Supabase Auth is not set up
-                const devCred = DEV_CREDENTIALS.find(c => c.email === staffEmail);
-                if (devCred && staffPassword === devCred.password) {
-                    // Moveremos este bypass demo si es extrictamente necesario.
-                    // En el entorno enterprise, los Admins inician por DB puro.
-                    setStaffError("Database auth required for Admin. Demo mode deprecated.");
-                } else {
-                    setStaffError(err.message || "Authentication failed. Please try again.");
-                }
+                setStaffError(err.message || "Authentication failed. Please try again.");
             }
-        } finally {
             setIsStaffLoading(false);
         }
     };
