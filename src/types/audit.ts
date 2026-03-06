@@ -1,5 +1,5 @@
 // src/types/audit.ts
-import { Role } from "@/lib/store";
+import { Role } from "@/types/staff";
 
 export type AuditCategory = "AUTH" | "PHI_ACCESS" | "CLINICAL" | "BILLING" | "ADMIN" | "SYSTEM" | "GENERAL" | "COMPLIANCE";
 
