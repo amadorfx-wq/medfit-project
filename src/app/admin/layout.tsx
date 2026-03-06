@@ -11,6 +11,7 @@ import { signOut as supabaseSignOut } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import StaffOnboardingPage from "./onboarding/page";
 import {
     LayoutDashboard,
     Users,
@@ -92,9 +93,8 @@ export default function AdminLayout({
     const needsNDA = STAFF_ROLES_REQUIRING_NDA.includes(currentUser.role ?? "") && !currentUser.ndaSignedAt && !isOnboardingPage;
 
     if (needsNDA) {
-        // Instead of redirecting (which would cause layout issues), render inline
-        const OnboardingPage = require("./onboarding/page").default;
-        return <OnboardingPage />;
+        // Instead of redirecting, render the onboarding page inline
+        return <StaffOnboardingPage />;
     }
 
     const pendingAuthorizations = patients.filter(p => p.approvalStatus === "PENDING_APPROVAL" || p.approvalStatus === "PENDING_SHIPMENT").length;
