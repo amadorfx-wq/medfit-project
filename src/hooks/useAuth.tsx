@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
-import { supabase, assertSupabaseConfigured } from "@/lib/supabase";
-import { signInWithCredentials, getRoleFromUserMetadata } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
+import { getRoleFromUserMetadata } from "@/lib/auth";
 import { Role } from "@/types/staff";
 import { AuditService } from "@/services/audit.service";
 import { toast } from "sonner";
@@ -122,35 +122,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const loginWithCredentials = async (email: string, password: string) => {
-        // PRE-FLIGHT: Fail immediately if Supabase env vars are missing
-        assertSupabaseConfigured();
-
         // Set guard to prevent onAuthStateChange from racing
         isManualLoginInProgress.current = true;
         setIsAuthLoading(true);
 
         try {
-            const data = await signInWithCredentials(email, password);
-            if (!data.user) throw new Error("Authentication failed — no user returned.");
+            // ─── SERVER-SIDE AUTH: bypass client-side Supabase entirely ───────
+            // This sends credentials to our own API route, which authenticates
+            // with Supabase server-to-server (100% reliable, no browser quirks).
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
 
-            const role = getRoleFromUserMetadata(data.user) as Role || "ADMIN";
-            const name = data.user.user_metadata?.name || data.user.email || "Staff";
-            const tenantId = data.user.user_metadata?.tenant_id;
-            const ndaSignedAt = role !== "PATIENT" ? await fetchStaffNDA(data.user.id) : null;
+            const result = await res.json();
 
-            setCurrentUser({ id: data.user.id, role, name, tenantId, ndaSignedAt });
-            toast.success(`Welcome back, ${name}`);
+            if (!res.ok) {
+                throw new Error(result.error || 'Authentication failed.');
+            }
 
-            // CRITICAL: Use window.location.href instead of router.push.
-            // This forces a full page navigation, which ensures:
-            // 1. The Supabase auth cookie is fully written before the proxy reads it
-            // 2. The proxy middleware can correctly validate the session
-            // 3. No stale React state from the login page interferes
+            // The API route already set the auth cookies in the response.
+            // Now update React state with the user data returned by the server.
+            const user = result.user;
+            setCurrentUser({
+                id: user.id,
+                role: user.role as Role,
+                name: user.name,
+                tenantId: user.tenantId,
+                ndaSignedAt: user.ndaSignedAt,
+            });
+            toast.success(`Welcome back, ${user.name}`);
+
+            // Also set the session in the client-side Supabase instance
+            // so that subsequent client-side queries work (e.g., in admin pages).
+            if (result.session) {
+                await supabase.auth.setSession({
+                    access_token: result.session.access_token,
+                    refresh_token: result.session.refresh_token,
+                });
+            }
+
+            // Full page navigation ensures the middleware reads the fresh cookies
             window.location.href = '/admin';
         } finally {
             setIsAuthLoading(false);
-            // Release the guard after a short delay to let any pending
-            // onAuthStateChange events pass without causing duplicate work
             setTimeout(() => {
                 isManualLoginInProgress.current = false;
             }, 2000);
