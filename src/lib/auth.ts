@@ -3,7 +3,7 @@
  * Wraps Supabase Auth for use across the application.
  * Passwords are NEVER stored in plaintext — Supabase uses bcrypt internally.
  */
-import { supabase } from "@/lib/supabase";
+import { supabase, assertSupabaseConfigured } from "@/lib/supabase";
 import type { Role } from "@/types/staff";
 
 // ─── Dev Credentials (for bootstrapping / never expose in production) ──────────
@@ -13,9 +13,31 @@ export const DEV_CREDENTIALS = [
     { email: "reception@medfit.com", password: "Staff2026!", role: "RECEPTION" as Role, name: "Emily Watson" },
 ];
 
+// ─── Timeout utility ─────────────────────────────────────────────────────────
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+    return Promise.race([
+        promise,
+        new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(
+                `${label} timed out after ${ms / 1000}s. ` +
+                'This usually means Supabase environment variables are not configured in Vercel. ' +
+                'Go to Vercel → Settings → Environment Variables and add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.'
+            )), ms)
+        ),
+    ]);
+}
+
 // ─── Sign In ──────────────────────────────────────────────────────────────────
 export async function signInWithCredentials(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    // ENTERPRISE GUARD: Fail fast if Supabase is not configured
+    assertSupabaseConfigured();
+
+    const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password }),
+        10000, // 10 second timeout
+        'signInWithPassword'
+    );
+
     if (error) throw new Error(error.message);
     return data;
 }

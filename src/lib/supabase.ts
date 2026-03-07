@@ -1,15 +1,42 @@
 import { createBrowserClient } from '@supabase/ssr';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// ─── ENTERPRISE GUARD: Fail fast if env vars are missing ────────────────────
+// This prevents the app from silently hanging when Supabase config is absent.
 if (!supabaseUrl || !supabaseKey) {
-    console.warn("Supabase credentials are missing. Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your .env.local file.");
+    const msg = [
+        '[MedFit CRITICAL] Supabase environment variables are MISSING.',
+        `  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? 'SET' : '❌ NOT SET'}`,
+        `  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${supabaseKey ? 'SET' : '❌ NOT SET'}`,
+        '',
+        '  If running locally: create a .env.local file with these values.',
+        '  If on Vercel: add them in Settings → Environment Variables → Redeploy.',
+    ].join('\n');
+    console.error(msg);
 }
 
-// Default Supabase browser client (automatically handles cookies for Next.js SSR)
-export const supabase = createBrowserClient(supabaseUrl, supabaseKey);
+// Create the client even with empty strings to avoid import-time crashes,
+// but all operations will fail fast with clear error messages.
+export const supabase: SupabaseClient = createBrowserClient(
+    supabaseUrl || '',
+    supabaseKey || ''
+);
+
+/**
+ * Runtime check: throws immediately if Supabase is not configured.
+ * Call this before any critical auth operation.
+ */
+export function assertSupabaseConfigured(): void {
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error(
+            'Supabase is not configured. Environment variables NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required. ' +
+            'If on Vercel, add them in Settings → Environment Variables and Redeploy.'
+        );
+    }
+}
 
 /**
  * Set the current tenant context on a Supabase client.

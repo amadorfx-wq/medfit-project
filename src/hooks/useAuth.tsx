@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, assertSupabaseConfigured } from "@/lib/supabase";
 import { signInWithCredentials, getRoleFromUserMetadata } from "@/lib/auth";
 import { Role } from "@/types/staff";
 import { AuditService } from "@/services/audit.service";
@@ -122,6 +122,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const loginWithCredentials = async (email: string, password: string) => {
+        // PRE-FLIGHT: Fail immediately if Supabase env vars are missing
+        assertSupabaseConfigured();
+
         // Set guard to prevent onAuthStateChange from racing
         isManualLoginInProgress.current = true;
         setIsAuthLoading(true);
