@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
         // Set Supabase auth cookies so the middleware can read the session
         // These cookie names match what @supabase/ssr expects
-        // CRITICAL: httpOnly must be FALSE so createBrowserClient can read cookies
+        // httpOnly=false so the Supabase client can read cookies for data queries
         const cookieOptions = {
             path: '/',
             httpOnly: false,
