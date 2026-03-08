@@ -52,3 +52,24 @@ export function setSupabaseToken(accessToken: string) {
 export function clearSupabaseToken() {
     (supabase as any).rest.headers['Authorization'] = `Bearer ${supabaseKey}`;
 }
+
+/**
+ * Read the tenant_id from the browser cookie (set by the proxy middleware).
+ */
+export function getTenantIdFromBrowser(): string | null {
+    if (typeof document === 'undefined') return null;
+    const match = document.cookie.match(/(?:^|; )tenant_id=([^;]*)/);
+    return match ? match[1] : null;
+}
+
+/**
+ * Pre-flight check: throws immediately if Supabase env vars are missing.
+ * Used by auth.ts as a guard before attempting server auth.
+ */
+export function assertSupabaseConfigured(): void {
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error(
+            'Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel.'
+        );
+    }
+}
