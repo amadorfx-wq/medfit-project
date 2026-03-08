@@ -154,16 +154,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
             toast.success(`Welcome back, ${user.name}`);
 
-            // Also set the session in the client-side Supabase instance
-            // so that subsequent client-side queries work (e.g., in admin pages).
-            if (result.session) {
-                await supabase.auth.setSession({
-                    access_token: result.session.access_token,
-                    refresh_token: result.session.refresh_token,
-                });
-            }
-
-            // Full page navigation ensures the middleware reads the fresh cookies
+            // The API route set the auth cookies in the response.
+            // A full page navigation ensures:
+            // 1. Browser stores the cookies
+            // 2. initializeAuth() on /admin reads them via getSession()
+            // 3. Middleware reads them via createServerClient
+            // NO supabase.auth.setSession() needed — it causes Lock conflicts.
             window.location.href = '/admin';
         } finally {
             setIsAuthLoading(false);
