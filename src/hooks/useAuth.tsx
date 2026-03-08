@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { setSupabaseToken, clearSupabaseToken } from "@/lib/supabase";
+import { supabase, setSupabaseToken, clearSupabaseToken } from "@/lib/supabase";
 import { Role } from "@/types/staff";
 import { AuditService } from "@/services/audit.service";
 import { toast } from "sonner";
@@ -26,14 +26,58 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ─── TIMEOUT UTILITY ────────────────────────────────────────────────────────
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-    return Promise.race([
-        promise,
-        new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error(`Request timed out after ${ms / 1000}s`)), ms)
-        ),
-    ]);
+// ─── HELPER: Decode JWT payload without any library ─────────────────────────
+function decodeJwtPayload(token: string): Record<string, any> | null {
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) return null;
+        const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(payload));
+    } catch {
+        return null;
+    }
+}
+
+// ─── HELPER: Read auth cookie from browser ──────────────────────────────────
+function readAuthCookie(): { access_token: string; refresh_token: string; user: any } | null {
+    if (typeof document === 'undefined') return null;
+
+    try {
+        // The cookie name follows Supabase convention: sb-{project-ref}-auth-token
+        const cookies = document.cookie.split(';').map(c => c.trim());
+
+        // Try single cookie first
+        for (const c of cookies) {
+            if (c.startsWith('sb-') && c.includes('-auth-token=')) {
+                const value = decodeURIComponent(c.split('=').slice(1).join('='));
+                return JSON.parse(value);
+            }
+        }
+
+        // Try chunked cookies (sb-xxx-auth-token.0, sb-xxx-auth-token.1, ...)
+        const chunkPrefix = cookies
+            .map(c => c.split('=')[0])
+            .find(name => name.match(/^sb-.*-auth-token\.0$/));
+
+        if (chunkPrefix) {
+            const baseName = chunkPrefix.replace('.0', '');
+            const chunks: string[] = [];
+            let i = 0;
+            while (true) {
+                const chunk = cookies.find(c => c.startsWith(`${baseName}.${i}=`));
+                if (!chunk) break;
+                chunks.push(decodeURIComponent(chunk.split('=').slice(1).join('=')));
+                i++;
+            }
+            if (chunks.length > 0) {
+                return JSON.parse(chunks.join(''));
+            }
+        }
+    } catch (err) {
+        console.error('[Auth] Failed to read auth cookie:', err);
+    }
+
+    return null;
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -45,42 +89,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const initializeAuth = async () => {
             try {
-                // ─── ALL AUTH THROUGH SERVER-SIDE API ─────────────────────
-                // NO client-side Supabase auth calls. Zero Web Locks. Zero hangs.
-                const res = await withTimeout(
-                    fetch('/api/auth/session'),
-                    8000 // 8 second timeout — if server doesn't respond, fail fast
-                );
+                // ─── READ AUTH FROM COOKIE DIRECTLY ──────────────────────
+                // NO Supabase SDK auth calls. NO fetch to /api/auth/session.
+                // Just read the httpOnly:false cookie that /api/auth/login set.
+                const session = readAuthCookie();
 
-                if (!res.ok) throw new Error('Session check failed');
+                if (session?.access_token && mounted) {
+                    // Decode the JWT to get user metadata
+                    const payload = decodeJwtPayload(session.access_token);
 
-                const data = await res.json();
+                    if (payload) {
+                        const userMeta = payload.user_metadata || {};
+                        const role = userMeta.role || 'ADMIN';
+                        const name = userMeta.name || payload.email || 'Staff';
+                        const tenantId = userMeta.tenant_id;
 
-                if (data.user && mounted) {
-                    setCurrentUser({
-                        id: data.user.id,
-                        role: data.user.role as Role,
-                        name: data.user.name,
-                        tenantId: data.user.tenantId,
-                        ndaSignedAt: data.user.ndaSignedAt,
-                    });
+                        // Get NDA status from staff table (this is a DATA query, not AUTH)
+                        let ndaSignedAt: string | null = null;
+                        if (role !== 'PATIENT') {
+                            // Inject the token first so the query passes RLS
+                            setSupabaseToken(session.access_token);
 
-                    // Inject token into Supabase client for data queries (patients, etc)
-                    if (data.session?.access_token) {
-                        setSupabaseToken(data.session.access_token);
+                            try {
+                                const { data: staffData } = await supabase
+                                    .from('staff')
+                                    .select('nda_signed_at')
+                                    .eq('supabase_user_id', payload.sub)
+                                    .maybeSingle();
+                                ndaSignedAt = staffData?.nda_signed_at ?? null;
+                            } catch (err) {
+                                console.warn('[Auth] NDA check failed:', err);
+                            }
+                        }
+
+                        setCurrentUser({
+                            id: payload.sub,
+                            role: role as Role,
+                            name,
+                            tenantId,
+                            ndaSignedAt,
+                        });
                     }
                 } else {
-                    // Check for Demo Patient Cookie (Legacy MVP fallback)
+                    // Check Demo Patient Cookie (Legacy MVP fallback)
                     if (typeof document !== 'undefined') {
                         const cookieMatch = document.cookie.match(/(?:^|; )demo_patient_session=([^;]*)/);
-                        if (cookieMatch && cookieMatch[1] && mounted) {
+                        if (cookieMatch?.[1] && mounted) {
                             setCurrentUser({ id: cookieMatch[1], role: "PATIENT", name: "Patient (Demo Session)" });
                         }
                     }
                 }
             } catch (err) {
                 console.error("[Auth] Session init error:", err);
-                // On timeout or error, just show the page without auth (will show Access Denied or Login)
             } finally {
                 if (mounted) setIsAuthLoading(false);
             }
@@ -88,9 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         initializeAuth();
 
-        // NO onAuthStateChange listener — it uses Web Locks and hangs.
-        // Auth state is managed entirely through our API routes.
-
+        // NO onAuthStateChange. NO Web Locks. Auth state from cookies only.
         return () => { mounted = false; };
     }, []);
 
@@ -98,15 +156,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAuthLoading(true);
 
         try {
-            // Server-side authentication — no client-side Supabase
-            const res = await withTimeout(
-                fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password }),
-                }),
-                10000 // 10 second timeout
-            );
+            // Server-side authentication via our API route
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000);
+
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+                signal: controller.signal,
+            });
+            clearTimeout(timeout);
 
             const result = await res.json();
 
@@ -114,27 +174,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 throw new Error(result.error || 'Authentication failed.');
             }
 
-            // Update React state
-            const user = result.user;
-            setCurrentUser({
-                id: user.id,
-                role: user.role as Role,
-                name: user.name,
-                tenantId: user.tenantId,
-                ndaSignedAt: user.ndaSignedAt,
-            });
-            toast.success(`Welcome back, ${user.name}`);
+            toast.success(`Welcome back, ${result.user.name}`);
 
-            // Full page navigation — middleware reads cookies, page reloads cleanly
+            // Full page navigation — on reload, initializeAuth reads the new cookie
             window.location.href = '/admin';
+        } catch (err: any) {
+            if (err.name === 'AbortError') {
+                throw new Error('Connection timed out. Please check your internet connection and try again.');
+            }
+            throw err;
         } finally {
             setIsAuthLoading(false);
         }
     };
 
     const loginAsDemoPatient = (patientId: string, name: string) => {
-        const userObj = { id: patientId, role: "PATIENT" as Role, name };
-        setCurrentUser(userObj);
+        setCurrentUser({ id: patientId, role: "PATIENT" as Role, name });
         document.cookie = `demo_patient_session=${patientId}; path=/; max-age=86400; SameSite=Lax`;
     };
 
@@ -145,8 +200,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setCurrentUser(null);
                 document.cookie = 'demo_patient_session=; path=/; max-age=0; SameSite=Lax';
             } else {
-                // Server-side logout — clears cookies
-                await fetch('/api/auth/logout', { method: 'POST' });
+                // Clear auth cookie directly from browser
+                const cookies = document.cookie.split(';').map(c => c.trim());
+                for (const c of cookies) {
+                    const name = c.split('=')[0];
+                    if (name.startsWith('sb-') && name.includes('auth-token')) {
+                        document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
+                    }
+                }
                 clearSupabaseToken();
                 setCurrentUser(null);
             }
@@ -168,14 +229,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const timestamp = new Date().toISOString();
 
-            // NDA update through a direct API call to our own backend
-            // The Supabase data operations still work (they don't use Web Locks)
-            const { supabase } = await import("@/lib/supabase");
-            if (currentUser.role !== "PATIENT") {
-                await supabase.from('staff').update({
-                    nda_signed_at: timestamp
-                }).eq('supabase_user_id', currentUser.id);
-            }
+            await supabase.from('staff').update({
+                nda_signed_at: timestamp
+            }).eq('supabase_user_id', currentUser.id);
 
             updateUser({ ndaSignedAt: timestamp });
 
