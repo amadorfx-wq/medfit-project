@@ -2,15 +2,17 @@
 
 import { useCallback } from "react";
 import { usePatients } from "@/hooks/usePatients";
+import { useBilling } from "@/hooks/useBilling";
 import { ClinicalService } from "@/services/clinical.service";
+import { NotificationService } from "@/services/notification.service";
 import { ConsentSignature } from "@/types/clinical";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
-
 import { useAudit } from "@/hooks/useAudit";
+import { getTenantIdFromBrowser } from "@/lib/supabase";
 
 export const useClinical = () => {
     const { patients, updatePatient } = usePatients();
+    const { addCharge } = useBilling();
     const { logEvent } = useAudit();
 
     /**
@@ -65,20 +67,52 @@ export const useClinical = () => {
     }, []);
 
     /**
-     * Medical Director overriding authority to approve a file for payment.
+     * Medical Director authorizes treatment → creates charge + notifies patient.
+     * This is the CRITICAL wiring point between admin approval and patient billing.
      */
     const authorizeTreatment = useCallback(async (patientId: string, amount: number, description: string) => {
+        const patient = patients.find(p => p.id === patientId);
+        if (!patient) return;
+
+        // 1. Update patient approval status
         await updatePatient(patientId, { approvalStatus: "PENDING_PAYMENT" });
-    }, [updatePatient]);
+
+        // 2. CREATE the charge in the billing system (THE MISSING LINK)
+        await addCharge({
+            patientId,
+            amount,
+            description,
+        });
+
+        // 3. Notify the patient in real-time
+        await NotificationService.notifyPatient({
+            patient_id: patientId,
+            type: "PAYMENT_REQUIRED",
+            title: "Payment Required",
+            message: `Your ${description} treatment has been approved! A payment of $${amount.toFixed(2)} is required to proceed.`,
+            data: { amount, description },
+        });
+
+        logEvent("TREATMENT_AUTHORIZED", `Treatment authorized for ${patient.name}: $${amount} — ${description}`);
+    }, [patients, updatePatient, addCharge, logEvent]);
 
     /**
-     * Fulfillment logic to dispatch prescription to patient.
+     * Fulfillment: dispatch prescription to patient.
      */
     const markAsShipped = useCallback(async (patientId: string) => {
         const patient = patients.find(p => p.id === patientId);
         if (!patient) return;
 
         await updatePatient(patientId, { approvalStatus: "APPROVED" });
+
+        // Notify patient that their medication has shipped
+        await NotificationService.notifyPatient({
+            patient_id: patientId,
+            type: "SHIPMENT_DISPATCHED",
+            title: "Your Medication Has Shipped! 🚚",
+            message: `Your ${patient.activeTreatment} protocol medications are on their way. You will receive tracking information shortly.`,
+            data: { treatment: patient.activeTreatment },
+        });
 
         logEvent("MEDICATION_SHIPPED", `Medications shipped for ${patient.name}`);
         toast.success("Case Closed & Shipped", {

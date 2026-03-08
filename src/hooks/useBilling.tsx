@@ -3,8 +3,10 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { Charge, ChargeStatus } from "@/types/billing";
 import { BillingService } from "@/services/billing.service";
+import { NotificationService } from "@/services/notification.service";
 import { useAuth } from "./useAuth";
 import { getTenantIdFromBrowser } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
 interface BillingContextType {
@@ -35,14 +37,30 @@ export function BillingProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
-        // Fetch initially, and refetch if user changes context
         refreshCharges();
     }, [refreshCharges, currentUser?.id]);
+
+    // ── Supabase Realtime: auto-refresh charges when any INSERT/UPDATE happens ──
+    useEffect(() => {
+        const channel = supabase.channel("charges_realtime")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "charges" },
+                () => {
+                    // A charge was inserted or updated — refetch all charges
+                    refreshCharges();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [refreshCharges]);
 
     const addCharge = async (chargeData: Omit<Charge, "id" | "date" | "status">) => {
         const tenantId = getTenantIdFromBrowser();
         try {
-            // Optimistic approach
             const tempId = `temp_${Date.now()}`;
             const optimisticCharge: Charge = {
                 ...chargeData,
@@ -53,15 +71,10 @@ export function BillingProvider({ children }: { children: ReactNode }) {
             };
 
             setCharges(prev => [optimisticCharge, ...prev]);
-
-            // Database mutation
             const newCharge = await BillingService.createCharge(chargeData, tenantId);
-
-            // Swap temp with real
             setCharges(prev => prev.map(c => c.id === tempId ? newCharge : c));
 
         } catch (error: any) {
-            // Revert on failure (simplified for MVP)
             refreshCharges();
             toast.error("Failed to create charge.");
         }
@@ -69,12 +82,46 @@ export function BillingProvider({ children }: { children: ReactNode }) {
 
     const payCharge = async (chargeId: string) => {
         try {
+            // Find the charge being paid (before optimistic update)
+            const chargeToPay = charges.find(c => c.id === chargeId);
+
             // Optimistic update
             setCharges(prev => prev.map(c =>
                 c.id === chargeId ? { ...c, status: "PAID" as ChargeStatus } : c
             ));
 
             await BillingService.markChargePAID(chargeId);
+
+            // ── EVENT-DRIVEN: After payment, check if ALL patient charges are now PAID ──
+            if (chargeToPay) {
+                const patientId = chargeToPay.patientId;
+                const patientCharges = charges.filter(c => c.patientId === patientId);
+                const allPaid = patientCharges.every(c =>
+                    c.id === chargeId ? true : c.status === "PAID"
+                );
+
+                if (allPaid) {
+                    // Update patient status to PENDING_SHIPMENT
+                    const { error } = await supabase.from("patients").update({
+                        approval_status: "PENDING_SHIPMENT"
+                    }).eq("id", patientId);
+
+                    if (error) {
+                        console.error("[useBilling] Failed to update approvalStatus:", error.message);
+                    }
+
+                    // Notify admin that payment was received
+                    const patientName = chargeToPay.description || "Patient";
+                    await NotificationService.notifyAdmin({
+                        patient_id: patientId,
+                        patient_name: patientName,
+                        type: "PAYMENT_RECEIVED",
+                        content: `Payment of $${chargeToPay.amount.toFixed(2)} received. Patient is ready for shipment.`,
+                        data: { chargeId, amount: chargeToPay.amount },
+                    });
+                }
+            }
+
             toast.success("Payment Received.");
 
         } catch (error: any) {
