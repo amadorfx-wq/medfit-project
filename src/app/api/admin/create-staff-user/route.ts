@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "@/lib/api-auth";
 
 // ⚠️ This runs SERVER-SIDE only. The service_role key is never exposed to the browser.
 const supabaseAdmin = createClient(
@@ -9,6 +10,9 @@ const supabaseAdmin = createClient(
 );
 
 export async function POST(req: NextRequest) {
+    const { error: authError } = await requireAuth(req, ['SUPERADMIN']);
+    if (authError) return authError;
+
     try {
         const body = await req.json();
         const { email, password, metadata } = body;

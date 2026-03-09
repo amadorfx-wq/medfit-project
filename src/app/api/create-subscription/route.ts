@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getStripe } from '@/lib/stripe';
+import { requireAuth, STAFF_ROLES } from '@/lib/api-auth';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    const { error: authError } = await requireAuth(req, [...STAFF_ROLES]);
+    if (authError) return authError;
+
     try {
         const { patientEmail, patientName, priceAmount, planName, patientId } = await req.json();
 

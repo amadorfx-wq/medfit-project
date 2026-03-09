@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase, setSupabaseToken, clearSupabaseToken } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Role } from "@/types/staff";
 import { AuditService } from "@/services/audit.service";
 import { toast } from "sonner";
@@ -18,7 +18,7 @@ interface AuthContextType {
     currentUser: AuthUser | null;
     isAuthLoading: boolean;
     loginWithCredentials: (email: string, password: string) => Promise<void>;
-    loginAsDemoPatient: (patientId: string, name: string) => void;
+    loginAsPatient: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     updateUser: (updates: Partial<AuthUser>) => void;
     signNDA: () => Promise<void>;
@@ -107,8 +107,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         // Get NDA status from staff table (this is a DATA query, not AUTH)
                         let ndaSignedAt: string | null = null;
                         if (role !== 'PATIENT') {
-                            // Inject the token first so the query passes RLS
-                            setSupabaseToken(session.access_token);
+                            // Inject the session so the query passes RLS
+                            await supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token || '' });
 
                             try {
                                 const { data: staffData } = await supabase
@@ -130,14 +130,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             ndaSignedAt,
                         });
                     }
-                } else {
-                    // Check Demo Patient Cookie (Legacy MVP fallback)
-                    if (typeof document !== 'undefined') {
-                        const cookieMatch = document.cookie.match(/(?:^|; )demo_patient_session=([^;]*)/);
-                        if (cookieMatch?.[1] && mounted) {
-                            setCurrentUser({ id: cookieMatch[1], role: "PATIENT", name: "Patient (Demo Session)" });
-                        }
-                    }
                 }
             } catch (err) {
                 console.error("[Auth] Session init error:", err);
@@ -148,8 +140,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         initializeAuth();
 
+        // Proactive token refresh every 45 minutes (Supabase tokens expire at 60m).
+        // Fires silently — the user never sees a loading state.
+        const REFRESH_MS = 45 * 60 * 1000;
+        const refreshInterval = setInterval(() => {
+            fetch('/api/auth/refresh', { method: 'POST' }).catch(() => {
+                // Refresh failure is non-fatal; user will be logged out on next hard nav.
+            });
+        }, REFRESH_MS);
+
         // NO onAuthStateChange. NO Web Locks. Auth state from cookies only.
-        return () => { mounted = false; };
+        return () => {
+            mounted = false;
+            clearInterval(refreshInterval);
+        };
     }, []);
 
     const loginWithCredentials = async (email: string, password: string) => {
@@ -188,29 +192,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const loginAsDemoPatient = (patientId: string, name: string) => {
-        setCurrentUser({ id: patientId, role: "PATIENT" as Role, name });
-        document.cookie = `demo_patient_session=${patientId}; path=/; max-age=86400; SameSite=Lax`;
+    const loginAsPatient = async (email: string, password: string) => {
+        setIsAuthLoading(true);
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000);
+
+            const res = await fetch('/api/auth/patient-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+                signal: controller.signal,
+            });
+            clearTimeout(timeout);
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.error || 'Authentication failed.');
+            }
+
+            toast.success(`Welcome back, ${result.user.name}`);
+            window.location.href = '/dashboard';
+        } catch (err: any) {
+            if (err.name === 'AbortError') {
+                throw new Error('Connection timed out. Please check your internet connection and try again.');
+            }
+            throw err;
+        } finally {
+            setIsAuthLoading(false);
+        }
     };
 
     const logout = async () => {
         setIsAuthLoading(true);
         try {
-            if (currentUser?.role === "PATIENT") {
-                setCurrentUser(null);
-                document.cookie = 'demo_patient_session=; path=/; max-age=0; SameSite=Lax';
-            } else {
-                // Clear auth cookie directly from browser
-                const cookies = document.cookie.split(';').map(c => c.trim());
-                for (const c of cookies) {
-                    const name = c.split('=')[0];
-                    if (name.startsWith('sb-') && name.includes('auth-token')) {
-                        document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
-                    }
+            // Clear all Supabase auth cookies (works for both staff and patients)
+            const cookies = document.cookie.split(';').map(c => c.trim());
+            for (const c of cookies) {
+                const name = c.split('=')[0];
+                if (name.startsWith('sb-') && name.includes('auth-token')) {
+                    document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
                 }
-                clearSupabaseToken();
-                setCurrentUser(null);
             }
+            await supabase.auth.signOut({ scope: 'local' });
+            setCurrentUser(null);
             window.location.href = '/login';
         } finally {
             setIsAuthLoading(false);
@@ -252,7 +278,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ currentUser, isAuthLoading, loginWithCredentials, loginAsDemoPatient, logout, updateUser, signNDA }}>
+        <AuthContext.Provider value={{ currentUser, isAuthLoading, loginWithCredentials, loginAsPatient, logout, updateUser, signNDA }}>
             {children}
         </AuthContext.Provider>
     );

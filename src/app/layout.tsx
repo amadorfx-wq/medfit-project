@@ -5,7 +5,6 @@ import "./globals.css";
 // store.tsx ha sido erradicado
 import { AuthProvider } from "@/hooks/useAuth";
 import { BillingProvider } from "@/hooks/useBilling";
-import { PatientsProvider } from "@/hooks/usePatients";
 import { StaffProvider } from "@/hooks/useStaff";
 import { CartProvider } from "@/hooks/useCart";
 import { Toaster } from "@/components/ui/sonner";
@@ -42,10 +41,10 @@ const localBusinessSchema = {
   "image": "https://medfitamerica.com/logo.png",
   "@id": "https://medfitamerica.com",
   "url": "https://medfitamerica.com",
-  "telephone": "+1-404-555-0100",
+  "telephone": process.env.NEXT_PUBLIC_CLINIC_PHONE || "+1-404-555-0100",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "123 Peachtree St NE",
+    "streetAddress": process.env.NEXT_PUBLIC_CLINIC_ADDRESS || "123 Peachtree St NE",
     "addressLocality": "Atlanta",
     "addressRegion": "GA",
     "postalCode": "30303",
@@ -81,15 +80,9 @@ export default async function RootLayout({
 
   // [SSR OPTIMIZATION] Predict user state to prevent hydration blinks on guarded layouts
   let initialUser = null;
-  const demoCookie = cookieStore.get('demo_patient_session')?.value;
-
-  if (demoCookie) {
-    initialUser = { id: demoCookie, role: "PATIENT", name: "Loading..." };
-  } else {
-    const hasSupabaseCookie = cookieStore.getAll().some((c: any) => c.name.includes('-auth-token'));
-    if (hasSupabaseCookie) {
-      initialUser = { id: "ssr-shell", role: "ADMIN", name: "Loading..." };
-    }
+  const hasSupabaseCookie = cookieStore.getAll().some((c: any) => c.name.includes('-auth-token'));
+  if (hasSupabaseCookie) {
+    initialUser = { id: "ssr-shell", role: "ADMIN", name: "Loading..." };
   }
 
   return (
@@ -118,7 +111,6 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <PatientsProvider>
               <StaffProvider>
                 <CartProvider>
                   <BillingProvider>
@@ -128,7 +120,6 @@ export default async function RootLayout({
                   </BillingProvider>
                 </CartProvider>
               </StaffProvider>
-            </PatientsProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CheckCircle2, FileText, ChevronRight, Activity, ShieldCheck, HeartPulse, Stethoscope, Download, Copy, Loader2, FileCheck2, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,16 +38,6 @@ export default function TreatmentsAndFormsPage() {
         }).length;
     };
 
-    // Global click and hydration tracer
-    useEffect(() => {
-        console.log("TreatmentsAndFormsPage Rendered, selectedTreatment:", selectedTreatment);
-        const logClick = (e: MouseEvent) => {
-            console.log("GLOBAL CLICK INTERCEPTED AT:", e.target);
-            // alert(`Click target: ${ (e.target as HTMLElement).tagName } \nClasses: ${ (e.target as HTMLElement).className } `);
-        };
-        document.addEventListener('click', logClick, true); // true = capture phase
-        return () => document.removeEventListener('click', logClick, true);
-    }, [selectedTreatment]);
 
     const [treatmentsState, setTreatmentsState] = useState<TreatmentCategory[]>([
         {
@@ -99,9 +89,7 @@ export default function TreatmentsAndFormsPage() {
 
     const activeDetails = treatmentsState.find(t => t.name === selectedTreatment);
 
-    const handleCopy = (e: React.MouseEvent, form: FormTemp) => {
-        console.log("Copy clicked for:", form.title);
-
+    const handleCopy = (_e: React.MouseEvent, form: FormTemp) => {
         try {
             setTreatmentsState((prev: TreatmentCategory[]) => prev.map((t: TreatmentCategory) => {
                 if (t.name === selectedTreatment) {
@@ -117,55 +105,42 @@ export default function TreatmentsAndFormsPage() {
         }
     };
 
-    const handleDownload = (e: React.MouseEvent, title: string) => {
-        console.log("Download clicked for:", title);
-
-        const promise = new Promise((resolve) => {
-            setTimeout(() => {
-                const blob = new Blob([`Mock PDF content for Blank Template: ${title} `], { type: 'application/pdf' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Template_${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-                resolve(true);
-            }, 1000);
+    const handleDownload = (_e: React.MouseEvent, title: string) => {
+        const promise = fetch('/api/forms/pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ formTitle: title }),
+        }).then(async res => {
+            if (!res.ok) throw new Error('PDF generation failed');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MedFit_${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 100);
         });
 
         toast.promise(promise, {
-            loading: `Packaging master PDF for ${title}...`,
-            success: 'Reference Blank PDF downloaded successfully.',
-            error: 'Failed to access filesystem.',
+            loading: `Generating PDF for ${title}...`,
+            success: 'PDF downloaded successfully.',
+            error: 'Failed to generate PDF.',
         });
     };
 
-    const handleOpenPreview = (e: React.MouseEvent, title: string) => {
-        console.log("Open Preview clicked for:", title);
+    const handleOpenPreview = (_e: React.MouseEvent, title: string) => {
         setPreviewDoc(title);
     };
 
-    const handleGoToBuilder = (e: React.MouseEvent, title: string) => {
-        console.log("Go To Builder clicked for:", title);
+    const handleGoToBuilder = (_e: React.MouseEvent, title: string) => {
         setIsNavigating(title);
         toast.info(`Routing to Builder Editor for ${title}...`);
-
-        try {
-            router.push(`/ admin / forms / builder ? form = ${encodeURIComponent(title)} `);
-        } catch (err) {
-            console.error("Router error:", err);
-            window.location.href = `/ admin / forms / builder ? form = ${encodeURIComponent(title)} `;
-        }
+        router.push(`/admin/forms/builder?form=${encodeURIComponent(title)}`);
     };
 
-    const handleMapNewForm = (e: React.MouseEvent) => {
+    const handleMapNewForm = (_e: React.MouseEvent) => {
         if (!selectedFormToMap) return;
-
-        console.log("Map form clicked for:", selectedFormToMap);
 
         try {
             setTreatmentsState((prev: TreatmentCategory[]) => prev.map((t: TreatmentCategory) => {
@@ -240,7 +215,7 @@ export default function TreatmentsAndFormsPage() {
                 {/* Selected Treatment Details & Forms */}
                 <div className="flex-1">
                     {activeDetails && (
-                        <div className="animate-in slide-in-from-right-4 duration-300 relative z-10" onClick={() => console.log("Card wrapper clicked")}>
+                        <div className="animate-in slide-in-from-right-4 duration-300 relative z-10">
                             <Card className="bg-[#0C1420] border-border/50 shadow-2xl relative z-20 pointer-events-auto overflow-visible">
                                 <CardContent className="p-8">
                                     <div className="flex items-center justify-between mb-8 pb-8 border-b border-border/50">

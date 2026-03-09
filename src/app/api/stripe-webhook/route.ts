@@ -2,6 +2,21 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { getStripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
+import { z } from 'zod';
+
+const InvoiceSchema = z.object({
+    customer: z.string().nullable().optional(),
+    subscription: z.string().nullable().optional(),
+    amount_paid: z.number().optional().default(0),
+    amount_due: z.number().optional().default(0),
+    customer_email: z.string().nullable().optional(),
+    metadata: z.record(z.string(), z.string()).nullable().optional(),
+});
+
+const SubscriptionSchema = z.object({
+    id: z.string(),
+    customer: z.string().nullable().optional(),
+});
 
 // Service-role client for webhook (bypasses RLS)
 const supabaseAdmin = createClient(
@@ -38,7 +53,12 @@ export async function POST(req: Request) {
     try {
         switch (event.type) {
             case 'invoice.paid': {
-                const invoice = event.data.object as any;
+                const parsed = InvoiceSchema.safeParse(event.data.object);
+                if (!parsed.success) {
+                    console.error('[MedFit] invoice.paid payload invalid:', parsed.error.flatten());
+                    return NextResponse.json({ received: true });
+                }
+                const invoice = parsed.data;
                 const customerId = invoice.customer;
                 const subscriptionId = invoice.subscription;
                 const amountPaid = invoice.amount_paid / 100;
@@ -67,12 +87,16 @@ export async function POST(req: Request) {
                     date: new Date().toISOString().split('T')[0],
                 });
 
-                console.log(`[MedFit] ✅ Invoice paid: $${amountPaid} for ${invoice.customer_email}`);
                 break;
             }
 
             case 'invoice.payment_failed': {
-                const invoice = event.data.object as any;
+                const parsed = InvoiceSchema.safeParse(event.data.object);
+                if (!parsed.success) {
+                    console.error('[MedFit] invoice.payment_failed payload invalid:', parsed.error.issues);
+                    return NextResponse.json({ received: true });
+                }
+                const invoice = parsed.data;
                 const customerId = invoice.customer;
 
                 await supabaseAdmin.from('audit_logs').insert({
@@ -98,12 +122,16 @@ export async function POST(req: Request) {
                     read: false,
                 });
 
-                console.log(`[MedFit] ❌ Invoice payment failed for ${invoice.customer_email}`);
                 break;
             }
 
             case 'customer.subscription.deleted': {
-                const subscription = event.data.object as any;
+                const parsed = SubscriptionSchema.safeParse(event.data.object);
+                if (!parsed.success) {
+                    console.error('[MedFit] customer.subscription.deleted payload invalid:', parsed.error.issues);
+                    return NextResponse.json({ received: true });
+                }
+                const subscription = parsed.data;
 
                 await supabaseAdmin.from('audit_logs').insert({
                     id: `stripe_${event.id}`,
@@ -118,12 +146,11 @@ export async function POST(req: Request) {
                     timestamp: new Date().toISOString(),
                 });
 
-                console.log(`[MedFit] 🔴 Subscription cancelled: ${subscription.id}`);
                 break;
             }
 
             default:
-                console.log(`[MedFit] Unhandled webhook event: ${event.type}`);
+                break;
         }
 
         return NextResponse.json({ received: true });

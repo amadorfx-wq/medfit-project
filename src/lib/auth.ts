@@ -6,13 +6,6 @@
 import { supabase, assertSupabaseConfigured } from "@/lib/supabase";
 import type { Role } from "@/types/staff";
 
-// ─── Dev Credentials (for bootstrapping / never expose in production) ──────────
-export const DEV_CREDENTIALS = [
-    { email: "admin@medfit.com", password: "MedFit2026!", role: "SUPERADMIN" as Role, name: "Dr. James Kitchens" },
-    { email: "doctor@medfit.com", password: "Doctor2026!", role: "DOCTOR" as Role, name: "Sarah Connor, NP" },
-    { email: "reception@medfit.com", password: "Staff2026!", role: "RECEPTION" as Role, name: "Emily Watson" },
-];
-
 // ─── Timeout utility ─────────────────────────────────────────────────────────
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
     return Promise.race([

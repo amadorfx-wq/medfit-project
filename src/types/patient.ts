@@ -41,4 +41,5 @@ export interface PatientInsertDTO {
     required_forms: string[];
     completed_forms: string[];
     tenant_id?: string;
+    created_at?: string;
 }

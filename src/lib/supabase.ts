@@ -9,7 +9,7 @@
 //   POST /api/auth/logout   → sign out
 //
 // This client is used ONLY for data queries (patients, staff, etc).
-// The access_token is injected at runtime via setSupabaseToken().
+// Auth token is injected via supabase.auth.setSession() after login.
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -32,26 +32,6 @@ export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey, {
         detectSessionInUrl: false,
     },
 });
-
-/**
- * Inject an access token into the Supabase client for authenticated data queries.
- * Called after fetching the session from /api/auth/session.
- * This sets the Authorization header so RLS policies work correctly.
- */
-export function setSupabaseToken(accessToken: string) {
-    // The Supabase JS client stores global headers internally
-    // We access the REST client's headers to inject our token
-    (supabase as any).rest.headers['Authorization'] = `Bearer ${accessToken}`;
-    // Also set on realtime if needed
-    (supabase as any).realtime?.setAuth(accessToken);
-}
-
-/**
- * Clear the auth token from the Supabase client.
- */
-export function clearSupabaseToken() {
-    (supabase as any).rest.headers['Authorization'] = `Bearer ${supabaseKey}`;
-}
 
 /**
  * Read the tenant_id from the browser cookie (set by the proxy middleware).

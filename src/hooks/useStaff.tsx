@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from "react";
-import { Staff, StaffDocument } from "@/types/staff";
+import { Staff, StaffDocument, Role } from "@/types/staff";
 import { StaffService } from "@/services/staff.service";
 import { AuditService } from "@/services/audit.service";
 import { useAuth } from "@/hooks/useAuth";
@@ -93,7 +93,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                 details: `Invited new staff member: ${newStaff.name} (${newStaff.role})`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
 
         } catch (error: any) {
@@ -113,7 +113,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                 details: `Updated staff profile for ID: ${id}`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
         } catch (error: any) {
             toast.error(`Failed to update staff: ${error.message}`);
@@ -130,7 +130,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                 details: `Removed staff member access for ID: ${id}`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
         } catch (error: any) {
             toast.error(`Failed to delete staff: ${error.message}`);
@@ -151,7 +151,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
             const staffMember = staff.find(s => s.id === staffId);
             if (staffMember) {
                 const updatedDocs = [...(staffMember.documents || []), newDoc];
-                await StaffService.updateStaff(staffId, { documents: updatedDocs as any });
+                await StaffService.updateStaff(staffId, { documents: updatedDocs });
                 setStaff(prev => prev.map(s => s.id === staffId ? { ...s, documents: updatedDocs } : s));
 
                 AuditService.logEvent({
@@ -160,7 +160,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                     details: `Document compliance uploaded for staff ID: ${staffId}`,
                     userId: currentUser?.id || "system",
                     userName: currentUser?.name || "System",
-                    userRole: currentUser?.role || ("SUPERADMIN" as any)
+                    userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
                 }, getTenantIdFromBrowser() || undefined);
             }
         } catch (error: any) {
@@ -175,7 +175,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
             setStaff(prev => prev.map(s => {
                 if (s.id === staffId && s.documents) {
                     const newDocs = s.documents.filter(d => d.name !== docName);
-                    StaffService.updateStaff(staffId, { documents: newDocs as any }).catch(console.error);
+                    StaffService.updateStaff(staffId, { documents: newDocs }).catch(console.error);
                     return { ...s, documents: newDocs };
                 }
                 return s;
@@ -187,7 +187,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                 details: `Document deleted for staff ID: ${staffId}`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
         } catch (error: any) {
             toast.error(`Failed to delete document: ${error.message}`);

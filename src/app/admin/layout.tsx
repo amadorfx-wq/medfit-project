@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { usePatients } from "@/hooks/usePatients";
+import { usePatients, PatientsProvider } from "@/hooks/usePatients";
 import { useNotifications } from "@/hooks/useNotifications";
 import { tenant } from "@/lib/theme.config";
 import { signOut as supabaseSignOut } from "@/lib/auth";
@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export default function AdminLayout({
+function AdminLayoutInner({
     children,
 }: {
     children: React.ReactNode;
@@ -333,5 +333,17 @@ export default function AdminLayout({
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <PatientsProvider>
+            <AdminLayoutInner>{children}</AdminLayoutInner>
+        </PatientsProvider>
     );
 }

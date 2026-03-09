@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { usePatients } from "@/hooks/usePatients";
@@ -11,47 +10,55 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShieldCheck, HeartPulse, UserCircle2, AlertCircle } from "lucide-react";
-import { DEV_CREDENTIALS } from "@/lib/auth";
-
 export default function LoginPage() {
-    const router = useRouter();
-    const { loginWithCredentials, loginAsDemoPatient } = useAuth();
-    const { registerAndLogin, patients } = usePatients();
+    const { loginWithCredentials, loginAsPatient } = useAuth();
+    const { registerAndLogin } = usePatients();
     const [email, setEmail] = useState("");
+    const [patientPassword, setPatientPassword] = useState("");
     const [name, setName] = useState("");
     const [isAdminLogin, setIsAdminLogin] = useState(false);
     const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
+    // Patient login/register error state
+    const [patientError, setPatientError] = useState("");
+    const [isPatientLoading, setIsPatientLoading] = useState(false);
+
     // Staff login states
-    const [staffEmail, setStaffEmail] = useState(DEV_CREDENTIALS[0].email);
+    const [staffEmail, setStaffEmail] = useState("");
     const [staffPassword, setStaffPassword] = useState("");
     const [staffError, setStaffError] = useState("");
     const [isStaffLoading, setIsStaffLoading] = useState(false);
 
     const [isRegistering, setIsRegistering] = useState(false);
 
-    const handlePatientLogin = (e: React.FormEvent) => {
+    const handlePatientLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        const targetEmail = email || "sarah@example.com";
-        const existingPatient = patients.find(p => p.email.toLowerCase() === targetEmail.toLowerCase());
-
-        if (existingPatient) {
-            loginAsDemoPatient(existingPatient.id, existingPatient.name);
-        } else {
-            loginAsDemoPatient("demo_patient_fallback", targetEmail);
+        setPatientError("");
+        setIsPatientLoading(true);
+        try {
+            await loginAsPatient(email, patientPassword);
+            // loginAsPatient handles navigation internally
+        } catch (err: any) {
+            setPatientError(err.message || "Invalid email or password.");
+        } finally {
+            setIsPatientLoading(false);
         }
-        router.push("/dashboard");
     };
 
     const handlePatientRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        setPatientError("");
         setIsRegistering(true);
         try {
-            const res = await registerAndLogin(name || "New Patient", email || "new@example.com");
+            const res = await registerAndLogin(name, email, patientPassword);
             if (res?.success) {
-                // Hard reload to bypass aggressive Next.js App Router cache on first login
                 window.location.href = "/dashboard/intake";
+            } else if (res?.error === 'email_exists') {
+                setPatientError("An account with this email already exists. Please log in instead.");
+                setIsCreatingAccount(false);
             }
+        } catch {
+            setPatientError("Error creating account. Please try again.");
         } finally {
             setIsRegistering(false);
         }
@@ -186,10 +193,20 @@ export default function LoginPage() {
                                             id="reg-password"
                                             type="password"
                                             placeholder="••••••••"
+                                            value={patientPassword}
+                                            onChange={(e) => setPatientPassword(e.target.value)}
                                             className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary text-lg h-12"
+                                            minLength={8}
                                             required
                                         />
                                     </div>
+
+                                    {patientError && (
+                                        <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                            <AlertCircle className="w-4 h-4 shrink-0" />
+                                            <span>{patientError}</span>
+                                        </div>
+                                    )}
 
                                     <div className="flex items-start gap-3 mt-4">
                                         <input
@@ -245,7 +262,8 @@ export default function LoginPage() {
                                             id="password"
                                             type="password"
                                             placeholder="••••••••"
-                                            defaultValue="password123"
+                                            value={patientPassword}
+                                            onChange={(e) => setPatientPassword(e.target.value)}
                                             className="border-0 border-b border-border/50 rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary text-lg h-12"
                                             required
                                         />
@@ -253,8 +271,19 @@ export default function LoginPage() {
                                     <div className="flex justify-end">
                                         <span className="text-sm text-primary hover:underline cursor-pointer">Forgot password?</span>
                                     </div>
-                                    <Button type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md mt-4 shadow-[0_0_15px_rgba(184,151,126,0.3)] transition-all duration-300 font-medium tracking-wide">
-                                        Access Secure Portal
+                                    {patientError && (
+                                        <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                            <AlertCircle className="w-4 h-4 shrink-0" />
+                                            <span>{patientError}</span>
+                                        </div>
+                                    )}
+                                    <Button disabled={isPatientLoading} type="submit" className="w-full rounded-full h-14 bg-primary hover:bg-primary/90 text-primary-foreground text-md mt-4 shadow-[0_0_15px_rgba(184,151,126,0.3)] transition-all duration-300 font-medium tracking-wide">
+                                        {isPatientLoading ? (
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                                                Authenticating...
+                                            </span>
+                                        ) : "Access Secure Portal"}
                                     </Button>
 
                                     <div className="text-center mt-6">
@@ -267,10 +296,6 @@ export default function LoginPage() {
                                         </button>
                                     </div>
 
-                                    {/* Demo Note */}
-                                    <p className="text-xs text-center text-muted-foreground pt-4 opacity-50">
-                                        (Demo: Any email logs you into existing test patient).
-                                    </p>
                                 </form>
                             )}
                         </TabsContent>
@@ -318,9 +343,6 @@ export default function LoginPage() {
                                     {isStaffLoading ? "Authenticating..." : "Access Clinical Console"}
                                 </Button>
 
-                                <p className="text-xs text-center text-white/30 pt-2">
-                                    Dev credentials: admin@medfit.com / MedFit2026!
-                                </p>
                             </form>
                         </TabsContent>
                     </Tabs>

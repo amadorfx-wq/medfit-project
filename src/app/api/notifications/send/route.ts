@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { Resend } from "resend";
+import { requireAuth, STAFF_ROLES } from "@/lib/api-auth";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    const { error: authError } = await requireAuth(req, [...STAFF_ROLES]);
+    if (authError) return authError;
+
     try {
         const body = await req.json();
         const { patientId, patientName, type } = body;
@@ -16,27 +20,28 @@ export async function POST(req: Request) {
             );
         }
 
-        console.log(`[Notification Engine] Triggering rescue sequence for ${patientName} (${patientId})...`);
         const messageType = type || "ONBOARDING_RESCUE";
 
-        // Fetch patient email from DB to send the real email
+        // Fetch patient email from DB
         const { data: patientData, error: patientError } = await supabase
             .from('patients')
             .select('email')
             .eq('id', patientId)
             .single();
 
-        let targetEmail = patientData?.email;
-
-        // Fallback for demo if no email is found
-        if (!targetEmail || patientError) {
-            targetEmail = "demo@example.com";
+        if (!patientData?.email || patientError) {
+            return NextResponse.json(
+                { error: 'Patient has no email address on file. Cannot send notification.' },
+                { status: 400 }
+            );
         }
 
-        // 1. Send Real Email via Resend
+        const targetEmail = patientData.email;
+
+        // 1. Send email via Resend
         if (process.env.RESEND_API_KEY) {
             const { error: emailError } = await resend.emails.send({
-                from: 'MedFit Concierge <onboarding@medfitamerica.com>', // Requires verified domain in Resend
+                from: 'MedFit Concierge <onboarding@medfitamerica.com>',
                 to: [targetEmail],
                 subject: 'Action Required: Complete your MedFit Profile',
                 html: `
@@ -59,15 +64,15 @@ export async function POST(req: Request) {
             });
 
             if (emailError) {
-                console.error("[API] Resend failed to send email:", emailError);
+                console.error("[Notifications] Resend failed to send email:", emailError);
             }
         } else {
-            console.warn("[API] RESEND_API_KEY is missing. Email simulation only.");
+            console.warn("[Notifications] RESEND_API_KEY is missing. Email not sent.");
         }
 
-        // 2. Log the action in Supabase Audit Logs for compliance
+        // 2. Audit log
         const { error: auditError } = await supabase.from('audit_logs').insert({
-            id: `al_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: `al_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
             action: `SYSTEM_ALERT_${messageType}`,
             user_id: "system",
             user_name: "Auto-Recovery Engine",
@@ -77,7 +82,7 @@ export async function POST(req: Request) {
         });
 
         if (auditError) {
-            console.error("[API] Failed to save audit log for notification trigger:", auditError);
+            console.error("[Notifications] Failed to save audit log:", auditError);
         }
 
         return NextResponse.json({
@@ -86,11 +91,9 @@ export async function POST(req: Request) {
             timestamp: new Date().toISOString()
         });
 
-    } catch (error: any) {
-        console.error("[API] Error in /api/trigger-sms:", error);
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error.message },
-            { status: 500 }
-        );
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        console.error("[Notifications] Unhandled error:", message);
+        return NextResponse.json({ error: "Internal Server Error", details: message }, { status: 500 });
     }
 }

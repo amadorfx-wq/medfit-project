@@ -166,7 +166,7 @@ export default function AdminDashboardPage() {
                                         className="w-full bg-[#a10c22]/10 border-[#a10c22]/20 text-[#a10c22] hover:bg-[#a10c22] hover:text-black transition-colors"
                                         onClick={async () => {
                                             try {
-                                                const res = await fetch("/api/trigger-sms", {
+                                                const res = await fetch("/api/notifications/send", {
                                                     method: "POST",
                                                     headers: { "Content-Type": "application/json" },
                                                     body: JSON.stringify({
@@ -178,11 +178,12 @@ export default function AdminDashboardPage() {
 
                                                 if (res.ok) {
                                                     toast.success("Recovery sequence initiated", {
-                                                        description: `Automated SMS & Email sent to ${patient.name}.`
+                                                        description: `Automated email sent to ${patient.name}.`
                                                     });
                                                 } else {
-                                                    toast.error("Failed to sequence", {
-                                                        description: "The communication gateway is currently unavailable."
+                                                    const err = await res.json().catch(() => ({}));
+                                                    toast.error("Cannot send notification", {
+                                                        description: err.error || "The communication gateway is currently unavailable."
                                                     });
                                                 }
                                             } catch (error) {

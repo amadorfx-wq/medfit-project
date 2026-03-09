@@ -5,12 +5,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from "react";
-import { Patient } from "@/types/patient";
+import { Patient, PatientInsertDTO } from "@/types/patient";
 import { PatientService } from "@/services/patient.service";
 import { AuditService } from "@/services/audit.service";
 import { supabase, getTenantIdFromBrowser } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { Role } from "@/types/staff";
 import { toast } from "sonner";
+
 
 // Re-utilizamos la función del store temporalmente o la movemos a clinical
 export const getRequiredFormsForTreatment = (treatment: string): string[] => {
@@ -28,7 +30,7 @@ interface PatientsContextType {
     isPatientsLoading: boolean;
     updatePatient: (patientId: string, updates: Partial<Patient>) => Promise<void>;
     deletePatient: (patientId: string) => Promise<void>;
-    registerAndLogin: (name: string, email: string) => Promise<{ success: boolean; isNew?: boolean; id?: string } | undefined>;
+    registerAndLogin: (name: string, email: string, password: string) => Promise<{ success: boolean; isNew?: boolean; error?: string }>;
     refreshPatients: () => Promise<void>;
     // Navigation/Selection State
     selectedGlobalPatientId: string | null;
@@ -38,7 +40,7 @@ interface PatientsContextType {
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
 
 export function PatientsProvider({ children }: { children: ReactNode }) {
-    const { currentUser, loginAsDemoPatient } = useAuth();
+    const { currentUser } = useAuth();
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isPatientsLoading, setIsPatientsLoading] = useState(true);
     const [selectedGlobalPatientId, setSelectedGlobalPatientId] = useState<string | null>(null);
@@ -62,7 +64,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
         const patientsChannel = supabase
             .channel('patients-realtime')
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'patients' }, (payload) => {
-                const p = payload.new as any;
+                const p = payload.new as PatientInsertDTO;
                 setPatients(prev => prev.map(patient =>
                     patient.id === p.id ? {
                         ...patient,
@@ -75,7 +77,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
                 ));
             })
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'patients' }, (payload) => {
-                const p = payload.new as any;
+                const p = payload.new as PatientInsertDTO;
                 const newPatient: Patient = {
                     id: p.id, name: p.name, email: p.email, phone: p.phone,
                     address: p.address, dob: p.dob,
@@ -84,7 +86,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
                     approvalStatus: p.approval_status,
                     requiredForms: p.required_forms || [],
                     completedForms: p.completed_forms || [],
-                    createdAt: p.created_at,
+                    createdAt: p.created_at ?? new Date().toISOString(),
                     tenantId: p.tenant_id
                 };
                 setPatients(prev => {
@@ -114,7 +116,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
                 details: `Updated profile for patient ${patientId}`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
         } catch (error) {
             // Rollback could be implemented here
@@ -152,7 +154,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
                 details: `Permanently deleted patient record ${patientId}`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
         } catch (error: any) {
             console.error('[MedFit] Supabase deletePatient error:', error);
@@ -162,73 +164,39 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
                 details: `Supabase error deleting ${patientId}: ${error.message}`,
                 userId: currentUser?.id || "system",
                 userName: currentUser?.name || "System",
-                userRole: currentUser?.role || ("SUPERADMIN" as any)
+                userRole: currentUser?.role ?? ("SUPERADMIN" as Role)
             }, getTenantIdFromBrowser() || undefined);
         }
     }, [selectedGlobalPatientId, currentUser]);
 
-    const registerAndLogin = useCallback(async (name: string, email: string) => {
+    const registerAndLogin = useCallback(async (name: string, email: string, password: string) => {
         // [DEDUPLICATION LOCK] Check if email already exists
         const existingPatient = patients.find(p => p.email.toLowerCase() === email.toLowerCase());
-
         if (existingPatient) {
-            const userObj = { id: existingPatient.id, role: "PATIENT" as any, name: existingPatient.name };
-            loginAsDemoPatient(userObj.id, userObj.name);
-
-            AuditService.logEvent({
-                action: "PATIENT_LOGIN_REDIRECT",
-                category: "AUTH",
-                details: `Existing patient ${email} attempted to register but was logged in instead.`,
-                resourceType: "patient",
-                resourceId: existingPatient.id,
-                userId: existingPatient.id,
-                userName: userObj.name,
-                userRole: userObj.role
-            }, getTenantIdFromBrowser() || undefined);
-            return { success: true, isNew: false, id: existingPatient.id };
+            return { success: false, error: 'email_exists' as const };
         }
-
-        const activeTreatment = "Pending Evaluation";
-        const reqForms = getRequiredFormsForTreatment(activeTreatment);
-        const newPatient: Patient = {
-            id: `p${Date.now()}`,
-            name,
-            email,
-            activeTreatment,
-            formsStatus: "PENDING",
-            approvalStatus: "PENDING_FORMS",
-            requiredForms: reqForms,
-            completedForms: [],
-            createdAt: new Date().toISOString()
-        };
-
-        // Optimistic update
-        setPatients(prev => [newPatient, ...prev]);
 
         try {
-            await PatientService.createPatient(newPatient, getTenantIdFromBrowser() || undefined);
+            const res = await fetch('/api/auth/patient-register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password }),
+            });
 
-            const userObj = { id: newPatient.id, role: "PATIENT" as any, name: newPatient.name };
-            loginAsDemoPatient(userObj.id, userObj.name);
+            const result = await res.json();
 
-            AuditService.logEvent({
-                action: "PATIENT_REGISTERED",
-                category: "AUTH",
-                details: `New patient lead registered: ${email}`,
-                resourceType: "patient",
-                resourceId: newPatient.id,
-                userId: newPatient.id,
-                userName: userObj.name,
-                userRole: userObj.role
-            }, getTenantIdFromBrowser() || undefined);
+            if (!res.ok) {
+                toast.error(result.error || 'Error creating account. Please try again.');
+                return { success: false };
+            }
 
-            return { success: true, isNew: true, id: newPatient.id };
+            // Registration succeeded — session cookie is set by the API route
+            return { success: true, isNew: true };
         } catch (error) {
-            toast.error("Error creating account. Please try again.");
-            setPatients(prev => prev.filter(p => p.id !== newPatient.id));
+            toast.error('Error creating account. Please try again.');
             return { success: false };
         }
-    }, [patients, loginAsDemoPatient]);
+    }, [patients]);
 
     return (
         <PatientsContext.Provider value={{
