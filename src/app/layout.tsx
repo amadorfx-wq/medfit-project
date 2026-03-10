@@ -11,6 +11,7 @@ import { PatientsProvider } from "@/hooks/usePatients";
 import { Toaster } from "@/components/ui/sonner";
 import { GlobalCart } from "@/components/GlobalCart";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { getClinicConfig } from "@/config/clinic-config";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,68 +25,55 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
+// ── Clinic identity from environment — zero hardcoded branding ──────────────
+const clinic = getClinicConfig();
+
 export const metadata: Metadata = {
-  title: "Medfit | Atlanta Medical Weight Loss & Longevity Clinic",
-  description: "Reclaim your vitality with Atlanta's premier medical weight loss and longevity clinic. Board-certified physicians offering Semaglutide, Tirzepatide, TRT, and Peptides.",
+  title: `${clinic.name} | Medical Weight Loss & Longevity Clinic`,
+  description: clinic.tagline,
   openGraph: {
-    title: "Medfit | Atlanta Medical Weight Loss & Longevity",
-    description: "Reclaim your vitality with Atlanta's premier medical weight loss and longevity clinic.",
+    title: `${clinic.name} | Medical Weight Loss & Longevity`,
+    description: clinic.tagline,
     type: "website",
     locale: "en_US",
   },
 };
 
+// ── Schema.org structured data — all values from env vars ───────────────────
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "MedicalClinic",
-  "name": "Medfit",
-  "image": "https://medfitamerica.com/logo.png",
-  "@id": "https://medfitamerica.com",
-  "url": "https://medfitamerica.com",
-  "telephone": process.env.NEXT_PUBLIC_CLINIC_PHONE || "+1-404-555-0100",
+  "name": clinic.name,
+  "image": clinic.logoUrl,
+  "@id": clinic.siteUrl,
+  "url": clinic.siteUrl,
+  "telephone": clinic.phone,
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": process.env.NEXT_PUBLIC_CLINIC_ADDRESS || "123 Peachtree St NE",
-    "addressLocality": "Atlanta",
-    "addressRegion": "GA",
-    "postalCode": "30303",
-    "addressCountry": "US"
+    "streetAddress": clinic.address,
+    "addressLocality": clinic.city,
+    "addressRegion": clinic.state,
+    "postalCode": clinic.zip,
+    "addressCountry": clinic.country,
   },
   "geo": {
     "@type": "GeoCoordinates",
-    "latitude": 33.7490,
-    "longitude": -84.3880
+    "latitude": clinic.lat,
+    "longitude": clinic.lng,
   },
   "openingHoursSpecification": {
     "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday"
-    ],
-    "opens": "09:00",
-    "closes": "18:00"
-  }
+    "dayOfWeek": clinic.openDays,
+    "opens": clinic.opensAt,
+    "closes": clinic.closesAt,
+  },
 };
-
-import { cookies } from "next/headers";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-
-  // [SSR OPTIMIZATION] Predict user state to prevent hydration blinks on guarded layouts
-  let initialUser = null;
-  const hasSupabaseCookie = cookieStore.getAll().some((c: any) => c.name.includes('-auth-token'));
-  if (hasSupabaseCookie) {
-    initialUser = { id: "ssr-shell", role: "ADMIN", name: "Loading..." };
-  }
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

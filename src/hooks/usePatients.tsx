@@ -40,7 +40,7 @@ interface PatientsContextType {
 const PatientsContext = createContext<PatientsContextType | undefined>(undefined);
 
 export function PatientsProvider({ children }: { children: ReactNode }) {
-    const { currentUser } = useAuth();
+    const { currentUser, isAuthReady } = useAuth();
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isPatientsLoading, setIsPatientsLoading] = useState(true);
     const [selectedGlobalPatientId, setSelectedGlobalPatientId] = useState<string | null>(null);
@@ -58,6 +58,8 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
+        if (!isAuthReady) return;
+
         refreshPatients();
 
         // 2. Listen for patient record changes in real-time (approval_status, etc.)
@@ -102,7 +104,7 @@ export function PatientsProvider({ children }: { children: ReactNode }) {
         return () => {
             supabase.removeChannel(patientsChannel);
         };
-    }, [refreshPatients]);
+    }, [isAuthReady, refreshPatients]);
 
     const updatePatient = useCallback(async (patientId: string, updates: Partial<Patient>) => {
         // Optimistic UI update

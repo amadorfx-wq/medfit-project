@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { Role } from "@/types/staff";
 import { AuditService } from "@/services/audit.service";
@@ -17,6 +17,7 @@ interface AuthUser {
 interface AuthContextType {
     currentUser: AuthUser | null;
     isAuthLoading: boolean;
+    isAuthReady: boolean;
     loginWithCredentials: (email: string, password: string) => Promise<void>;
     loginAsPatient: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
@@ -26,13 +27,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ─── HELPER: Decode JWT payload without any library ─────────────────────────
-function decodeJwtPayload(token: string): Record<string, any> | null {
+// ─── HELPER: Decode and validate JWT payload ─────────────────────────────────
+// Validates expiration and required Supabase claims.
+// Note: HMAC-SHA256 signature verification requires the Supabase secret key
+// (not available client-side). Server-side auth guards use getUser() for that.
+function decodeAndValidateJwt(token: string): Record<string, unknown> | null {
     try {
         const parts = token.split('.');
         if (parts.length !== 3) return null;
-        const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(atob(payload));
+        const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+
+        // Reject expired tokens
+        if (payload.exp && payload.exp * 1000 < Date.now()) {
+            console.warn('[Auth] JWT expired — clearing session');
+            return null;
+        }
+
+        // Reject tokens missing required Supabase claims
+        if (!payload.sub || !payload.aud) return null;
+
+        return payload;
     } catch {
         return null;
     }
@@ -43,7 +57,6 @@ function readAuthCookie(): { access_token: string; refresh_token: string; user: 
     if (typeof document === 'undefined') return null;
 
     try {
-        // The cookie name follows Supabase convention: sb-{project-ref}-auth-token
         const cookies = document.cookie.split(';').map(c => c.trim());
 
         // Try single cookie first
@@ -83,6 +96,7 @@ function readAuthCookie(): { access_token: string; refresh_token: string; user: 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
+    const [isAuthReady, setIsAuthReady] = useState(false);
 
     useEffect(() => {
         let mounted = true;
@@ -95,20 +109,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const session = readAuthCookie();
 
                 if (session?.access_token && mounted) {
-                    // Decode the JWT to get user metadata
-                    const payload = decodeJwtPayload(session.access_token);
+                    // Decode and validate the JWT (expiration + required claims)
+                    const payload = decodeAndValidateJwt(session.access_token);
 
                     if (payload) {
-                        const userMeta = payload.user_metadata || {};
-                        const role = userMeta.role || 'ADMIN';
-                        const name = userMeta.name || payload.email || 'Staff';
-                        const tenantId = userMeta.tenant_id;
+                        const userMeta = (payload.user_metadata as Record<string, unknown>) || {};
+                        const role = (userMeta.role as string) || 'ADMIN';
+                        const name = (userMeta.name as string) || (payload.email as string) || 'Staff';
+                        const tenantId = userMeta.tenant_id as string | undefined;
 
                         // Get NDA status from staff table (this is a DATA query, not AUTH)
                         let ndaSignedAt: string | null = null;
                         if (role !== 'PATIENT') {
                             // Inject the session so the query passes RLS
-                            await supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token || '' });
+                            await supabase.auth.setSession({
+                                access_token: session.access_token,
+                                refresh_token: session.refresh_token || '',
+                            });
 
                             try {
                                 const { data: staffData } = await supabase
@@ -123,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         }
 
                         setCurrentUser({
-                            id: payload.sub,
+                            id: payload.sub as string,
                             role: role as Role,
                             name,
                             tenantId,
@@ -134,7 +151,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch (err) {
                 console.error("[Auth] Session init error:", err);
             } finally {
-                if (mounted) setIsAuthLoading(false);
+                if (mounted) {
+                    setIsAuthLoading(false);
+                    // Signal to data providers that auth token is injected.
+                    // They gate their initial Supabase queries on this flag.
+                    setIsAuthReady(true);
+                }
             }
         };
 
@@ -160,7 +182,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAuthLoading(true);
 
         try {
-            // Server-side authentication via our API route
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 10000);
 
@@ -227,14 +248,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = async () => {
         setIsAuthLoading(true);
         try {
-            // Clear all Supabase auth cookies (works for both staff and patients)
-            const cookies = document.cookie.split(';').map(c => c.trim());
-            for (const c of cookies) {
-                const name = c.split('=')[0];
-                if (name.startsWith('sb-') && name.includes('auth-token')) {
-                    document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`;
-                }
-            }
+            // Server-side logout: invalidates JWT globally on Supabase + clears cookies
+            await fetch('/api/auth/logout', { method: 'POST' });
             await supabase.auth.signOut({ scope: 'local' });
             setCurrentUser(null);
             window.location.href = '/login';
@@ -278,7 +293,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ currentUser, isAuthLoading, loginWithCredentials, loginAsPatient, logout, updateUser, signNDA }}>
+        <AuthContext.Provider value={{
+            currentUser,
+            isAuthLoading,
+            isAuthReady,
+            loginWithCredentials,
+            loginAsPatient,
+            logout,
+            updateUser,
+            signNDA,
+        }}>
             {children}
         </AuthContext.Provider>
     );

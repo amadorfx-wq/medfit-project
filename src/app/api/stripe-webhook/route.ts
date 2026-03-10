@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { getStripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import { apiResponse } from '@/core/api-response';
 
 const InvoiceSchema = z.object({
     customer: z.string().nullable().optional(),
@@ -155,7 +156,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ received: true });
     } catch (err: unknown) {
-        console.error('[MedFit] Webhook processing error:', err);
-        return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+        console.error('[Webhook] Processing error:', err);
+        return apiResponse.error(err);
     }
 }

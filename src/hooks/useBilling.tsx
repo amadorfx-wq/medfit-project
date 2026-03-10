@@ -20,7 +20,7 @@ interface BillingContextType {
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
 export function BillingProvider({ children }: { children: ReactNode }) {
-    const { currentUser } = useAuth();
+    const { currentUser, isAuthReady } = useAuth();
     const [charges, setCharges] = useState<Charge[]>([]);
     const [isLoadingCharges, setIsLoadingCharges] = useState(true);
 
@@ -37,11 +37,13 @@ export function BillingProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
+        if (!isAuthReady) return;
         refreshCharges();
-    }, [refreshCharges, currentUser?.id]);
+    }, [isAuthReady, refreshCharges, currentUser?.id]);
 
     // ── Supabase Realtime: auto-refresh charges when any INSERT/UPDATE happens ──
     useEffect(() => {
+        if (!isAuthReady) return;
         const channel = supabase.channel("charges_realtime")
             .on(
                 "postgres_changes",

@@ -1,5 +1,6 @@
 import { Charge } from "@/types/billing";
 import { supabase } from "@/lib/supabase";
+import { ServiceError } from "@/core/errors";
 
 /**
  * Enterprise Service Layer: Billing
@@ -17,8 +18,7 @@ export const BillingService = {
             .order('date', { ascending: false });
 
         if (error) {
-            console.error('[BillingService] getCharges error:', error.message);
-            throw error;
+            throw new ServiceError('BillingService', `getCharges failed: ${error.message}`, error);
         }
 
         return (data || []).map(c => ({
@@ -32,12 +32,13 @@ export const BillingService = {
     },
 
     /**
-     * Create a new charge
+     * Create a new charge.
+     * Uses crypto.randomUUID() — collision-safe under concurrent load.
      */
     async createCharge(chargeData: Omit<Charge, "id" | "date" | "status">, tenantId: string | null): Promise<Charge> {
         const newCharge: Charge = {
             ...chargeData,
-            id: `c${Date.now()}`,
+            id: crypto.randomUUID(),
             status: "PENDING",
             date: new Date().toISOString().split('T')[0],
         };
@@ -53,8 +54,7 @@ export const BillingService = {
         });
 
         if (error) {
-            console.error('[BillingService] createCharge error:', error.message);
-            throw error;
+            throw new ServiceError('BillingService', `createCharge failed: ${error.message}`, error);
         }
 
         return newCharge;
@@ -70,8 +70,7 @@ export const BillingService = {
             .eq('id', chargeId);
 
         if (error) {
-            console.error('[BillingService] markChargePAID error:', error.message);
-            throw error;
+            throw new ServiceError('BillingService', `markChargePAID failed: ${error.message}`, error);
         }
     }
 };

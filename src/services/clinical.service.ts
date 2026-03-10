@@ -2,6 +2,7 @@
 import { supabase } from '@/lib/supabase';
 import { Patient } from '@/types/patient';
 import { ConsentSignature, ConsentFormInsertDTO, ClinicalPatientUpdate } from '@/types/clinical';
+import type { ConsentFormData } from '@/core/types/clinical';
 
 /**
  * Capa de Servicios: ClinicalService
@@ -32,7 +33,7 @@ export class ClinicalService {
     static async saveConsentForm(
         patientId: string,
         formSlug: string,
-        formData: Record<string, any>,
+        formData: ConsentFormData,
         signature: ConsentSignature,
         tenantId?: string
     ): Promise<void> {

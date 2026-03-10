@@ -22,7 +22,7 @@ interface StaffContextType {
 const StaffContext = createContext<StaffContextType | undefined>(undefined);
 
 export function StaffProvider({ children }: { children: ReactNode }) {
-    const { currentUser } = useAuth();
+    const { currentUser, isAuthReady } = useAuth();
     const [staff, setStaff] = useState<Staff[]>([]);
     const [isStaffLoading, setIsStaffLoading] = useState(true);
 
@@ -39,8 +39,9 @@ export function StaffProvider({ children }: { children: ReactNode }) {
     }, []);
 
     useEffect(() => {
+        if (!isAuthReady) return;
         refreshStaff();
-    }, [refreshStaff]);
+    }, [isAuthReady, refreshStaff]);
 
     const addStaff = useCallback(async (staffObj: Omit<Staff, "id" | "lastActive" | "documents"> & { password?: string }) => {
         const { password, ...staffData } = staffObj;
