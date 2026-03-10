@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { BillingProvider } from "@/hooks/useBilling";
 import { StaffProvider } from "@/hooks/useStaff";
 import { CartProvider } from "@/hooks/useCart";
+import { PatientsProvider } from "@/hooks/usePatients";
 import { Toaster } from "@/components/ui/sonner";
 import { GlobalCart } from "@/components/GlobalCart";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -111,6 +112,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
+            <PatientsProvider>
               <StaffProvider>
                 <CartProvider>
                   <BillingProvider>
@@ -120,6 +122,7 @@ export default async function RootLayout({
                   </BillingProvider>
                 </CartProvider>
               </StaffProvider>
+            </PatientsProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
