@@ -80,14 +80,20 @@ export default function PatientsManagementPage() {
         const patientIdToDelete = activePatient.id;
         const patientNameToDelete = activePatient.name;
 
-        // Mock Stripe Deactivation
+        // Cancel Stripe subscriptions server-side before removing from DB
+        await fetch('/api/admin/cancel-patient-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ patientEmail: activePatient.email }),
+        }).catch(() => { /* non-fatal: patient may not have a Stripe subscription */ });
+
         logEvent('STRIPE_SUBSCRIPTION_CANCELLED', `Cancelled active billing subscriptions for ${patientIdToDelete} prior to deletion.`);
 
         // Close modals first to prevent UI referencing a deleted/null patient
         setIsDeleteModalOpen(false);
         setIsEditModalOpen(false);
 
-        // Optimistic UI cache burst 
+        // Optimistic UI cache burst
         setPatients(prev => prev.filter(p => p.id !== patientIdToDelete));
 
         // Now run the delete
@@ -395,13 +401,29 @@ export default function PatientsManagementPage() {
                                         {activePatient.completedForms.length > 0 && (
                                             <Button
                                                 className="bg-[#a10c22] text-primary-foreground hover:bg-[#a10c22]/90 h-11 px-6 font-medium shadow-[0_0_20px_rgba(184,151,126,0.15)]"
-                                                onClick={() => {
-                                                    const promise = new Promise((resolve) => setTimeout(resolve, 2000));
-                                                    toast.promise(promise, {
-                                                        loading: 'Compiling Encrypted Medical File...',
-                                                        success: 'Secure PDF Ready for Download.',
-                                                        error: 'Error Compiling Data.',
-                                                    });
+                                                onClick={async () => {
+                                                    const toastId = toast.loading('Compiling Medical Record...');
+                                                    try {
+                                                        const res = await fetch('/api/admin/medical-record', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ patientId: activePatient.id }),
+                                                        });
+                                                        if (!res.ok) throw new Error('Export failed');
+                                                        const blob = await res.blob();
+                                                        const url = window.URL.createObjectURL(blob);
+                                                        const a = document.createElement('a');
+                                                        a.href = url;
+                                                        a.download = `MedicalRecord_${activePatient.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+                                                        document.body.appendChild(a);
+                                                        a.click();
+                                                        setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 100);
+                                                        toast.dismiss(toastId);
+                                                        toast.success('Medical Record exported successfully.');
+                                                    } catch {
+                                                        toast.dismiss(toastId);
+                                                        toast.error('Failed to export medical record.');
+                                                    }
                                                 }}
                                             >
                                                 <Download className="w-4 h-4 mr-2" />

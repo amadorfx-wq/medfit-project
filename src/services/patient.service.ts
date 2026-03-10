@@ -28,20 +28,9 @@ export class PatientService {
 
             if (!data) return [];
 
-            // [Nivel Enterprise: Filtro Anti-Clones / Deduplicación por Email]
-            // Usamos un Map para garantizar unicidad algorítmica O(n).
-            const uniquePatientsMap = new Map<string, any>();
-            for (const row of data) {
-                const emailKey = row.email?.toLowerCase();
-                if (emailKey && !uniquePatientsMap.has(emailKey)) {
-                    uniquePatientsMap.set(emailKey, row);
-                }
-            }
-
-            const uniqueRows = Array.from(uniquePatientsMap.values());
-
-            // Transformar DB (snake_case) a Contrato de Dominio (camelCase)
-            return uniqueRows.map(row => ({
+            // Uniqueness is enforced at the DB level via UNIQUE(email) constraint.
+            // No client-side deduplication needed.
+            return data.map(row => ({
                 id: row.id,
                 name: row.name,
                 email: row.email,
